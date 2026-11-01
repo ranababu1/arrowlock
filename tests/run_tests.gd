@@ -38,6 +38,7 @@ func _initialize() -> void:
 	_test_design_components()
 	_test_settings_screen()
 	_test_level_select_design()
+	_test_arrow_shape()
 	print("Tests: %d passed, %d failed" % [_passed, _failed])
 	quit(1 if _failed > 0 else 0)
 
@@ -836,6 +837,27 @@ func _test_level_select_design() -> void:
 	tiles[3].pressed.emit()
 	_check(opened[0] == 3, "pressing a tile opens that level")
 	select.queue_free()
+
+
+func _test_arrow_shape() -> void:
+	var shape := BoardView._arrow_shape()
+	_check(shape.size() == 7 * (BoardView.ARROW_CORNER_STEPS + 1), "arrow outline has 7 rounded corners")
+	var min_x := 99.0
+	var max_x := -99.0
+	var max_y := 0.0
+	var sum_y := 0.0
+	for p in shape:
+		min_x = minf(min_x, p.x)
+		max_x = maxf(max_x, p.x)
+		max_y = maxf(max_y, absf(p.y))
+		sum_y += p.y
+	_check(max_x <= 0.35 and min_x >= -0.31 and max_y <= BoardView.ARROW_HEAD + 0.001, "arrow fits inside its cell with room to spare")
+	_check(absf(sum_y) < 0.001, "arrow outline is symmetric about its axis")
+	_check(max_x - min_x > 0.55, "arrow is longer than it is wide")
+	var tip_ok := false
+	for p in shape:
+		tip_ok = tip_ok or (p.x > 0.30 and absf(p.y) < 0.03)
+	_check(tip_ok, "the point of the arrow is on its axis")
 
 
 func _test_move_limit() -> void:

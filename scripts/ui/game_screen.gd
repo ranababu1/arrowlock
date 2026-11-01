@@ -315,7 +315,7 @@ func _load_level() -> void:
 	var world := Progress.world_of(level["id"])
 	_title.text = "%d  %s" % [level["id"], level["name"]]
 	_world_caption.text = "WORLD %d  %s" % [world + 1, Palette.world_name(world).to_upper()]
-	_world_caption.add_theme_color_override("font_color", Palette.world_color(world))
+	_world_caption.add_theme_color_override("font_color", Palette.world_color(world).lightened(0.4))
 	_hide_overlay()
 	_refresh()
 

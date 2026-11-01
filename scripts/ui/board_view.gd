@@ -17,6 +17,13 @@ const SHAKE_HZ := 18.0
 const HINT_PULSE_HZ := 2.0
 const SPARKS_PER_ARROW := 8
 const SPARK_SECONDS := 0.5
+const ARROW_SHAFT := 0.095  ## half-width of the shaft, in cells
+const ARROW_HEAD := 0.26  ## half-width of the head
+const ARROW_CORNER_STEPS := 5
+## Draw size relative to the cell; the shape's own bounds stay well inside 0.5.
+const ARROW_SCALE := 1.15
+## The silhouette spans x = -0.30 .. 0.34; this recentres it on the cell.
+const ARROW_CENTER_X := 0.02
 
 var _controller: GameController
 ## id -> {"info": Dictionary, "t": float}; arrows animating off the board.
@@ -29,6 +36,7 @@ var _hint_id: int = -1
 var _clock: float = 0.0
 var _rng := RandomNumberGenerator.new()
 var _tile_style := StyleBoxFlat.new()
+static var _shape_cache := PackedVector2Array()
 
 
 func _init() -> void:
@@ -177,22 +185,43 @@ func _draw_hint_frame(origin: Vector2, cell: float, pos: Vector2i) -> void:
 	draw_style_box(style, Rect2(origin + Vector2(pos) * cell, Vector2(cell, cell)).grow(-3.0))
 
 
-## Rounded arrow on a soft glow. Direction lives in the shape, not just the colour.
+## One flat, rounded silhouette. Direction lives in the shape, not just the colour.
 func _draw_arrow(origin: Vector2, cell: float, pos: Vector2i, dir: String, color: Color, alpha: float, shift_cells: float, offset: Vector2, scale: float) -> void:
 	var step := Vector2(BoardState.DIRECTIONS[dir])
 	var center := origin + (Vector2(pos) + Vector2(0.5, 0.5) + step * shift_cells) * cell + offset
 	var perp := Vector2(-step.y, step.x)
-	var unit := cell * scale
-	var width := maxf(4.0, unit * 0.15)
-	draw_circle(center, unit * 0.38, Color(color, 0.10 * alpha))
-	var col := Color(color, alpha)
-	var tail := center - step * unit * 0.28
-	var neck := center + step * unit * 0.04
-	draw_line(tail, neck, col, width, true)
-	draw_circle(tail, width * 0.5, col)
-	var tip := center + step * unit * 0.34
-	var back_a := center - step * unit * 0.02 + perp * unit * 0.2
-	var back_b := center - step * unit * 0.02 - perp * unit * 0.2
-	draw_colored_polygon(PackedVector2Array([tip, back_a, back_b]), col)
-	for corner in [tip, back_a, back_b]:
-		draw_circle(corner.lerp(center, 0.12), width * 0.28, col)
+	var unit := cell * scale * ARROW_SCALE
+	var points := PackedVector2Array()
+	for local in _arrow_shape():
+		points.append(center + step * (local.x - ARROW_CENTER_X) * unit + perp * local.y * unit)
+	var shadow := PackedVector2Array()
+	for p in points:
+		shadow.append(p + Vector2(0.0, unit * 0.035))
+	draw_colored_polygon(shadow, Color(0, 0, 0, 0.28 * alpha))
+	draw_colored_polygon(points, Color(color, alpha))
+
+
+## The arrow outline in local units (one cell = 1.0), pointing along +x, with
+## every corner rounded. Built once.
+static func _arrow_shape() -> PackedVector2Array:
+	if not _shape_cache.is_empty():
+		return _shape_cache
+	var corners := [
+		[Vector2(-0.30, -ARROW_SHAFT), 0.05], [Vector2(0.04, -ARROW_SHAFT), 0.02],
+		[Vector2(0.04, -ARROW_HEAD), 0.04], [Vector2(0.34, 0.0), 0.07],
+		[Vector2(0.04, ARROW_HEAD), 0.04], [Vector2(0.04, ARROW_SHAFT), 0.02],
+		[Vector2(-0.30, ARROW_SHAFT), 0.05],
+	]
+	var count := corners.size()
+	for i in count:
+		var corner: Vector2 = corners[i][0]
+		var radius: float = corners[i][1]
+		var to_prev: Vector2 = corners[(i + count - 1) % count][0] - corner
+		var to_next: Vector2 = corners[(i + 1) % count][0] - corner
+		var reach := minf(radius, minf(to_prev.length(), to_next.length()) * 0.5)
+		var start := corner + to_prev.normalized() * reach
+		var end := corner + to_next.normalized() * reach
+		for s in ARROW_CORNER_STEPS + 1:
+			var t := float(s) / ARROW_CORNER_STEPS
+			_shape_cache.append(start * (1.0 - t) * (1.0 - t) + corner * 2.0 * (1.0 - t) * t + end * t * t)
+	return _shape_cache

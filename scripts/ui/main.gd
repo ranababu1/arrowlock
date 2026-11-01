@@ -12,11 +12,13 @@ var _host: MarginContainer
 var _current: Control
 var _last_index := -1
 var _audio := AudioManager.new()
+var _backdrop: Backdrop
 
 
 func _ready() -> void:
 	theme = AppTheme.build()
-	add_child(Backdrop.new())
+	_backdrop = Backdrop.new()
+	add_child(_backdrop)
 	# Android back goes to the menu from a level instead of quitting the app.
 	get_tree().set_auto_accept_quit(false)
 	_save.load_data()
@@ -76,6 +78,9 @@ func _swap(screen: Control) -> void:
 		_host.remove_child(_current)
 		_current.queue_free()
 	_current = screen
+	# Decorative arrows would look like puzzle arrows behind the board, so they
+	# only drift on menu screens.
+	_backdrop.show_arrows = not (screen is GameScreen)
 	_host.add_child(screen)
 	screen.modulate.a = 0.0
 	screen.create_tween().tween_property(screen, "modulate:a", 1.0, FADE_SECONDS)
