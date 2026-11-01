@@ -36,6 +36,8 @@ var _moves: Label
 var _arrows: Label
 var _moves_bar: ProgressPill
 var _note: Label
+var _coach: PanelContainer
+var _coach_label: Label
 var _undo_button: ActionButton
 var _hint_button: ActionButton
 var _overlay: Control
@@ -58,6 +60,11 @@ func setup(levels: Array[Dictionary], index: int, progress: Progress, save: Save
 	_save = save
 	_build()
 	_load_level()
+
+
+## The tutorial tip currently on screen ("" when none).
+func coach_text() -> String:
+	return _coach_label.text if _coach.visible else ""
 
 
 func overlay_kind() -> String:
@@ -150,6 +157,23 @@ func _build() -> void:
 	_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_note.custom_minimum_size = Vector2(0, 20)
 	root.add_child(_note)
+
+	_coach = PanelContainer.new()
+	_coach.theme_type_variation = "Card"
+	_coach.visible = false
+	var coach_row := HBoxContainer.new()
+	coach_row.add_theme_constant_override("separation", 12)
+	_coach.add_child(coach_row)
+	var bulb := GlyphView.new("bulb", Palette.GOLD, 28)
+	bulb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	coach_row.add_child(bulb)
+	_coach_label = Label.new()
+	_coach_label.theme_type_variation = "Muted"
+	_coach_label.add_theme_color_override("font_color", Palette.TEXT)
+	_coach_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_coach_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	coach_row.add_child(_coach_label)
+	root.add_child(_coach)
 
 	var board_card := PanelContainer.new()
 	board_card.theme_type_variation = "Card"
@@ -337,7 +361,21 @@ func _refresh() -> void:
 	_undo_button.disabled = not controller.can_undo() or not _progress.can_afford(Economy.PRICE_UNDO)
 	_hint_button.disabled = controller.state != GameController.State.PLAYING \
 		or not _progress.can_afford(Economy.PRICE_HINT)
+	_update_coach()
 	board_view.queue_redraw()
+
+
+## Shows the first-levels tutorial tip and points at an arrow when it has one.
+func _update_coach() -> void:
+	var step := {}
+	if not controller.is_over():
+		step = Tutorial.step_for(_levels[_index]["id"], controller.board, controller.moves_used, _progress.tips_enabled)
+	_coach.visible = not step.is_empty()
+	if step.is_empty():
+		board_view.set_coach(-1, "")
+		return
+	_coach_label.text = step["text"]
+	board_view.set_coach(step["target"], step["kind"])
 
 
 func _hide_overlay() -> void:

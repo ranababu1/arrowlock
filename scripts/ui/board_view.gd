@@ -33,6 +33,8 @@ var _flashing: Dictionary = {}
 ## Each spark: [position, velocity, age, colour]. Decoration only.
 var _sparks: Array[Array] = []
 var _hint_id: int = -1
+var _coach_id: int = -1
+var _coach_kind := ""
 var _clock: float = 0.0
 var _rng := RandomNumberGenerator.new()
 var _tile_style := StyleBoxFlat.new()
@@ -59,6 +61,7 @@ func clear_animations() -> void:
 	_flashing.clear()
 	_sparks.clear()
 	_hint_id = -1
+	_coach_id = -1
 	queue_redraw()
 
 
@@ -71,6 +74,17 @@ func clear_hint() -> void:
 	if _hint_id != -1:
 		_hint_id = -1
 		queue_redraw()
+
+
+## Tutorial pointer: a pulsing outline, mint for "tap this", red for "blocked".
+func set_coach(id: int, kind: String) -> void:
+	_coach_id = id
+	_coach_kind = kind
+	queue_redraw()
+
+
+func coach_id() -> int:
+	return _coach_id
 
 
 func hint_id() -> int:
@@ -96,7 +110,7 @@ func _on_arrow_removed(id: int, info: Dictionary) -> void:
 
 
 func _process(delta: float) -> void:
-	if _exiting.is_empty() and _flashing.is_empty() and _sparks.is_empty() and _hint_id == -1:
+	if _exiting.is_empty() and _flashing.is_empty() and _sparks.is_empty() and _hint_id == -1 and _coach_id == -1:
 		return
 	_clock += delta
 	for id in _exiting.keys():
@@ -160,8 +174,10 @@ func _draw() -> void:
 			color = BLOCKED_COLOR
 			var strength: float = _flashing[id] / BLOCKED_FLASH_SECONDS
 			offset = Vector2(sin(_clock * SHAKE_HZ * TAU) * SHAKE_CELLS * cell * strength, 0.0)
+		if id == _coach_id:
+			_draw_frame(origin, cell, b.arrow_position(id), Palette.RED if _coach_kind == "blocked" else Palette.MINT, 2.0)
 		if id == _hint_id:
-			_draw_hint_frame(origin, cell, b.arrow_position(id))
+			_draw_frame(origin, cell, b.arrow_position(id), HINT_COLOR, HINT_PULSE_HZ)
 			color = HINT_COLOR
 		_draw_arrow(origin, cell, b.arrow_position(id), b.arrow_direction(id), color, 1.0, 0.0, offset, 1.0)
 	for id in _exiting.keys():
@@ -174,12 +190,12 @@ func _draw() -> void:
 		draw_circle(spark[0], maxf(1.5, cell * 0.05 * life), Color(spark[3], life))
 
 
-## A pulsing outline, so the hint is visible without relying on colour.
-func _draw_hint_frame(origin: Vector2, cell: float, pos: Vector2i) -> void:
-	var pulse := 0.6 + 0.4 * sin(_clock * HINT_PULSE_HZ * TAU)
+## A pulsing outline, so a pointer is visible without relying on colour.
+func _draw_frame(origin: Vector2, cell: float, pos: Vector2i, color: Color, pulse_hz: float) -> void:
+	var pulse := 0.6 + 0.4 * sin(_clock * pulse_hz * TAU)
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(HINT_COLOR, 0.14 * pulse)
-	style.border_color = Color(HINT_COLOR, pulse)
+	style.bg_color = Color(color, 0.14 * pulse)
+	style.border_color = Color(color, pulse)
 	style.set_border_width_all(3)
 	style.set_corner_radius_all(roundi(cell * 0.2))
 	draw_style_box(style, Rect2(origin + Vector2(pos) * cell, Vector2(cell, cell)).grow(-3.0))

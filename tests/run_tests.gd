@@ -40,6 +40,8 @@ func _initialize() -> void:
 	_test_level_select_design()
 	_test_arrow_shape()
 	_test_tutorial_steps()
+	_test_coach_ui()
+	_test_tips_setting_toggle()
 	print("Tests: %d passed, %d failed" % [_passed, _failed])
 	quit(1 if _failed > 0 else 0)
 
@@ -897,6 +899,76 @@ func _test_tutorial_steps() -> void:
 	_check(progress.tips_enabled, "replaying level 3 does not switch re-enabled tips off again")
 	_check(Progress.from_dict(progress.to_dict()).tips_enabled and not Progress.from_dict({"tips_enabled": false}).tips_enabled, "the tips setting is saved and loaded")
 	_check(Progress.from_dict({}).tips_enabled, "tips default to on in old saves")
+
+
+func _test_coach_ui() -> void:
+	var repo := _pack_repo()
+	var save := SaveService.new("user://test_coach_save.json")
+	var progress := Progress.new()
+	var screen := GameScreen.new()
+	root.add_child(screen)
+	screen.setup(repo.levels, 0, progress, save)
+	var board: BoardState = repo.levels[0]["board"]
+	_check(screen.coach_text() == Tutorial.TEXT_TAP and screen.board_view.coach_id() == 2, "level 1 opens with a tip and a pointer on the free arrow")
+	screen.tap_cell(board.arrow_position(2))
+	_check(screen.coach_text() == Tutorial.TEXT_BLOCKED and screen.board_view.coach_id() == 1, "after the first tap it explains the blocked arrow")
+	screen.tap_cell(board.arrow_position(0))
+	_check(screen.coach_text() == Tutorial.TEXT_REST and screen.board_view.coach_id() == -1, "once the blocker is gone it encourages")
+	screen.tap_cell(board.arrow_position(1))
+	_check(screen.overlay_kind() == "won" and screen.coach_text() == "" and screen.board_view.coach_id() == -1, "the tip disappears when the level is won")
+	screen.queue_free()
+
+	var second := GameScreen.new()
+	root.add_child(second)
+	second.setup(repo.levels, 1, progress, save)
+	_check(second.coach_text() == Tutorial.TEXT_MOVES and second.board_view.coach_id() == -1, "level 2 explains moves with no pointer")
+	second.queue_free()
+
+	var later := GameScreen.new()
+	root.add_child(later)
+	later.setup(repo.levels, 3, progress, save)
+	_check(later.coach_text() == "", "no tip after level 3")
+	later.queue_free()
+
+	var off := Progress.new()
+	off.tips_enabled = false
+	var quiet := GameScreen.new()
+	root.add_child(quiet)
+	quiet.setup(repo.levels, 0, off, save)
+	_check(quiet.coach_text() == "" and quiet.board_view.coach_id() == -1, "nothing is shown when tips are off")
+	quiet.queue_free()
+
+	var finishing := Progress.new()
+	var third := GameScreen.new()
+	root.add_child(third)
+	third.setup(repo.levels, 2, finishing, save)
+	var third_board: BoardState = repo.levels[2]["board"]
+	for id in PuzzleSolver.solve(third_board):
+		third.tap_cell(third_board.arrow_position(id))
+	_check(third.overlay_kind() == "won" and not finishing.tips_enabled, "clearing level 3 turns the tips off")
+	third.queue_free()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_coach_save.json"))
+
+
+func _test_tips_setting_toggle() -> void:
+	var path := "user://test_tips_save.json"
+	var save := SaveService.new(path)
+	var audio := AudioManager.new()
+	root.add_child(audio)
+	var screen := SettingsScreen.new()
+	root.add_child(screen)
+	screen.setup(save.progress, save, audio)
+	_check(screen.tips_toggle.on, "tips toggle starts on")
+	_click(screen.tips_toggle)
+	_check(not save.progress.tips_enabled, "switching tips off updates the setting")
+	var reloaded := SaveService.new(path)
+	reloaded.load_data()
+	_check(not reloaded.progress.tips_enabled, "the tips setting is saved")
+	_click(screen.tips_toggle)
+	_check(save.progress.tips_enabled, "switching tips back on works")
+	screen.queue_free()
+	audio.queue_free()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 
 
 func _test_move_limit() -> void:

@@ -8,6 +8,7 @@ const VERSION_SETTING := "application/config/version"
 
 var music_toggle: ToggleSwitch
 var sfx_toggle: ToggleSwitch
+var tips_toggle: ToggleSwitch
 
 var _progress: Progress
 var _save: SaveService
@@ -48,6 +49,8 @@ func _build() -> void:
 	music_toggle = _row(rows, "note", Palette.CYAN, "Music", "Calm background loop", _progress.music_enabled, _on_music_toggled)
 	rows.add_child(HSeparator.new())
 	sfx_toggle = _row(rows, "speaker", Palette.MINT, "Sound effects", "Taps, hints and rewards", _progress.sound_enabled, _on_sfx_toggled)
+	rows.add_child(HSeparator.new())
+	tips_toggle = _row(rows, "bulb", Palette.GOLD, "Tutorial tips", "Short pointers on the first levels", _progress.tips_enabled, _on_tips_toggled)
 
 	var about := PanelContainer.new()
 	about.theme_type_variation = "Card"
@@ -112,6 +115,11 @@ func _on_sfx_toggled(on: bool) -> void:
 	_apply_and_save()
 	if on:
 		_audio.play("tap_clear")  # a short sample so the player hears it is on
+
+
+func _on_tips_toggled(on: bool) -> void:
+	_progress.tips_enabled = on
+	_save.save_data()
 
 
 func _apply_and_save() -> void:
