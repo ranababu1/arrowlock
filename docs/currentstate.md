@@ -39,4 +39,4 @@ Verified 2026-11-01: `godot_console --headless --path . -s tests/run_tests.gd` -
 3. Android check on a physical device (M0); test pause/resume and save persistence.
 
 ## Decisions needing owner approval
-- 500-level proposal in `docs/level-plan-500.md` (departure from `plan.md`; Track B mechanics also need approval). Nothing from it is implemented.
+- Release 1 scope is `docs/level-plan-100.md` (100 levels, move limits, rewards, leaderboard). Open questions are in its section 11; the online leaderboard needs explicit approval. `docs/level-plan-500.md` is deferred. Nothing from these plans is implemented; the running build has unlimited moves and 4 levels.

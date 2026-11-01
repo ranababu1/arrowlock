@@ -2,6 +2,12 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-01 — Release 1 scope: 100 levels, move limits, rewards (docs only)
+
+- Owner decisions (from chat): first release is 100 levels; layouts may be reused under a new name; every tap on an arrow is a move; a blocked tap wastes a move; limited moves cause game over; plan rewards and a leaderboard.
+- Added `docs/level-plan-100.md` (rules, 10-world curve, reuse policy, rewards, save v2, leaderboard, milestones R1 to R8). It supersedes the scope of `level-plan-500.md`, which is now deferred.
+- Departs from `plan.md` (no punishment for blocked taps in the MVP; no online leaderboard). `plan.md` unchanged. No code changes; the current build still has unlimited moves.
+
 ## 2026-11-01 — 500-level proposal (docs only)
 
 - Added `docs/level-plan-500.md`: proposal for 500 levels in 10 worlds, seeded offline generator with solver validation, and a two-track structure. Key finding: under the MVP rules every solvable board takes exactly N moves for N arrows, so efficiency medals and "suboptimal move" difficulty from `plan.md` do not apply to the core rule.
