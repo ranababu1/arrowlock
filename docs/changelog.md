@@ -2,6 +2,30 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-01 — R4: interface (level select, game screen, panels, helpers)
+
+### Added
+- `LevelSelect`: all 10 worlds with per-level stars (drawn shapes, `StarRow`), locked worlds greyed with the unlock rule, total stars and coins, opens scrolled to the player's current level. Buttons swallow touches, so drag-to-scroll is handled explicitly and a drag's closing tap is ignored.
+- `GameScreen`: Menu button, coins, moves left and arrows left, board, Undo / Hint / Restart with prices, win panel (stars, moves and wasted taps, coins earned, world bonus, new badges, Next / Replay / Menu) and game-over panel (Retry, +3 moves for 50 coins once per attempt, Menu). A full-screen dimmer blocks board taps behind a panel.
+- `BoardView`: hint highlight (green plus a pulsing outline, so not colour-only) and a shake on blocked arrows in addition to the red flash.
+- `main.gd` is now a router: loads `data/packs/` (the draft 100 levels), applies safe-area margins, and maps Android back to "menu from a level, quit from the menu". `AppTheme` gives buttons and panels visible edges. `icon.svg` set as the project icon (the export no longer warns about a missing icon).
+- `data/levels.json` (the original 4 levels) is no longer loaded by the game; it is still used by tests.
+
+### Verification
+- `godot_console --headless --path . -s tests/run_tests.gd`: 205 passed, 0 failed. New UI smoke tests build the real screens headless: level select counts and locking, drag scrolling and tap suppression, focus scrolling; game screen win, game over, extra moves once, hint and undo coin rules, Next at a locked world and at the end of the pack, blocked-tap flash state.
+- Emulator (Pixel_10a, 1080x2424), debug APK:
+  - Level select renders all 10 worlds, locked worlds greyed; a save injected with levels 1-90 cleared showed 270/300 stars, 500 coins, worlds unlocked, and the menu opened at World 10.
+  - Level 1: Hint spent 30 coins and highlighted the clear arrow; 1 wasted tap then a clean finish gave 2 stars, +20 coins, "First clear" badge, 90 coins total.
+  - Six blocked taps gave the game-over panel ("3 arrows left, 6 wasted taps") with all three buttons readable.
+  - Level 100 (8x10, 34 arrows, 40 moves) renders with about 126 px cells.
+  - Swipes did not scroll the list before the drag fix and do after it.
+- Not verified on device: the red flash and shake on a blocked tap (the screenshot after `adb input tap` arrives after the 0.35 s effect ends; the earlier R1 build did capture the red flash; the state is covered by a test), safe-area margins on a device with a cutout (the emulator has none), Android back button, Hint/Undo rejection messages, extra-moves flow on device, startup time (about 10 s on this emulator; not profiled).
+- adb on the emulator went offline repeatedly; several runs were discarded. One screenshot came from an unrelated old file on the emulator and was not used.
+
+### Known gaps
+- No tutorial or first-run explanation yet; level 1 teaches nothing about blocked taps. No sound or haptics. Settings screen does not exist (`sound_enabled` is saved but unused). No badge screen (badges appear only on the win panel).
+- The pack is a draft: no owner review. Level 100 looks easy for a final level (17 of 34 arrows are free at the start).
+
 ## 2026-11-01 — R3: level generator, validator, reuse tooling, draft 100-level pack
 
 ### Added

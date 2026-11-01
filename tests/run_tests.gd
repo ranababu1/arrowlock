@@ -31,6 +31,8 @@ func _initialize() -> void:
 	_test_validator()
 	_test_generated_pack_files()
 	_test_generation_is_deterministic()
+	await _test_level_select_ui()
+	_test_game_screen_ui()
 	print("Tests: %d passed, %d failed" % [_passed, _failed])
 	quit(1 if _failed > 0 else 0)
 
@@ -483,6 +485,173 @@ func _test_generation_is_deterministic() -> void:
 	var first := JSON.stringify(LevelGenerator.generate_pack(config)["levels"])
 	var second := JSON.stringify(LevelGenerator.generate_pack(config)["levels"])
 	_check(first == second, "generating a pack twice gives identical levels")
+
+
+func _pack_repo() -> PuzzleRepository:
+	var repo := PuzzleRepository.new()
+	var ok := repo.load_dir("res://data/packs")
+	_check(ok, "pack loads for UI tests: " + "; ".join(repo.errors))
+	return repo
+
+
+func _blocked_cell(c: GameController) -> Vector2i:
+	for id in c.board.arrow_ids():
+		if MoveValidator.first_blocker(c.board, id) != -1:
+			return c.board.arrow_position(id)
+	return Vector2i(-1, -1)
+
+
+func _test_level_select_ui() -> void:
+	var repo := _pack_repo()
+	var progress := Progress.new()
+	var select := LevelSelect.new()
+	root.add_child(select)
+	select.setup(repo, progress)
+	_check(select.level_button_count() == 100, "level select lists all 100 levels")
+	_check(select.enabled_level_count() == 10, "only world 1 is playable at the start")
+	var chosen := [-1]
+	select.level_chosen.connect(func(i: int) -> void: chosen[0] = i)
+	select.press_level(3)
+	_check(chosen[0] == 3, "pressing an unlocked level selects it")
+	select.press_level(15)
+	_check(chosen[0] == 3, "pressing a locked level does nothing")
+
+	# Dragging scrolls the list and swallows the tap at the end of the drag.
+	await process_frame
+	await process_frame
+	var press := InputEventMouseButton.new()
+	press.button_index = MOUSE_BUTTON_LEFT
+	press.pressed = true
+	press.position = Vector2(100, 600)
+	select._input(press)
+	var move := InputEventMouseMotion.new()
+	move.position = Vector2(100, 400)
+	move.relative = Vector2(0, -200)
+	move.button_mask = MOUSE_BUTTON_MASK_LEFT
+	select._input(move)
+	_check(select.is_dragging() and select.scroll_position() > 0, "dragging up scrolls the level list")
+	var release := InputEventMouseButton.new()
+	release.button_index = MOUSE_BUTTON_LEFT
+	release.pressed = false
+	release.position = Vector2(100, 400)
+	select._input(release)
+	chosen[0] = -1
+	select.press_level(0)
+	_check(chosen[0] == 0, "press_level still works as a direct call")
+	var small := InputEventMouseMotion.new()
+	small.position = Vector2(100, 605)
+	small.relative = Vector2(0, 5)
+	small.button_mask = MOUSE_BUTTON_MASK_LEFT
+	select._input(press)
+	select._input(small)
+	_check(not select.is_dragging(), "a tiny movement is a tap, not a drag")
+	select._input(release)
+	select.queue_free()
+
+	# The menu opens scrolled to the focus level.
+	var open_progress := Progress.new()
+	for id in range(1, 9):
+		open_progress.record_result(id, 3, 6, 3, 0)
+	var focused := LevelSelect.new()
+	root.add_child(focused)
+	focused.setup(repo, open_progress, 15)
+	await process_frame
+	await process_frame
+	await process_frame
+	_check(focused.scroll_position() > 0, "menu scrolls to the focus level")
+	focused.queue_free()
+
+	for id in range(1, 9):
+		progress.record_result(id, 3, 6, 3, 0)
+	var later := LevelSelect.new()
+	root.add_child(later)
+	later.setup(repo, progress)
+	_check(later.enabled_level_count() == 20, "clearing 8 levels opens world 2")
+	later.queue_free()
+
+
+func _test_game_screen_ui() -> void:
+	var repo := _pack_repo()
+	var save := SaveService.new("user://test_ui_save.json")
+	var progress := Progress.new()
+	var screen := GameScreen.new()
+	root.add_child(screen)
+	screen.setup(repo.levels, 0, progress, save)
+	var ctl := screen.controller
+	_check(ctl.state == GameController.State.PLAYING and screen.overlay_kind() == "", "level starts playing with no panel")
+
+	# Win by replaying the reference solution.
+	var board: BoardState = repo.levels[0]["board"]
+	for id in PuzzleSolver.solve(board):
+		screen.tap_cell(board.arrow_position(id))
+	_check(screen.overlay_kind() == "won" and progress.is_cleared(1), "winning shows the win panel and records progress")
+	_check(progress.stars_of(1) == 3 and progress.coins == Economy.START_COINS + 25, "a clean win pays 3 stars and 25 coins")
+	var used := ctl.moves_used
+	screen.tap_cell(board.arrow_position(0))
+	_check(ctl.moves_used == used, "taps are ignored while the win panel is up")
+	var nexts := [-2]
+	screen.next_requested.connect(func(i: int) -> void: nexts[0] = i)
+	screen.press_next()
+	_check(nexts[0] == 1, "Next goes to the following level")
+	screen.restart()
+	_check(screen.overlay_kind() == "" and ctl.moves_used == 0, "Replay resets the level")
+
+	# Lose, then continue once with extra moves.
+	var blocked := _blocked_cell(ctl)
+	screen.tap_cell(blocked)
+	_check(screen.board_view.is_flashing(ctl.board.arrow_at(blocked)), "a blocked tap starts the flash and shake on that arrow")
+	for _i in ctl.moves_limit - 1:
+		screen.tap_cell(blocked)
+	_check(screen.overlay_kind() == "lost" and ctl.state == GameController.State.LOST, "running out of moves shows the game-over panel")
+	var coins := progress.coins
+	screen.use_extra_moves()
+	_check(progress.coins == coins - Economy.PRICE_EXTRA_MOVES and screen.overlay_kind() == "", "extra moves cost coins and close the panel")
+	_check(ctl.state == GameController.State.PLAYING and ctl.moves_left() == Economy.EXTRA_MOVES, "extra moves are added to the budget")
+	for _i in Economy.EXTRA_MOVES:
+		screen.tap_cell(blocked)
+	var after_second_loss := progress.coins
+	screen.use_extra_moves()
+	_check(screen.overlay_kind() == "lost" and progress.coins == after_second_loss, "extra moves can be used only once per attempt")
+	screen.queue_free()
+
+	# Hint and undo cost coins and respect the wallet.
+	var poor := Progress.new()
+	var screen2 := GameScreen.new()
+	root.add_child(screen2)
+	screen2.setup(repo.levels, 0, poor, save)
+	var free_id := screen2.controller.hint()
+	screen2.use_hint()
+	_check(poor.coins == Economy.START_COINS - Economy.PRICE_HINT and screen2.board_view.hint_id() == free_id, "hint costs coins and highlights a clear arrow")
+	screen2.tap_cell(screen2.controller.board.arrow_position(free_id))
+	_check(screen2.board_view.hint_id() == -1 and screen2.controller.moves_used == 1, "tapping clears the hint highlight and spends a move")
+	poor.coins = 10
+	screen2.use_undo()
+	_check(poor.coins == 10 and screen2.controller.board.remaining_count() == 2, "undo without enough coins does nothing")
+	poor.coins = 100
+	screen2.use_undo()
+	_check(poor.coins == 80 and screen2.controller.board.remaining_count() == 3, "undo costs coins and restores the arrow")
+	poor.coins = 5
+	screen2.use_hint()
+	_check(poor.coins == 5 and screen2.board_view.hint_id() == -1, "hint without enough coins does nothing")
+	screen2.queue_free()
+
+	# Next at the edge of a locked world or the end of the pack returns to the menu.
+	for index in [9, 99]:
+		var fresh := Progress.new()
+		var edge := GameScreen.new()
+		root.add_child(edge)
+		edge.setup(repo.levels, index, fresh, save)
+		var menu_calls := [0]
+		var next_calls := [0]
+		edge.menu_requested.connect(func() -> void: menu_calls[0] += 1)
+		edge.next_requested.connect(func(_i: int) -> void: next_calls[0] += 1)
+		var edge_board: BoardState = repo.levels[index]["board"]
+		for id in PuzzleSolver.solve(edge_board):
+			edge.tap_cell(edge_board.arrow_position(id))
+		edge.press_next()
+		_check(edge.overlay_kind() == "won" and menu_calls[0] == 1 and next_calls[0] == 0, "Next returns to the menu when nothing is unlocked after level %d" % repo.levels[index]["id"])
+		edge.queue_free()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_ui_save.json"))
 
 
 func _test_move_limit() -> void:
