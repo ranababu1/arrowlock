@@ -31,6 +31,8 @@ func _initialize() -> void:
 	_test_validator()
 	_test_generated_pack_files()
 	_test_generation_is_deterministic()
+	_test_hard_pack()
+	_test_chain_generation()
 	await _test_level_select_ui()
 	_test_audio_manager()
 	_test_game_screen_sounds()
@@ -492,6 +494,47 @@ func _test_generated_pack_files() -> void:
 	_check(rising, "average arrow count rises every world")
 	var empty := PuzzleRepository.new()
 	_check(not empty.load_dir("res://data/no_such_dir") and not empty.errors.is_empty(), "missing pack folder is an error")
+
+
+func _test_hard_pack() -> void:
+	var repo := PuzzleRepository.new()
+	_check(repo.load_dir("res://data/packs_hard"), "Difficult pack loads: " + "; ".join(repo.errors))
+	_check(repo.levels.size() == 100, "Difficult pack has 100 levels")
+	_check(LevelValidator.validate_pack(repo.levels, {"expected_count": 100}).is_empty(), "Difficult pack passes the content validator")
+	var shifted := PuzzleRepository.new()
+	_check(shifted.load_dir("res://data/packs_hard", Difficulty.HARD_ID_BASE), "Difficult pack loads with an id offset")
+	_check(shifted.levels[0]["id"] == 1001 and shifted.levels[99]["id"] == 1100, "ids are offset into the Difficult range")
+	var easy := PuzzleRepository.new()
+	easy.load_dir("res://data/packs")
+	var spare_ok := true
+	var bigger := true
+	for i in 100:
+		var level: Dictionary = repo.levels[i]
+		var count: int = level["board"].remaining_count()
+		spare_ok = spare_ok and level["moves_limit"] - count <= 2
+		bigger = bigger and count > easy.levels[i]["board"].remaining_count()
+	_check(spare_ok, "Difficult levels leave at most two spare moves")
+	_check(bigger, "every Difficult level has more arrows than its Easy counterpart")
+	var tough := Array(repo.levels).filter(func(l: Dictionary) -> bool: return LevelMetrics.compute(l["board"])["depth"] >= 7)
+	_check(tough.size() == 100, "every Difficult level has a dependency chain at least 7 deep")
+
+
+func _test_chain_generation() -> void:
+	var plain_depth := 0
+	var chained_depth := 0
+	for k in 12:
+		var rng := RandomNumberGenerator.new()
+		rng.seed = 900 + k
+		var plain := LevelGenerator.generate_board(7, 9, 26, 0.9, rng)
+		rng.seed = 900 + k
+		var chained := LevelGenerator.generate_board(7, 9, 26, 0.9, rng, 0.9)
+		if plain == null or chained == null:
+			continue
+		_check(PuzzleSolver.solve(chained).size() == 26 and PuzzleSolver.topo_solvable(chained), "a chained board is solvable")
+		plain_depth += LevelMetrics.compute(plain)["depth"]
+		chained_depth += LevelMetrics.compute(chained)["depth"]
+	_check(chained_depth > plain_depth, "chaining builds deeper dependency chains")
+	_check(LevelGenerator.moves_limit_for(20, 0.0, 1) == 21 and LevelGenerator.moves_limit_for(20, 0.0) == 22, "min_slack sets the spare moves")
 
 
 func _test_generation_is_deterministic() -> void:

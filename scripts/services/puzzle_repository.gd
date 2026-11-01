@@ -20,8 +20,9 @@ func load_file(path: String) -> bool:
 
 
 ## Loads every *.json file in `dir_path` (sorted by name) into one level list.
-## Duplicate level ids across files are reported as errors.
-func load_dir(dir_path: String) -> bool:
+## Duplicate level ids across files are reported as errors. `id_offset` is
+## added to every level id (and variant_of), for packs that share a save.
+func load_dir(dir_path: String, id_offset: int = 0) -> bool:
 	levels.clear()
 	errors.clear()
 	var files := DirAccess.get_files_at(dir_path)
@@ -43,6 +44,9 @@ func load_dir(dir_path: String) -> bool:
 				errors.append("%s: duplicate level id %d" % [file_name, level["id"]])
 				continue
 			seen[level["id"]] = true
+			level["id"] += id_offset
+			if level["variant_of"] >= 0:
+				level["variant_of"] += id_offset
 			merged.append(level)
 	levels = merged
 	return errors.is_empty()

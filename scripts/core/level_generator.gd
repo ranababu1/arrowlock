@@ -11,6 +11,8 @@ extends RefCounted
 const GENERATOR_VERSION := 1
 const LEVELS_PER_WORLD := 10
 const MAX_FILL := 0.55  ## arrows never occupy more than this share of the cells
+const DEFAULT_MIN_SLACK := 2  ## spare moves every level gets unless its spec says otherwise
+const DEFAULT_DEPTH_RATIO := 0.3
 const NAME_ADJECTIVES: Array[String] = [
 	"Amber", "Quiet", "Crimson", "Gentle", "Hidden", "Iron", "Lunar", "Misty", "Narrow", "Open",
 	"Pale", "Rapid", "Silver", "Tidy", "Upper", "Velvet", "Winding", "Young", "Zesty", "Bright",
@@ -22,14 +24,19 @@ const NAME_NOUNS: Array[String] = [
 
 
 ## Returns a board whose arrow IDs double as the reference removal order, or
-## null when the board fills up before `count` arrows fit.
-static func generate_board(width: int, height: int, count: int, bias: float, rng: RandomNumberGenerator) -> BoardState:
+## null when the board fills up before `count` arrows fit. `chain` (0..1) is
+## the chance that a new arrow is placed on the ray of the arrow placed just
+## before it, which builds long "A waits for B waits for C" chains.
+static func generate_board(width: int, height: int, count: int, bias: float, rng: RandomNumberGenerator, chain: float = 0.0) -> BoardState:
 	var board := BoardState.new(width, height)
 	## cell -> number of placed arrows whose ray crosses it
 	var cover: Dictionary = {}
+	## cells on the ray of the arrow placed last
+	var last_ray: Dictionary = {}
 	for placed in count:
 		var all: Array[Array] = []
 		var shadowing: Array[Array] = []
+		var chained: Array[Array] = []
 		for y in height:
 			for x in width:
 				var pos := Vector2i(x, y)
@@ -40,15 +47,21 @@ static func generate_board(width: int, height: int, count: int, bias: float, rng
 						all.append([pos, dir])
 						if cover.get(pos, 0) > 0:
 							shadowing.append([pos, dir])
+						if last_ray.has(pos):
+							chained.append([pos, dir])
 		if all.is_empty():
 			return null
 		var pool := shadowing if (not shadowing.is_empty() and rng.randf() < bias) else all
+		if chain > 0.0 and not chained.is_empty() and rng.randf() < chain:
+			pool = chained
 		var pick: Array = pool[rng.randi_range(0, pool.size() - 1)]
 		board.add_arrow(count - 1 - placed, pick[0], pick[1])
+		last_ray.clear()
 		var step: Vector2i = BoardState.DIRECTIONS[pick[1]]
 		var cell: Vector2i = pick[0] + step
 		while board.in_bounds(cell):
 			cover[cell] = cover.get(cell, 0) + 1
+			last_ray[cell] = true
 			cell += step
 	return board
 
@@ -77,12 +90,12 @@ static func slot_params(spec: Dictionary, index: int) -> Dictionary:
 		"width": width,
 		"height": height,
 		"arrows": count,
-		"moves_limit": moves_limit_for(count, float(spec["slack"])),
+		"moves_limit": moves_limit_for(count, float(spec["slack"]), int(spec.get("min_slack", DEFAULT_MIN_SLACK))),
 	}
 
 
-static func moves_limit_for(arrow_count: int, slack: float) -> int:
-	return maxi(arrow_count + 2, ceili(arrow_count * (1.0 + slack)))
+static func moves_limit_for(arrow_count: int, slack: float, min_slack: int = DEFAULT_MIN_SLACK) -> int:
+	return maxi(arrow_count + min_slack, ceili(arrow_count * (1.0 + slack)))
 
 
 static func level_name(level_id: int) -> String:
@@ -104,21 +117,24 @@ static func board_to_arrows(board: BoardState) -> Array[Dictionary]:
 static func generate_level(spec: Dictionary, world: int, index: int, level_id: int, master_seed: int, candidates: int, used_canon: Dictionary) -> Dictionary:
 	var params := slot_params(spec, index)
 	var count: int = params["arrows"]
-	var target_depth := mini(count - 1, roundi(count * 0.3 + world * 0.5))
+	var depth_ratio := float(spec.get("depth_ratio", DEFAULT_DEPTH_RATIO))
+	var target_depth := mini(count - 1, roundi(count * depth_ratio + world * 0.5))
+	## Optional pull toward boards that start with few free arrows.
+	var free_weight := float(spec.get("free_weight", 0.0))
 	var rng := RandomNumberGenerator.new()
 	var best: Dictionary = {}
 	var best_cost := 1 << 30
 	for k in candidates:
 		var seed_value := master_seed * 1000003 + level_id * 1009 + k
 		rng.seed = seed_value
-		var board := generate_board(params["width"], params["height"], count, float(spec["bias"]), rng)
+		var board := generate_board(params["width"], params["height"], count, float(spec["bias"]), rng, float(spec.get("chain", 0.0)))
 		if board == null:
 			continue
 		var canon := BoardCanon.canonical(board)
 		if used_canon.has(canon):
 			continue
 		var metrics := LevelMetrics.compute(board)
-		var cost := absi(metrics["depth"] - target_depth)
+		var cost := absi(metrics["depth"] - target_depth) * 1000 + roundi(free_weight * metrics["free_at_start"])
 		if cost < best_cost:
 			best_cost = cost
 			best = {

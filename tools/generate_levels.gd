@@ -1,13 +1,19 @@
 extends SceneTree
-## Generates the draft 100-level pack into data/packs/ and validates it.
-## Run: godot --headless --path . -s tools/generate_levels.gd
+## Generates a draft 100-level pack and validates it.
+## Easy:      godot --headless --path . -s tools/generate_levels.gd
+##            (tools/world_specs.json -> data/packs)
+## Difficult: godot --headless --path . -s tools/generate_levels.gd -- --hard
+##            (tools/world_specs_hard.json -> data/packs_hard)
 ## Output is a DRAFT until the owner has played and reviewed each world.
 
-const SPEC_PATH := "res://tools/world_specs.json"
-const OUT_DIR := "res://data/packs"
+var SPEC_PATH := "res://tools/world_specs.json"
+var OUT_DIR := "res://data/packs"
 
 
 func _initialize() -> void:
+	if OS.get_cmdline_user_args().has("--hard"):
+		SPEC_PATH = "res://tools/world_specs_hard.json"
+		OUT_DIR = "res://data/packs_hard"
 	var spec_file := FileAccess.open(SPEC_PATH, FileAccess.READ)
 	if spec_file == null:
 		printerr("Cannot open %s" % SPEC_PATH)
