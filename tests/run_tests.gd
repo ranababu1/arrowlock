@@ -48,6 +48,8 @@ func _initialize() -> void:
 	_test_difficulty_ids()
 	_test_countdown()
 	_test_difficulty_progress()
+	await _test_difficulty_ui()
+	_test_countdown_screen()
 	print("Tests: %d passed, %d failed" % [_passed, _failed])
 	quit(1 if _failed > 0 else 0)
 
@@ -1237,3 +1239,92 @@ func _test_difficulty_progress() -> void:
 	_check(again.difficulty == Difficulty.DIFFICULT and again.is_cleared(1005), "the chosen tier and Difficult clears are saved")
 	_check(Progress.from_dict({"difficulty": 9}).difficulty == Difficulty.DIFFICULT and Progress.from_dict({"difficulty": -4}).difficulty == Difficulty.EASY, "a damaged tier value is clamped")
 	_check(Progress.from_dict({}).difficulty == Difficulty.EASY, "old saves start on Easy")
+
+
+func _hard_repo() -> PuzzleRepository:
+	var repo := PuzzleRepository.new()
+	_check(repo.load_dir("res://data/packs_hard", Difficulty.HARD_ID_BASE), "Difficult pack loads for UI tests: " + "; ".join(repo.errors))
+	return repo
+
+
+func _test_difficulty_ui() -> void:
+	var hard := _hard_repo()
+	var progress := Progress.new()
+	progress.difficulty = Difficulty.DIFFICULT
+	var select := LevelSelect.new()
+	select.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.add_child(select)
+	select.setup(hard, progress, 0)
+	await process_frame
+	_check(select.difficulty_buttons.size() == 2, "the menu has an Easy and a Difficult button")
+	_check(select.difficulty_buttons[1].theme_type_variation == "DangerButton" and select.difficulty_buttons[0].theme_type_variation == "", "the active tier is highlighted")
+	_check(select.level_button_count() == 100 and select.enabled_level_count() == 10, "Difficult starts with its first world open")
+	var chosen: Array = []
+	select.difficulty_chosen.connect(func(tier: int) -> void: chosen.append(tier))
+	select.difficulty_buttons[1].pressed.emit()
+	_check(chosen.is_empty(), "choosing the tier already shown does nothing")
+	select.difficulty_buttons[0].pressed.emit()
+	_check(chosen == [Difficulty.EASY], "choosing Easy asks for the Easy pack")
+	var picked: Array = []
+	select.level_chosen.connect(func(index: int) -> void: picked.append(index))
+	select.press_level(3)
+	_check(picked == [3], "Difficult levels can be opened")
+	select.queue_free()
+
+	var easy_select := LevelSelect.new()
+	easy_select.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.add_child(easy_select)
+	easy_select.setup(_pack_repo(), Progress.new(), 0)
+	await process_frame
+	var tiers: Array = []
+	easy_select.difficulty_chosen.connect(func(tier: int) -> void: tiers.append(tier))
+	easy_select.difficulty_buttons[1].pressed.emit()
+	_check(tiers == [Difficulty.DIFFICULT] and easy_select.difficulty_buttons[0].theme_type_variation == "PrimaryButton", "Easy is the default and can switch to Difficult")
+	easy_select.queue_free()
+
+
+func _test_countdown_screen() -> void:
+	var save := SaveService.new("user://test_clock_save.json")
+	var hard := _hard_repo()
+	var screen := GameScreen.new()
+	root.add_child(screen)
+	screen.setup(hard.levels, 0, save.progress, save)
+	_check(screen.controller.countdown == 10.0 and screen.time_text().contains("10 s per tap"), "a Difficult level shows its 10 s rule before the first tap")
+	screen.advance_time(5.0)
+	_check(screen.controller.state == GameController.State.PLAYING, "the clock waits for the first tap")
+	var board: BoardState = hard.levels[0]["board"]
+	var free_ids := MoveValidator.removable_ids(board)
+	screen.tap_cell(board.arrow_position(free_ids[0]))
+	_check(screen.time_text().begins_with("TIME") and screen.time_text().contains("10.0 s"), "the first tap shows a full clock")
+	screen.advance_time(0.2)
+	screen.advance_time(0.2)
+	_check(screen.controller.time_left < 9.7 and screen.controller.time_left > 9.5, "the clock counts down while playing")
+	screen.advance_time(9.0)
+	screen.advance_time(9.0)
+	_check(screen.controller.time_left > 8.0, "one long frame cannot eat the whole clock")
+	var time_left_before := screen.controller.time_left
+	screen.use_hint()
+	_check(screen.controller.time_left > time_left_before - 0.001, "a Hint refills the clock (or leaves it if coins ran short)")
+	screen.controller.time_left = 0.01
+	screen.advance_time(0.1)
+	_check(screen.overlay_kind() == "lost" and screen.controller.lost_by_time, "running out of time shows the game-over panel")
+	_check(screen.time_text().contains("0.0"), "the clock reads zero after a timeout")
+	var coins := save.progress.coins
+	screen.use_extra_moves()
+	_check(screen.controller.state == GameController.State.LOST and save.progress.coins == coins, "extra moves are refused after a timeout")
+	screen.restart()
+	_check(screen.overlay_kind() == "" and not screen.controller.lost_by_time and not screen.controller.clock_running(), "Retry gives a fresh, idle clock")
+	screen.queue_free()
+
+	var easy := _pack_repo()
+	var early := GameScreen.new()
+	root.add_child(early)
+	early.setup(easy.levels, 29, Progress.new(), save)
+	_check(early.controller.countdown == 0.0 and early.time_text() == "", "Easy level 30 has no clock")
+	early.queue_free()
+	var later := GameScreen.new()
+	root.add_child(later)
+	later.setup(easy.levels, 30, Progress.new(), save)
+	_check(later.controller.countdown == 20.0 and later.time_text().contains("20 s per tap"), "Easy level 31 has a 20 s clock")
+	later.queue_free()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_clock_save.json"))

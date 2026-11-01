@@ -13,12 +13,16 @@ const BADGE_NAMES := {
 	"clears_100": "All 100 levels cleared",
 	"perfect_clear": "Perfect level",
 	"world_perfect": "Perfect world",
+	"hard_clear": "Difficult cleared",
 }
 const LOW_MOVES_RATIO := 0.25
 const MID_MOVES_RATIO := 0.5
 const OVERLAY_FADE_SECONDS := 0.2
 const STAR_START_DELAY := 0.6
 const STAR_STEP := 0.3
+## A longer frame (app paused, debugger) never eats more than this much clock.
+const MAX_TICK_SECONDS := 0.25
+const LOW_TIME_RATIO := 0.3
 
 var controller := GameController.new()
 var board_view: BoardView
@@ -35,6 +39,9 @@ var _coins: Label
 var _moves: Label
 var _arrows: Label
 var _moves_bar: ProgressPill
+var _time_box: VBoxContainer
+var _time_label: Label
+var _time_bar: ProgressPill
 var _note: Label
 var _coach: PanelContainer
 var _coach_label: Label
@@ -71,6 +78,24 @@ func overlay_kind() -> String:
 	return _overlay_kind
 
 
+## Advances the countdown (if the level has one) and redraws the clock. Called
+## every frame; tests call it directly.
+func advance_time(delta: float) -> void:
+	if _overlay_kind == "":
+		controller.tick(minf(delta, MAX_TICK_SECONDS))
+	_refresh_time()
+
+
+## The clock line currently shown ("" when the level has no clock).
+func time_text() -> String:
+	return _time_label.text if _time_box.visible else ""
+
+
+func _process(delta: float) -> void:
+	if controller.has_clock():
+		advance_time(delta)
+
+
 func tap_cell(cell: Vector2i) -> void:
 	if _overlay_kind != "":
 		return
@@ -99,6 +124,7 @@ func use_hint() -> void:
 	if not _progress.spend(Economy.PRICE_HINT):
 		_note.text = "Hint costs %d coins" % Economy.PRICE_HINT
 		return
+	controller.refill_clock()
 	board_view.show_hint(id)
 	_sfx("hint")
 	_note.text = "Tap the highlighted arrow"
@@ -107,7 +133,7 @@ func use_hint() -> void:
 
 
 func use_extra_moves() -> void:
-	if controller.state != GameController.State.LOST or controller.extra_moves_granted > 0:
+	if controller.state != GameController.State.LOST or controller.lost_by_time or controller.extra_moves_granted > 0:
 		return
 	if not _progress.spend(Economy.PRICE_EXTRA_MOVES):
 		_note.text = "Extra moves cost %d coins" % Economy.PRICE_EXTRA_MOVES
@@ -269,6 +295,15 @@ func _moves_card() -> Control:
 	right.add_child(_arrows)
 	_moves_bar = ProgressPill.new(10)
 	box.add_child(_moves_bar)
+	_time_box = VBoxContainer.new()
+	_time_box.add_theme_constant_override("separation", 4)
+	_time_box.visible = false
+	box.add_child(_time_box)
+	_time_label = Label.new()
+	_time_label.theme_type_variation = "Caption"
+	_time_box.add_child(_time_label)
+	_time_bar = ProgressPill.new(10)
+	_time_box.add_child(_time_bar)
 	return card
 
 
@@ -332,13 +367,14 @@ func _load_level() -> void:
 	controller.lost.connect(_on_lost)
 	controller.arrow_removed.connect(func(_id: int, _info: Dictionary) -> void: _sfx("tap_clear"))
 	controller.move_blocked.connect(func(_id: int, _blocker: int) -> void: _sfx("tap_blocked"))
-	if not controller.start(level["board"], level["moves_limit"]):
+	if not controller.start(level["board"], level["moves_limit"], Difficulty.countdown_for(level["id"])):
 		_note.text = "This level is misconfigured."
 		return
 	board_view.bind(controller)
 	var world := Progress.world_of(level["id"])
-	_title.text = "%d  %s" % [level["id"], level["name"]]
-	_world_caption.text = "WORLD %d  %s" % [world + 1, Palette.world_name(world).to_upper()]
+	_title.text = "%d  %s" % [Difficulty.local_id(level["id"]), level["name"]]
+	var tier_prefix := "DIFFICULT  " if Difficulty.of_level(level["id"]) == Difficulty.DIFFICULT else ""
+	_world_caption.text = "%sWORLD %d  %s" % [tier_prefix, world + 1, Palette.world_name(world).to_upper()]
 	_world_caption.add_theme_color_override("font_color", Palette.world_color(world).lightened(0.4))
 	_hide_overlay()
 	_refresh()
@@ -362,7 +398,28 @@ func _refresh() -> void:
 	_hint_button.disabled = controller.state != GameController.State.PLAYING \
 		or not _progress.can_afford(Economy.PRICE_HINT)
 	_update_coach()
+	_refresh_time()
 	board_view.queue_redraw()
+
+
+func _refresh_time() -> void:
+	_time_box.visible = controller.has_clock()
+	if not controller.has_clock():
+		return
+	var tint := Palette.CYAN
+	if controller.lost_by_time:
+		_time_bar.ratio = 0.0
+		_time_label.text = "TIME  -  0.0 s"
+		tint = Palette.RED
+	elif not controller.clock_running():
+		_time_bar.ratio = 1.0
+		_time_label.text = "TIME  -  %d s per tap, starts on your first tap" % roundi(controller.countdown)
+	else:
+		var ratio := controller.time_left / controller.countdown
+		_time_bar.ratio = ratio
+		_time_label.text = "TIME  -  %.1f s" % controller.time_left
+		tint = Palette.RED if ratio <= LOW_TIME_RATIO else (Palette.GOLD if ratio <= 0.6 else Palette.MINT)
+	_time_bar.color = tint
 
 
 ## Shows the first-levels tutorial tip and points at an arrow when it has one.
@@ -421,11 +478,15 @@ func _on_completed(moves: int) -> void:
 
 
 func _on_lost(wasted: int) -> void:
-	_overlay_title.text = "Out of moves"
+	var timed_out := controller.lost_by_time
+	_overlay_title.text = "Time's up" if timed_out else "Out of moves"
 	_overlay_stars.visible = false
 	_overlay_detail.text = "%d arrows left  -  %d wasted taps" % [controller.board.remaining_count(), wasted]
+	if timed_out:
+		_overlay_detail.text = "No tap for %d seconds
+" % roundi(controller.countdown) + _overlay_detail.text
 	_set_button(_overlay_primary, "Retry", restart, true)
-	var can_continue := controller.extra_moves_granted == 0
+	var can_continue := controller.extra_moves_granted == 0 and not timed_out
 	_set_button(_overlay_extra, "+%d moves  (%d coins)" % [Economy.EXTRA_MOVES, Economy.PRICE_EXTRA_MOVES], use_extra_moves)
 	_overlay_extra.visible = can_continue
 	_overlay_extra.disabled = not _progress.can_afford(Economy.PRICE_EXTRA_MOVES)

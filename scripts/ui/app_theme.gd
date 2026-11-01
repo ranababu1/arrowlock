@@ -1,7 +1,7 @@
 class_name AppTheme
 extends RefCounted
 ## The shared look. Type variations (set `theme_type_variation` on a control):
-##   Button:         PrimaryButton, IconButton
+##   Button:         PrimaryButton, DangerButton, IconButton
 ##   PanelContainer: Card
 ##   Label:          Heading, Subheading, Muted, Caption
 
@@ -42,6 +42,13 @@ static func _buttons(theme: Theme, font: Font) -> void:
 	theme.set_stylebox("hover", "PrimaryButton", _box(Palette.PRIMARY_HOVER, Color(1, 1, 1, 0.22), 20, glow, 16, Vector2(0, 5)))
 	theme.set_stylebox("pressed", "PrimaryButton", _box(Palette.PRIMARY_PRESSED, Color(1, 1, 1, 0.12), 20, Color(Palette.PRIMARY, 0.25), 6, Vector2(0, 2)))
 	theme.set_stylebox("disabled", "PrimaryButton", _box(Color("3a3566"), Color(1, 1, 1, 0.06), 20))
+
+	theme.set_type_variation("DangerButton", "Button")
+	var heat := Color(Palette.RED, 0.45)
+	theme.set_stylebox("normal", "DangerButton", _box(Palette.RED.darkened(0.15), Color(1, 1, 1, 0.18), 20, heat, 14, Vector2(0, 5)))
+	theme.set_stylebox("hover", "DangerButton", _box(Palette.RED, Color(1, 1, 1, 0.22), 20, heat, 16, Vector2(0, 5)))
+	theme.set_stylebox("pressed", "DangerButton", _box(Palette.RED.darkened(0.35), Color(1, 1, 1, 0.12), 20, Color(Palette.RED, 0.25), 6, Vector2(0, 2)))
+	theme.set_stylebox("disabled", "DangerButton", _box(Color("5a2f3d"), Color(1, 1, 1, 0.06), 20))
 
 	theme.set_type_variation("IconButton", "Button")
 	theme.set_stylebox("normal", "IconButton", _box(Palette.GLASS, Palette.GLASS_BORDER, 100))

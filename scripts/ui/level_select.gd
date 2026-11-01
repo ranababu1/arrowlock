@@ -5,6 +5,7 @@ extends Control
 
 signal level_chosen(index: int)
 signal settings_requested
+signal difficulty_chosen(difficulty: int)
 
 const COLUMNS := 5
 ## Pixels of vertical movement before a press becomes a scroll drag.
@@ -13,6 +14,8 @@ const DRAG_THRESHOLD := 12.0
 var _repo: PuzzleRepository
 var _progress: Progress
 var _level_buttons: Array[Button] = []
+## One button per tier, index = Difficulty constant.
+var difficulty_buttons: Array[Button] = []
 var _scroll: ScrollContainer
 var _tracking := false
 var _dragging := false
@@ -98,6 +101,7 @@ func _build(focus_index: int) -> void:
 
 	root.add_child(_header())
 	root.add_child(_chips())
+	root.add_child(_difficulty_switch())
 	root.add_child(_continue_button(focus_index))
 
 	_scroll = ScrollContainer.new()
@@ -138,9 +142,39 @@ func _header() -> Control:
 func _chips() -> Control:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 10)
-	row.add_child(_chip("star", Palette.GOLD, "%d / %d" % [_progress.total_stars(), _repo.levels.size() * Economy.MAX_STARS]))
+	row.add_child(_chip("star", Palette.GOLD, "%d / %d" % [_progress.total_stars(_progress.difficulty), _repo.levels.size() * Economy.MAX_STARS]))
 	row.add_child(_chip("coin", Palette.GOLD, str(_progress.coins)))
 	return row
+
+
+## Easy | Difficult, with a line below describing the selected tier's rules.
+func _difficulty_switch() -> Control:
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 6)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	box.add_child(row)
+	difficulty_buttons.clear()
+	for tier in Difficulty.COUNT:
+		var button := Button.new()
+		button.text = Difficulty.name_of(tier)
+		button.focus_mode = Control.FOCUS_NONE
+		button.custom_minimum_size = Vector2(0, 52)
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		if tier == _progress.difficulty:
+			button.theme_type_variation = "DangerButton" if tier == Difficulty.DIFFICULT else "PrimaryButton"
+		button.pressed.connect(func() -> void:
+			if not _suppress_press and tier != _progress.difficulty:
+				difficulty_chosen.emit(tier))
+		difficulty_buttons.append(button)
+		row.add_child(button)
+	var rules := Label.new()
+	rules.text = Difficulty.rule_text(_progress.difficulty)
+	rules.theme_type_variation = "Caption"
+	rules.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	rules.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(rules)
+	return box
 
 
 func _chip(glyph: String, color: Color, text: String) -> Control:
@@ -168,7 +202,7 @@ func _continue_button(focus_index: int) -> Control:
 	button.focus_mode = Control.FOCUS_NONE
 	var index := focus_index if focus_index >= 0 else 0
 	var level_id: int = _repo.levels[index]["id"] if not _repo.levels.is_empty() else 1
-	button.text = ("Play  Level %d" if not _progress.is_cleared(level_id) else "Replay  Level %d") % level_id
+	button.text = ("Play  Level %d" if not _progress.is_cleared(level_id) else "Replay  Level %d") % Difficulty.local_id(level_id)
 	button.pressed.connect(func() -> void:
 		if not _suppress_press:
 			level_chosen.emit(index))
@@ -176,11 +210,11 @@ func _continue_button(focus_index: int) -> Control:
 
 
 func _world_card(world: int, focus_index: int) -> Control:
-	var unlocked := _progress.is_world_unlocked(world)
+	var unlocked := _progress.is_world_unlocked(world, _progress.difficulty)
 	var accent := Palette.world_color(world)
 	var first := world * Economy.LEVELS_PER_WORLD
 	var last := mini(first + Economy.LEVELS_PER_WORLD, _repo.levels.size())
-	var cleared := _progress.world_clears(world)
+	var cleared := _progress.world_clears(world, _progress.difficulty)
 	var stars := 0
 	for index in range(first, last):
 		stars += _progress.stars_of(_repo.levels[index]["id"])

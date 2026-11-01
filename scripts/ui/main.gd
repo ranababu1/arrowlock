@@ -2,11 +2,13 @@ extends Control
 ## Root: owns the services and switches between the level-select and game
 ## screens. Presentation only.
 
-const PACK_DIR := "res://data/packs"
+## Pack folder for each tier, indexed by Difficulty constant.
+const PACK_DIRS: Array[String] = ["res://data/packs", "res://data/packs_hard"]
 const MIN_MARGIN := 16.0
 const FADE_SECONDS := 0.2
 
-var _repo := PuzzleRepository.new()
+var _repo := PuzzleRepository.new()  ## the tier on screen (one of _repos)
+var _repos: Array[PuzzleRepository] = []
 var _save := SaveService.new()
 var _host: MarginContainer
 var _current: Control
@@ -32,8 +34,15 @@ func _ready() -> void:
 	add_child(_host)
 	_apply_safe_area()
 	get_viewport().size_changed.connect(_apply_safe_area)
-	if not _repo.load_dir(PACK_DIR):
-		push_error("Level load failed: %s" % "; ".join(_repo.errors))
+	for tier in Difficulty.COUNT:
+		var repo := PuzzleRepository.new()
+		if not repo.load_dir(PACK_DIRS[tier], Difficulty.HARD_ID_BASE if tier == Difficulty.DIFFICULT else 0):
+			push_error("Level load failed (%s): %s" % [Difficulty.name_of(tier), "; ".join(repo.errors)])
+		_repos.append(repo)
+	if _repos[Difficulty.EASY].levels.is_empty():
+		_repo = _repos[Difficulty.EASY]
+	else:
+		_select_tier(_save.progress.difficulty)
 	if _repo.levels.is_empty():
 		var message := Label.new()
 		message.text = "No playable levels found."
@@ -86,12 +95,28 @@ func _swap(screen: Control) -> void:
 	screen.create_tween().tween_property(screen, "modulate:a", 1.0, FADE_SECONDS)
 
 
+## Points the menus at one tier's pack; falls back to Easy if that pack is missing.
+func _select_tier(tier: int) -> void:
+	if _repos[tier].levels.is_empty():
+		tier = Difficulty.EASY
+	_save.progress.difficulty = tier
+	_repo = _repos[tier]
+
+
+func _change_difficulty(tier: int) -> void:
+	_select_tier(tier)
+	_last_index = -1
+	_save.save_data()
+	_show_select()
+
+
 func _show_select() -> void:
 	var select := LevelSelect.new()
 	_swap(select)
 	select.setup(_repo, _save.progress, _last_index if _last_index >= 0 else _first_uncleared_index())
 	select.level_chosen.connect(_start_level)
 	select.settings_requested.connect(_show_settings)
+	select.difficulty_chosen.connect(_change_difficulty)
 
 
 func _show_settings() -> void:

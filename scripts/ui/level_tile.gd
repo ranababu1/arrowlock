@@ -70,4 +70,4 @@ func _draw() -> void:
 		Glyphs.draw(self, "lock", size * 0.5, 30.0, Color(1, 1, 1, 0.35))
 		return
 	var font := get_theme_font("font", "Button")
-	draw_string(font, Vector2(0, size.y * 0.42), str(level_id), HORIZONTAL_ALIGNMENT_CENTER, size.x, 26, Color(1, 1, 1, label_alpha))
+	draw_string(font, Vector2(0, size.y * 0.42), str(Difficulty.local_id(level_id)), HORIZONTAL_ALIGNMENT_CENTER, size.x, 26, Color(1, 1, 1, label_alpha))
