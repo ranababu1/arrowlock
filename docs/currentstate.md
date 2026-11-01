@@ -15,7 +15,7 @@
 | Save/progress (M3) | Implemented; automated tests pass; no level-select screen, resumes at first incomplete level |
 | Settings/pause menu, audio, haptics | Planned (`sound_enabled` flag is saved but unused) |
 | Safe-area insets | Planned (fixed 16px margins only) |
-| Android export (M0) | Not started |
+| Android export (M0) | Debug APK exports and runs on the emulator; physical device not tested |
 
 ## Architecture
 - `scripts/core/` — pure logic, no Node dependencies: `board_state.gd`, `move_validator.gd`, `puzzle_solver.gd`, `game_controller.gd`.
@@ -27,7 +27,7 @@
 Godot 4.7.2 stable (winget). `config/features` says 4.3; project runs on 4.7.2.
 
 ## Build/test status
-Verified 2026-11-01: `godot_console --headless --path . -s tests/run_tests.gd` -> 55 passed, 0 failed. Headless startup of the main scene: no errors. Not verified: on-screen rendering, input, Android export.
+Verified 2026-11-01: `godot_console --headless --path . -s tests/run_tests.gd` -> 55 passed, 0 failed. Headless startup of the main scene: no errors. Android debug export + install + launch + tap-through of level 1 verified on the Pixel_10a emulator (2026-11-01). Not verified: physical device, pause/resume, save persistence across restarts.
 
 ## Known issues / risks
 - `DirAccess.rename_absolute` overwrite behaviour on Windows is unconfirmed; save atomicity is unverified.
@@ -36,7 +36,7 @@ Verified 2026-11-01: `godot_console --headless --path . -s tests/run_tests.gd` -
 ## Next steps
 1. Run the game in the editor; check touch/mouse input and layout at phone aspect ratios.
 2. Add level select, tutorial prompts, settings/pause, and grow content to ~40 levels.
-3. Android export spike on a physical device (M0).
+3. Android check on a physical device (M0); test pause/resume and save persistence.
 
 ## Decisions needing owner approval
 None pending.

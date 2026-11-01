@@ -14,5 +14,6 @@ window/stretch/aspect="expand"
 window/handheld/orientation=1
 
 [rendering]
+textures/vram_compression/import_etc2_astc=true
 renderer/rendering_method="mobile"
 environment/defaults/default_clear_color=Color(0.082, 0.098, 0.133, 1)
