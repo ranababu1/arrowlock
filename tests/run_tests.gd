@@ -39,6 +39,7 @@ func _initialize() -> void:
 	_test_settings_screen()
 	_test_level_select_design()
 	_test_arrow_shape()
+	_test_tutorial_steps()
 	print("Tests: %d passed, %d failed" % [_passed, _failed])
 	quit(1 if _failed > 0 else 0)
 
@@ -858,6 +859,44 @@ func _test_arrow_shape() -> void:
 	for p in shape:
 		tip_ok = tip_ok or (p.x > 0.30 and absf(p.y) < 0.03)
 	_check(tip_ok, "the point of the arrow is on its axis")
+
+
+func _test_tutorial_steps() -> void:
+	var repo := _pack_repo()
+	# Level 1: arrow 0 (down) blocks arrow 1 (left); arrow 2 (up) is free and blocks nothing.
+	var board: BoardState = repo.levels[0]["board"].duplicate_state()
+	var first := Tutorial.step_for(1, board, 0, true)
+	_check(first["text"] == Tutorial.TEXT_TAP and first["kind"] == Tutorial.KIND_CLEAR and first["target"] == 2, "level 1 starts by pointing at a free arrow that blocks nothing")
+	_check(MoveValidator.can_remove(board, 2) and not MoveValidator.can_remove(board, 1), "level 1 layout is as the tutorial expects")
+	board.remove_arrow(2)
+	var second := Tutorial.step_for(1, board, 1, true)
+	_check(second["text"] == Tutorial.TEXT_BLOCKED and second["kind"] == Tutorial.KIND_BLOCKED and second["target"] == 1, "after one tap it points at the blocked arrow")
+	board.remove_arrow(0)
+	var third := Tutorial.step_for(1, board, 2, true)
+	_check(third["text"] == Tutorial.TEXT_REST and third["target"] == -1, "once nothing is blocked it just encourages")
+	var wasted_first := Tutorial.step_for(1, repo.levels[0]["board"], 1, true)
+	_check(wasted_first["kind"] == Tutorial.KIND_BLOCKED, "tapping the blocked arrow first still gets the explanation")
+
+	var other: BoardState = repo.levels[1]["board"]
+	_check(Tutorial.step_for(2, other, 0, true)["text"] == Tutorial.TEXT_MOVES and Tutorial.step_for(2, other, 0, true)["target"] == -1, "level 2 explains moves, no pointer")
+	_check(Tutorial.step_for(2, other, Tutorial.TEXT_TIP_TAPS, true).is_empty(), "the level 2 tip goes away after a few taps")
+	_check(Tutorial.step_for(3, other, 0, true)["text"] == Tutorial.TEXT_HINT, "level 3 mentions the hint")
+	_check(Tutorial.step_for(4, other, 0, true).is_empty() and Tutorial.step_for(0, other, 0, true).is_empty(), "no tips beyond level 3")
+	_check(Tutorial.step_for(1, repo.levels[0]["board"], 0, false).is_empty(), "no tips when tips are off")
+	_check(Tutorial.step_for(1, BoardState.new(2, 2), 0, true).is_empty(), "no tips on an empty board")
+
+	var progress := Progress.new()
+	_check(progress.tips_enabled, "tips default to on")
+	progress.record_result(1, 3, 6, 3, 0)
+	progress.record_result(2, 3, 6, 3, 0)
+	_check(progress.tips_enabled, "tips stay on until level 3 is cleared")
+	progress.record_result(3, 3, 6, 3, 0)
+	_check(not progress.tips_enabled, "clearing level 3 switches the tips off")
+	progress.tips_enabled = true
+	progress.record_result(3, 3, 6, 3, 0)
+	_check(progress.tips_enabled, "replaying level 3 does not switch re-enabled tips off again")
+	_check(Progress.from_dict(progress.to_dict()).tips_enabled and not Progress.from_dict({"tips_enabled": false}).tips_enabled, "the tips setting is saved and loaded")
+	_check(Progress.from_dict({}).tips_enabled, "tips default to on in old saves")
 
 
 func _test_move_limit() -> void:

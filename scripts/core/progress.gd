@@ -15,6 +15,8 @@ var badges: Array[String] = []
 ## Sound effects on/off.
 var sound_enabled: bool = true
 var music_enabled: bool = true
+## Coaching on the first levels; switches off once level 3 is cleared.
+var tips_enabled: bool = true
 
 
 static func world_of(level_id: int) -> int:
@@ -106,6 +108,8 @@ func record_result(level_id: int, arrow_count: int, moves_limit: int, moves_used
 	if clears_before < Economy.LEVELS_PER_WORLD and world_clears(world) == Economy.LEVELS_PER_WORLD:
 		world_bonus = Economy.WORLD_COMPLETE_BONUS
 	coins += earned + world_bonus
+	if first and level_id == Tutorial.LAST_TIP_LEVEL:
+		tips_enabled = false
 	return {
 		"stars": stars,
 		"coins_earned": earned + world_bonus,
@@ -157,6 +161,7 @@ func to_dict() -> Dictionary:
 		"badges": badges.duplicate(),
 		"sound_enabled": sound_enabled,
 		"music_enabled": music_enabled,
+		"tips_enabled": tips_enabled,
 	}
 
 
@@ -188,6 +193,7 @@ static func from_dict(data: Dictionary) -> Progress:
 				p.badges.append(b)
 	p.sound_enabled = bool(data.get("sound_enabled", true))
 	p.music_enabled = bool(data.get("music_enabled", true))
+	p.tips_enabled = bool(data.get("tips_enabled", true))
 	return p
 
 
