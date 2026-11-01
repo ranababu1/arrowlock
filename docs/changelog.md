@@ -2,6 +2,11 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-01 — 500-level proposal (docs only)
+
+- Added `docs/level-plan-500.md`: proposal for 500 levels in 10 worlds, seeded offline generator with solver validation, and a two-track structure. Key finding: under the MVP rules every solvable board takes exactly N moves for N arrows, so efficiency medals and "suboptimal move" difficulty from `plan.md` do not apply to the core rule.
+- This departs from `plan.md` (about 40 levels; no procedural levels until generator validation) and is **not approved**. `plan.md` unchanged. No code changes.
+
 ## 2026-11-01 — Android emulator run
 
 - Enabled ETC2/ASTC import in `project.godot` (required for Android export).

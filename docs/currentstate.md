@@ -39,4 +39,4 @@ Verified 2026-11-01: `godot_console --headless --path . -s tests/run_tests.gd` -
 3. Android check on a physical device (M0); test pause/resume and save persistence.
 
 ## Decisions needing owner approval
-None pending.
+- 500-level proposal in `docs/level-plan-500.md` (departure from `plan.md`; Track B mechanics also need approval). Nothing from it is implemented.
