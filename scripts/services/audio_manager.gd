@@ -8,6 +8,7 @@ const SFX_BUS := "SFX"
 const MUSIC_PATH := "res://assets/audio/music/calm_loop.ogg"
 const MUSIC_VOLUME_DB := -9.0
 const SFX_POOL_SIZE := 6
+const SILENT_DB := -80.0
 ## name -> [resource path, volume in dB]
 const SOUNDS := {
 	"tap_clear": ["res://assets/audio/sfx/tap_clear.wav", -4.0],
@@ -62,10 +63,21 @@ func _ready() -> void:
 	_apply_mutes()
 
 
-func apply_settings(music_on: bool, sfx_on: bool) -> void:
+func apply_settings(music_on: bool, sfx_on: bool, music_volume: float = 1.0, sfx_volume: float = 1.0) -> void:
 	music_enabled = music_on
 	sfx_enabled = sfx_on
 	_apply_mutes()
+	_set_bus_volume(MUSIC_BUS, music_volume)
+	_set_bus_volume(SFX_BUS, sfx_volume)
+
+
+func apply_progress(progress: Progress) -> void:
+	apply_settings(progress.music_enabled, progress.sound_enabled, progress.music_volume, progress.sfx_volume)
+
+
+## Current bus loudness in dB, for tests and diagnostics.
+func bus_volume_db(bus_name: String) -> float:
+	return AudioServer.get_bus_volume_db(AudioServer.get_bus_index(bus_name))
 
 
 func start_music() -> void:
@@ -117,6 +129,12 @@ func _notification(what: int) -> void:
 func _apply_mutes() -> void:
 	AudioServer.set_bus_mute(AudioServer.get_bus_index(MUSIC_BUS), not music_enabled)
 	AudioServer.set_bus_mute(AudioServer.get_bus_index(SFX_BUS), not sfx_enabled)
+
+
+## `volume` is a 0..1 multiplier; 0 is silent.
+func _set_bus_volume(bus_name: String, volume: float) -> void:
+	var db := SILENT_DB if volume <= 0.001 else linear_to_db(clampf(volume, 0.0, 1.0))
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index(bus_name), db)
 
 
 func _ensure_bus(bus_name: String) -> void:

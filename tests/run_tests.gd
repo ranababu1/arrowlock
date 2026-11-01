@@ -42,6 +42,7 @@ func _initialize() -> void:
 	_test_tutorial_steps()
 	_test_coach_ui()
 	_test_tips_setting_toggle()
+	_test_volume()
 	print("Tests: %d passed, %d failed" % [_passed, _failed])
 	quit(1 if _failed > 0 else 0)
 
@@ -968,6 +969,91 @@ func _test_tips_setting_toggle() -> void:
 	_check(save.progress.tips_enabled, "switching tips back on works")
 	screen.queue_free()
 	audio.queue_free()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+
+
+func _mouse(control: Control, x: float, pressed: bool) -> void:
+	var event := InputEventMouseButton.new()
+	event.button_index = MOUSE_BUTTON_LEFT
+	event.pressed = pressed
+	event.position = Vector2(x, 10)
+	control._gui_input(event)
+
+
+func _drag(control: Control, x: float) -> void:
+	var event := InputEventMouseMotion.new()
+	event.position = Vector2(x, 10)
+	control._gui_input(event)
+
+
+func _test_volume() -> void:
+	_check(Progress.new().music_volume == 1.0 and Progress.new().sfx_volume == 1.0, "volumes default to full")
+	var odd := Progress.from_dict({"music_volume": 7.5, "sfx_volume": -3})
+	_check(odd.music_volume == 1.0 and odd.sfx_volume == 0.0, "saved volumes are clamped to 0..1")
+	var quiet := Progress.new()
+	quiet.music_volume = 0.4
+	quiet.sfx_volume = 0.7
+	var round_trip := Progress.from_dict(quiet.to_dict())
+	_check(is_equal_approx(round_trip.music_volume, 0.4) and is_equal_approx(round_trip.sfx_volume, 0.7), "volumes are saved and loaded")
+
+	var audio := AudioManager.new()
+	root.add_child(audio)
+	audio.apply_settings(true, true, 1.0, 1.0)
+	_check(is_zero_approx(audio.bus_volume_db("Music")) and is_zero_approx(audio.bus_volume_db("SFX")), "full volume leaves the mix as designed")
+	audio.apply_settings(true, true, 0.5, 0.25)
+	_check(is_equal_approx(audio.bus_volume_db("Music"), linear_to_db(0.5)) and is_equal_approx(audio.bus_volume_db("SFX"), linear_to_db(0.25)), "half and quarter volume lower each bus")
+	audio.apply_settings(true, true, 0.0, 1.0)
+	_check(audio.bus_volume_db("Music") <= -79.0, "zero volume is silent")
+	audio.apply_progress(quiet)
+	_check(is_equal_approx(audio.bus_volume_db("Music"), linear_to_db(0.4)), "apply_progress uses the saved volumes")
+	audio.apply_settings(true, true)
+	audio.queue_free()
+
+	var bar := VolumeBar.new()
+	bar.size = Vector2(300, 44)
+	root.add_child(bar)
+	bar.size = Vector2(300, 44)
+	var changes: Array = []
+	var releases: Array = []
+	bar.changed.connect(func(v: float) -> void: changes.append(v))
+	bar.released.connect(func(v: float) -> void: releases.append(v))
+	bar.set_value(0.3)
+	_check(is_equal_approx(bar.value, 0.3) and changes.is_empty(), "set_value does not emit")
+	_mouse(bar, 15.0, true)
+	_check(is_zero_approx(bar.value) and changes.size() == 1, "pressing at the left end sets zero")
+	_drag(bar, 150.0)
+	_check(bar.value > 0.4 and bar.value < 0.6, "dragging to the middle sets about half")
+	_mouse(bar, 150.0, false)
+	_check(releases.size() == 1 and is_equal_approx(releases[0], bar.value), "releasing emits once with the final value")
+	_drag(bar, 290.0)
+	_check(releases.size() == 1 and bar.value < 0.6, "moving without pressing does nothing")
+	_mouse(bar, 9999.0, true)
+	_check(is_equal_approx(bar.value, 1.0), "pressing past the end clamps to full")
+	_mouse(bar, 9999.0, false)
+	bar.queue_free()
+
+	var path := "user://test_volume_save.json"
+	var save := SaveService.new(path)
+	var sound := AudioManager.new()
+	root.add_child(sound)
+	var screen := SettingsScreen.new()
+	root.add_child(screen)
+	screen.setup(save.progress, save, sound)
+	screen.music_volume_bar.size = Vector2(300, 44)
+	screen.sfx_volume_bar.size = Vector2(300, 44)
+	_mouse(screen.music_volume_bar, 15.0 + 270.0 * 0.5, true)
+	_check(is_equal_approx(save.progress.music_volume, 0.5) and is_equal_approx(sound.bus_volume_db("Music"), linear_to_db(0.5)), "moving the music bar changes the setting and the bus")
+	_mouse(screen.music_volume_bar, 15.0 + 270.0 * 0.5, false)
+	var reloaded := SaveService.new(path)
+	reloaded.load_data()
+	_check(is_equal_approx(reloaded.progress.music_volume, 0.5), "the music volume is saved when the finger lifts")
+	var before := sound.sfx_played
+	_mouse(screen.sfx_volume_bar, 15.0 + 270.0 * 0.25, true)
+	_mouse(screen.sfx_volume_bar, 15.0 + 270.0 * 0.25, false)
+	_check(is_equal_approx(save.progress.sfx_volume, 0.25) and sound.sfx_played == before + 1, "releasing the effects bar saves and plays a sample")
+	screen.queue_free()
+	sound.apply_settings(true, true)
+	sound.queue_free()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 
 

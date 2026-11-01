@@ -9,6 +9,8 @@ const VERSION_SETTING := "application/config/version"
 var music_toggle: ToggleSwitch
 var sfx_toggle: ToggleSwitch
 var tips_toggle: ToggleSwitch
+var music_volume_bar: VolumeBar
+var sfx_volume_bar: VolumeBar
 
 var _progress: Progress
 var _save: SaveService
@@ -51,6 +53,19 @@ func _build() -> void:
 	sfx_toggle = _row(rows, "speaker", Palette.MINT, "Sound effects", "Taps, hints and rewards", _progress.sound_enabled, _on_sfx_toggled)
 	rows.add_child(HSeparator.new())
 	tips_toggle = _row(rows, "bulb", Palette.GOLD, "Tutorial tips", "Short pointers on the first levels", _progress.tips_enabled, _on_tips_toggled)
+
+	var volume_card := PanelContainer.new()
+	volume_card.theme_type_variation = "Card"
+	root.add_child(volume_card)
+	var volume_rows := VBoxContainer.new()
+	volume_rows.add_theme_constant_override("separation", 6)
+	volume_card.add_child(volume_rows)
+	var volume_title := Label.new()
+	volume_title.text = "Volume"
+	volume_title.theme_type_variation = "Subheading"
+	volume_rows.add_child(volume_title)
+	music_volume_bar = _volume_row(volume_rows, "Music", _progress.music_volume, _on_music_volume, _on_volume_released)
+	sfx_volume_bar = _volume_row(volume_rows, "Effects", _progress.sfx_volume, _on_sfx_volume, _on_sfx_volume_released)
 
 	var about := PanelContainer.new()
 	about.theme_type_variation = "Card"
@@ -103,6 +118,44 @@ func _row(parent: Control, glyph: String, color: Color, title: String, caption: 
 	return toggle
 
 
+func _volume_row(parent: Control, label_text: String, value: float, on_change: Callable, on_release: Callable) -> VolumeBar:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 14)
+	parent.add_child(row)
+	var label := Label.new()
+	label.text = label_text
+	label.theme_type_variation = "Muted"
+	label.custom_minimum_size = Vector2(80, 0)
+	label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(label)
+	var bar := VolumeBar.new()
+	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	bar.set_value(value)
+	bar.changed.connect(on_change)
+	bar.released.connect(on_release)
+	row.add_child(bar)
+	return bar
+
+
+func _on_music_volume(value: float) -> void:
+	_progress.music_volume = value
+	_audio.apply_progress(_progress)
+
+
+func _on_sfx_volume(value: float) -> void:
+	_progress.sfx_volume = value
+	_audio.apply_progress(_progress)
+
+
+func _on_volume_released(_value: float) -> void:
+	_save.save_data()
+
+
+func _on_sfx_volume_released(_value: float) -> void:
+	_save.save_data()
+	_audio.play("tap_clear")  # so the new loudness can be heard
+
+
 func _on_music_toggled(on: bool) -> void:
 	_progress.music_enabled = on
 	_apply_and_save()
@@ -123,5 +176,5 @@ func _on_tips_toggled(on: bool) -> void:
 
 
 func _apply_and_save() -> void:
-	_audio.apply_settings(_progress.music_enabled, _progress.sound_enabled)
+	_audio.apply_progress(_progress)
 	_save.save_data()

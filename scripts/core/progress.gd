@@ -15,6 +15,9 @@ var badges: Array[String] = []
 ## Sound effects on/off.
 var sound_enabled: bool = true
 var music_enabled: bool = true
+## 0..1 multipliers on the music and effects loudness (1 = the mixed level).
+var music_volume: float = 1.0
+var sfx_volume: float = 1.0
 ## Coaching on the first levels; switches off once level 3 is cleared.
 var tips_enabled: bool = true
 
@@ -162,6 +165,8 @@ func to_dict() -> Dictionary:
 		"sound_enabled": sound_enabled,
 		"music_enabled": music_enabled,
 		"tips_enabled": tips_enabled,
+		"music_volume": music_volume,
+		"sfx_volume": sfx_volume,
 	}
 
 
@@ -194,6 +199,8 @@ static func from_dict(data: Dictionary) -> Progress:
 	p.sound_enabled = bool(data.get("sound_enabled", true))
 	p.music_enabled = bool(data.get("music_enabled", true))
 	p.tips_enabled = bool(data.get("tips_enabled", true))
+	p.music_volume = clampf(float(data.get("music_volume", 1.0)), 0.0, 1.0)
+	p.sfx_volume = clampf(float(data.get("sfx_volume", 1.0)), 0.0, 1.0)
 	return p
 
 

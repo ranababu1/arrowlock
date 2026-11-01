@@ -23,7 +23,7 @@ func _ready() -> void:
 	get_tree().set_auto_accept_quit(false)
 	_save.load_data()
 	add_child(_audio)
-	_audio.apply_settings(_save.progress.music_enabled, _save.progress.sound_enabled)
+	_audio.apply_progress(_save.progress)
 	_audio.start_music()
 	# Every button, present and future, gets the click sound.
 	get_tree().node_added.connect(_on_node_added)
