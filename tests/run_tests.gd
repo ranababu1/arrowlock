@@ -36,6 +36,8 @@ func _initialize() -> void:
 	_test_game_screen_sounds()
 	_test_game_screen_ui()
 	_test_design_components()
+	_test_settings_screen()
+	_test_level_select_design()
 	print("Tests: %d passed, %d failed" % [_passed, _failed])
 	quit(1 if _failed > 0 else 0)
 
@@ -757,6 +759,83 @@ func _test_design_components() -> void:
 	root.add_child(backdrop)
 	_check(backdrop.mouse_filter == Control.MOUSE_FILTER_IGNORE, "backdrop never captures input")
 	backdrop.queue_free()
+
+
+func _click(control: Control) -> void:
+	var event := InputEventMouseButton.new()
+	event.button_index = MOUSE_BUTTON_LEFT
+	event.pressed = true
+	control._gui_input(event)
+
+
+func _test_settings_screen() -> void:
+	var path := "user://test_settings_save.json"
+	var save := SaveService.new(path)
+	var audio := AudioManager.new()
+	root.add_child(audio)
+	var screen := SettingsScreen.new()
+	root.add_child(screen)
+	screen.setup(save.progress, save, audio)
+	_check(screen.music_toggle.on and screen.sfx_toggle.on, "both toggles start on by default")
+
+	_click(screen.music_toggle)
+	_check(not save.progress.music_enabled and audio.music_muted() and not audio.sfx_muted(), "turning music off mutes only the music")
+	var reloaded := SaveService.new(path)
+	reloaded.load_data()
+	_check(not reloaded.progress.music_enabled and reloaded.progress.sound_enabled, "the music setting is saved")
+
+	_click(screen.sfx_toggle)
+	_check(not save.progress.sound_enabled and audio.sfx_muted(), "turning effects off mutes the effects bus")
+	var before := audio.sfx_played
+	audio.play("click")
+	_check(audio.sfx_played == before, "no effect plays while effects are off")
+
+	_click(screen.sfx_toggle)
+	_check(save.progress.sound_enabled and not audio.sfx_muted() and audio.last_sfx == "tap_clear", "turning effects back on plays a sample")
+	_click(screen.music_toggle)
+	_check(save.progress.music_enabled and not audio.music_muted() and audio.is_music_playing(), "turning music back on resumes it")
+
+	var backs := [0]
+	screen.back_requested.connect(func() -> void: backs[0] += 1)
+	screen.get_child(0).get_child(0).get_child(0).pressed.emit()
+	_check(backs[0] == 1, "the back button leaves the screen")
+	screen.queue_free()
+
+	# A screen opened with saved-off settings shows them off.
+	var off := Progress.new()
+	off.music_enabled = false
+	off.sound_enabled = false
+	var again := SettingsScreen.new()
+	root.add_child(again)
+	again.setup(off, save, audio)
+	_check(not again.music_toggle.on and not again.sfx_toggle.on, "toggles reflect saved settings")
+	again.queue_free()
+	audio.queue_free()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+
+
+func _test_level_select_design() -> void:
+	var repo := _pack_repo()
+	var progress := Progress.new()
+	progress.record_result(1, 3, 6, 3, 0)
+	progress.record_result(2, 3, 6, 4, 1)
+	var select := LevelSelect.new()
+	root.add_child(select)
+	select.setup(repo, progress, 2)
+	_check(select.level_button_count() == 100, "redesigned level select still lists 100 levels")
+	var tiles: Array[LevelTile] = []
+	for i in 12:
+		tiles.append(select._level_buttons[i])
+	_check(tiles[0].tile_state == LevelTile.State.CLEARED and tiles[1].tile_state == LevelTile.State.CLEARED, "cleared levels are marked cleared")
+	_check(tiles[2].tile_state == LevelTile.State.CURRENT, "the next level is marked current")
+	_check(tiles[3].tile_state == LevelTile.State.OPEN and tiles[10].tile_state == LevelTile.State.LOCKED, "open and locked levels are marked")
+	_check(tiles[10].disabled and not tiles[3].disabled, "locked tiles cannot be pressed")
+	var opened := [-1]
+	select.level_chosen.connect(func(i: int) -> void: opened[0] = i)
+	select.settings_requested.connect(func() -> void: opened[0] = -99)
+	tiles[3].pressed.emit()
+	_check(opened[0] == 3, "pressing a tile opens that level")
+	select.queue_free()
 
 
 func _test_move_limit() -> void:

@@ -4,6 +4,7 @@ extends Control
 
 const PACK_DIR := "res://data/packs"
 const MIN_MARGIN := 16.0
+const FADE_SECONDS := 0.2
 
 var _repo := PuzzleRepository.new()
 var _save := SaveService.new()
@@ -64,7 +65,7 @@ func _on_node_added(node: Node) -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST or what == NOTIFICATION_WM_CLOSE_REQUEST:
-		if _current is GameScreen:
+		if _current is GameScreen or _current is SettingsScreen:
 			_show_select()
 		else:
 			get_tree().quit()
@@ -76,6 +77,8 @@ func _swap(screen: Control) -> void:
 		_current.queue_free()
 	_current = screen
 	_host.add_child(screen)
+	screen.modulate.a = 0.0
+	screen.create_tween().tween_property(screen, "modulate:a", 1.0, FADE_SECONDS)
 
 
 func _show_select() -> void:
@@ -83,6 +86,14 @@ func _show_select() -> void:
 	_swap(select)
 	select.setup(_repo, _save.progress, _last_index if _last_index >= 0 else _first_uncleared_index())
 	select.level_chosen.connect(_start_level)
+	select.settings_requested.connect(_show_settings)
+
+
+func _show_settings() -> void:
+	var settings := SettingsScreen.new()
+	_swap(settings)
+	settings.setup(_save.progress, _save, _audio)
+	settings.back_requested.connect(_show_select)
 
 
 ## First level the player has not cleared yet (the last level if all are done).
