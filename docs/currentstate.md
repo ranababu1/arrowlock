@@ -16,7 +16,8 @@
 | Save v2 + rewards (R2) | Implemented and tested: stars, coins, world unlock, badges, v1 migration. UI only shows coins and a result line; no level select, no badge screen |
 | Helpers | Undo (20), Hint (30), +3 moves (50, once per attempt) wired to coins |
 | Audio | Implemented: music loop and 10 effects, original and synthesised (`tools/make_audio.py`); tested for wiring, not auditioned by ear |
-| Settings screen | Implemented: music and sound toggles, saved; no haptics, no volume sliders |
+| Settings screen | Implemented: music, sound and tutorial-tips toggles, music and effects volume sliders, all saved; no haptics |
+| Tutorial | Implemented for levels 1 to 3 (tip card, pointers, blocked-arrow lesson); ends after level 3, re-enable in Settings; not user-tested |
 | Visual design | Redesigned: Poppins font, palette, glass theme, animated backdrop, cards, vector icons, flat rounded arrows |
 | Safe-area insets | Implemented via `DisplayServer.get_display_safe_area()` with a 16px minimum; not tested on a device with a cutout |
 | Android export (M0) | Debug APK exports and runs on the emulator; physical device not tested |
@@ -35,10 +36,10 @@ Android package ID: `dev.imrn.arrowlock` (owner's domain imrn.dev); version name
 Godot 4.7.2 stable (winget). `config/features` says 4.3; project runs on 4.7.2.
 
 ## Build/test status
-Verified 2026-11-01: `godot_console --headless --path . -s tests/run_tests.gd` -> 266 passed, 0 failed. `godot_console --headless --path . -s tools/generate_levels.gd` -> 100 levels, 0 failures. Headless startup of the main scene: no errors. Android debug export + install + launch, tap-through of level 1 incl. move limit and game over, verified on the Pixel_10a emulator (2026-11-01). Not verified: physical device, pause/resume, save persistence across restarts.
+Verified 2026-11-01: `godot_console --headless --path . -s tests/run_tests.gd` -> 313 passed, 0 failed. `godot_console --headless --path . -s tools/generate_levels.gd` -> 100 levels, 0 failures. Headless startup of the main scene: no errors. Android debug export + install + launch, tap-through of level 1 incl. move limit and game over, verified on the Pixel_10a emulator (2026-11-01). Not verified: physical device, pause/resume, save persistence across restarts.
 
 ## Known issues / risks
-- No tutorial, haptics or badge screen yet. Audio has not been listened to by the owner.
+- No haptics or badge screen yet. Audio has not been listened to by the owner, so it is unreviewed.
 - Emulator `adb` is flaky (goes offline); device runs often need a retry.
 - A level is lost only at 0 moves even if it is already unwinnable.
 - Economy numbers and the generator's difficulty targets are untested guesses; tune after playtesting.
@@ -50,7 +51,7 @@ Verified 2026-11-01: `godot_console --headless --path . -s tests/run_tests.gd` -
 ## Next steps
 1. Owner: answer the open questions in `docs/level-plan-100.md` section 11.
 2. Owner: play through the 100 levels; note too-easy / too-hard / boring ones; adjust `tools/world_specs.json` and regenerate (R5/R6). Level 100 looks easy for a finale.
-3. Owner: listen to the music and effects and say what to change (edit `tools/make_audio.py`, rerun). Then add a first-run tutorial (teach the blocked tap), and a badge/stats screen.
+3. Owner: listen to the music and effects and say what to change (edit `tools/make_audio.py`, rerun). Then play the tutorial and say whether it is clear, and add a badge/stats screen.
 4. Android check on a physical device (M0); test pause/resume and save persistence.
 
 ## Decisions needing owner approval

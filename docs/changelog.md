@@ -2,6 +2,21 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-01 — Tutorial tips and volume sliders
+
+### Added
+- `Tutorial` (pure rules) for the first three levels. Level 1: a tip card and a green pulsing outline on a free arrow that blocks nothing; after the first tap, the blocked arrow is outlined in red and the arrow blocking it in white, with text explaining that tapping a blocked arrow wastes a move; then an encouraging line. Level 2: explains that every tap costs a move. Level 3: mentions Hint and its cost. Tips end once level 3 is cleared for the first time and can be switched back on in Settings ("Tutorial tips"). Saved as `tips_enabled`.
+- `GameScreen` tip card and `BoardView` pointers; frames pulse brighter.
+- Volume sliders in Settings for music and effects (`VolumeBar`; saved as `music_volume` and `sfx_volume`, 0..1; 1 = the mixed level; values are clamped on load). Effects slider plays a sample on release. Mute toggles still work independently.
+
+### Verification
+- `godot_console --headless --path . -s tests/run_tests.gd`: 313 passed, 0 failed. New tests cover each tutorial step against the real level 1 to 3 boards, the tip card and pointers through a full level-1 playthrough on the real screen, tips ending after level 3, the Settings toggle, volume save/clamp/load, correct dB on both buses, drag/press/release behaviour of the slider and its Settings wiring.
+- Emulator (dev.imrn.arrowlock), fresh install: level 1 shows the tip and green pointer; after one tap shows the red blocked arrow, the white blocker and the explanation; Settings shows the new toggle and sliders; a real swipe on the music slider wrote `music_volume` 0.4265 to the save file.
+- Not verified: how it sounds at different slider positions (no listening here); the tutorial on levels 2 and 3 on the device (covered by tests only); that new players understand the tips (no user test yet).
+
+### Sound feedback
+- Audio has not been changed beyond the earlier softening of the clear effect: there is no listening feedback yet. The sliders let the owner set a taste level; specific changes (tone, tempo, which effects feel wrong) need the owner's notes, then edit `tools/make_audio.py` and rerun it.
+
 ## 2026-11-01 — Package ID is now dev.imrn.arrowlock
 
 - Owner decision: all apps use the domain imrn.dev, so Arrowlock's Android package ID is `dev.imrn.arrowlock` (was the placeholder `com.ranababu.arrowlock`).
