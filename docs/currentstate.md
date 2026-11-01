@@ -28,6 +28,9 @@
 - `scripts/services/audio_manager.gd`; `assets/audio/`, `assets/fonts/`; `tools/make_audio.py`.
 - `data/levels.json` — versioned level data (schema version 2, `moves_limit` required). `tests/run_tests.gd` — test runner.
 
+## Identity
+Android package ID: `dev.imrn.arrowlock` (owner's domain imrn.dev); version name 0.1.0, version code 1. Set in the local `export_presets.cfg`, which is gitignored.
+
 ## Toolchain
 Godot 4.7.2 stable (winget). `config/features` says 4.3; project runs on 4.7.2.
 

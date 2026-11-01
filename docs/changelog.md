@@ -2,6 +2,12 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-01 — Package ID is now dev.imrn.arrowlock
+
+- Owner decision: all apps use the domain imrn.dev, so Arrowlock's Android package ID is `dev.imrn.arrowlock` (was the placeholder `com.ranababu.arrowlock`).
+- Changed `package/unique_name` in the local, gitignored `export_presets.cfg`. Rebuilt the debug APK, uninstalled the old package from the Pixel_10a emulator and installed the new one: `adb shell pm list packages` shows `package:dev.imrn.arrowlock`; the app launches to the level select with a fresh save (0/300 stars, 100 coins). Old emulator save data was not migrated.
+- Because `export_presets.cfg` is not committed, the ID is recorded here and in `currentstate.md`; the preset must be recreated with it on a new machine.
+
 ## 2026-11-01 — Audio, settings and visual redesign
 
 Pushed in small steps (10 commits, `8941d5c` to `467cd94`).
