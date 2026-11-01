@@ -1294,7 +1294,7 @@ func _test_difficulty_ui() -> void:
 	screen.difficulty_buttons[1].pressed.emit()
 	_check(screen.confirm_visible(), "choosing the other mode asks first")
 	var warning := SettingsScreen.warning_text(Difficulty.DIFFICULT)
-	_check(warning.contains("erased") and warning.contains("Easy mode is locked") and warning.contains("cannot be undone"), "the warning says progress is erased and the old mode is locked")
+	_check(warning.contains("erases") and warning.contains("Easy mode is locked") and warning.contains("cannot be undone"), "the warning says progress is erased and the old mode is locked")
 	_check(save.progress.difficulty == Difficulty.EASY and save.progress.cleared_count() == 2 and save.progress.coins > 640 - 1, "nothing changes while the warning is open")
 	screen.cancel_button.pressed.emit()
 	_check(not screen.confirm_visible() and save.progress.cleared_count() == 2 and switched.is_empty(), "keeping progress changes nothing")

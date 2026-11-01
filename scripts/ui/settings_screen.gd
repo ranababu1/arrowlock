@@ -106,8 +106,8 @@ func _build() -> void:
 
 ## What a tier switch will do, shown before anything is wiped.
 static func warning_text(tier: int) -> String:
-	return "Switching to %s mode starts you over. All your stars, coins and badges in %s mode are erased, %s mode is locked until you switch back (which erases this progress too), and this cannot be undone." % [
-		Difficulty.name_of(tier), Difficulty.name_of(1 - tier), Difficulty.name_of(1 - tier)]
+	return "Switching to %s mode erases all your stars, coins and badges. %s mode is locked until you switch back, and switching back erases your %s progress too. This cannot be undone." % [
+		Difficulty.name_of(tier), Difficulty.name_of(1 - tier), Difficulty.name_of(tier)]
 
 
 func confirm_visible() -> bool:

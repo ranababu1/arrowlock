@@ -2,6 +2,18 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-02 — Difficulty is chosen in Settings; switching resets progress
+
+### Changed
+- The Easy / Difficult buttons moved from the menu to Settings. A player plays one mode at a time and the other is locked. The menu only names the mode in play ("Easy mode" / "Difficult mode") with its rules.
+- Choosing the other mode in Settings opens a warning ("Reset your progress?") saying that all stars, coins and badges are erased, that the other mode is locked until switching back, that switching back erases the new progress too, and that it cannot be undone. "Keep my progress" changes nothing; "Erase progress and switch" resets (`Progress.switch_difficulty`): levels and badges cleared, coins back to 100, sound/volume/tips settings kept; saved immediately.
+- This replaces the earlier behaviour (both modes open at once, separate progress per mode). Level ids and the Difficult pack are unchanged.
+
+### Verification
+- `godot_console --headless --path . -s tests/run_tests.gd`: 408 passed, 0 failed (warning shown first and nothing changes while it is open; cancel keeps progress; confirm erases levels, badges and coins, keeps audio settings, saves, and tells the app; switching back also resets; switching to the current mode is refused).
+- Emulator, seeded save (640 coins, 2 levels, 1 badge): tapping Difficult showed the warning with the save unchanged; "Keep my progress" left it unchanged; "Erase progress and switch" wrote `difficulty 1`, 100 coins, no levels, no badges, and the menu then read "Difficult mode" with 0 / 300 stars.
+- Not verified: wording by a real player; a restart of the app after switching (the save file was checked, not a cold start).
+
 ## 2026-11-01 — Easy and Difficult tiers with a per-tap countdown
 
 ### Added
