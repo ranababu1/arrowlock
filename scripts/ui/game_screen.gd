@@ -23,6 +23,7 @@ var _levels: Array[Dictionary]
 var _index: int
 var _progress: Progress
 var _save: SaveService
+var _audio: AudioManager  ## optional; null in tests that do not need sound
 
 var _title: Label
 var _coins: Label
@@ -41,7 +42,8 @@ var _overlay_kind := ""
 
 
 ## Call after adding to the tree.
-func setup(levels: Array[Dictionary], index: int, progress: Progress, save: SaveService) -> void:
+func setup(levels: Array[Dictionary], index: int, progress: Progress, save: SaveService, audio: AudioManager = null) -> void:
+	_audio = audio
 	_levels = levels
 	_index = index
 	_progress = progress
@@ -83,6 +85,7 @@ func use_hint() -> void:
 		_note.text = "Hint costs %d coins" % Economy.PRICE_HINT
 		return
 	board_view.show_hint(id)
+	_sfx("hint")
 	_note.text = "Tap the highlighted arrow"
 	_save.save_data()
 	_refresh()
@@ -95,6 +98,7 @@ func use_extra_moves() -> void:
 		_note.text = "Extra moves cost %d coins" % Economy.PRICE_EXTRA_MOVES
 		return
 	controller.grant_extra_moves(Economy.EXTRA_MOVES)
+	_sfx("coin")
 	_save.save_data()
 	_hide_overlay()
 	_refresh()
@@ -232,6 +236,8 @@ func _load_level() -> void:
 	controller = GameController.new()
 	controller.completed.connect(_on_completed)
 	controller.lost.connect(_on_lost)
+	controller.arrow_removed.connect(func(_id: int, _info: Dictionary) -> void: _sfx("tap_clear"))
+	controller.move_blocked.connect(func(_id: int, _blocker: int) -> void: _sfx("tap_blocked"))
 	if not controller.start(level["board"], level["moves_limit"]):
 		_status.text = "This level is misconfigured."
 		return
@@ -284,6 +290,7 @@ func _on_completed(moves: int) -> void:
 	_set_button(_overlay_extra, "Replay", restart)
 	_set_button(_overlay_secondary, "Menu", func() -> void: menu_requested.emit())
 	_show_overlay("won")
+	_play_win_sounds(stars, result.get("coins_earned", 0))
 	_refresh()
 
 
@@ -298,8 +305,27 @@ func _on_lost(wasted: int) -> void:
 	_overlay_extra.disabled = not _progress.can_afford(Economy.PRICE_EXTRA_MOVES)
 	_set_button(_overlay_secondary, "Menu", func() -> void: menu_requested.emit())
 	_show_overlay("lost")
+	_sfx("lose")
 	_status.text = "Out of moves!"
 	_refresh()
+
+
+func _sfx(sound_name: String) -> void:
+	if _audio != null:
+		_audio.play(sound_name)
+
+
+## Fanfare, then one rising ding per star, then the coin sound if coins were paid.
+func _play_win_sounds(stars: int, coins_earned: int) -> void:
+	if _audio == null:
+		return
+	_audio.play("win")
+	var at := 0.6
+	for i in stars:
+		_audio.play_later("star%d" % (i + 1), at)
+		at += 0.3
+	if coins_earned > 0:
+		_audio.play_later("coin", at + 0.1)
 
 
 ## Replaces the handler of a panel button (the same three buttons serve both panels).

@@ -33,6 +33,7 @@ func _initialize() -> void:
 	_test_generation_is_deterministic()
 	await _test_level_select_ui()
 	_test_audio_manager()
+	_test_game_screen_sounds()
 	_test_game_screen_ui()
 	print("Tests: %d passed, %d failed" % [_passed, _failed])
 	quit(1 if _failed > 0 else 0)
@@ -571,6 +572,42 @@ func _test_level_select_ui() -> void:
 	later.setup(repo, progress)
 	_check(later.enabled_level_count() == 20, "clearing 8 levels opens world 2")
 	later.queue_free()
+
+
+func _test_game_screen_sounds() -> void:
+	var repo := _pack_repo()
+	var audio := AudioManager.new()
+	root.add_child(audio)
+	var screen := GameScreen.new()
+	root.add_child(screen)
+	var progress := Progress.new()
+	screen.setup(repo.levels, 0, progress, SaveService.new("user://test_sound_save.json"), audio)
+	var blocked := _blocked_cell(screen.controller)
+	screen.tap_cell(blocked)
+	_check(audio.last_sfx == "tap_blocked", "a blocked tap plays the blocked sound")
+	screen.use_hint()
+	_check(audio.last_sfx == "hint", "a hint plays the hint sound")
+	var board: BoardState = repo.levels[0]["board"]
+	var first_id: int = PuzzleSolver.solve(board)[0]
+	screen.tap_cell(board.arrow_position(first_id))
+	_check(audio.last_sfx == "tap_clear", "clearing an arrow plays the clear sound")
+	var played_before := audio.sfx_played
+	for id in PuzzleSolver.solve(board).slice(1):
+		screen.tap_cell(board.arrow_position(id))
+	_check(audio.last_sfx == "win" and audio.sfx_played > played_before, "winning plays the win sound")
+	screen.restart()
+	var lose_board := screen.controller
+	for _i in lose_board.moves_limit:
+		screen.tap_cell(blocked)
+	_check(audio.last_sfx == "lose", "game over plays the lose sound")
+	audio.apply_settings(true, false)
+	var silent_before := audio.sfx_played
+	screen.restart()
+	screen.tap_cell(blocked)
+	_check(audio.sfx_played == silent_before, "no effects play when sound is off")
+	screen.queue_free()
+	audio.queue_free()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_sound_save.json"))
 
 
 func _test_game_screen_ui() -> void:

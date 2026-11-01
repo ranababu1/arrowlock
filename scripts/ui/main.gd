@@ -10,6 +10,7 @@ var _save := SaveService.new()
 var _host: MarginContainer
 var _current: Control
 var _last_index := -1
+var _audio := AudioManager.new()
 
 
 func _ready() -> void:
@@ -17,6 +18,11 @@ func _ready() -> void:
 	# Android back goes to the menu from a level instead of quitting the app.
 	get_tree().set_auto_accept_quit(false)
 	_save.load_data()
+	add_child(_audio)
+	_audio.apply_settings(_save.progress.music_enabled, _save.progress.sound_enabled)
+	_audio.start_music()
+	# Every button, present and future, gets the click sound.
+	get_tree().node_added.connect(_on_node_added)
 	_host = MarginContainer.new()
 	_host.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(_host)
@@ -48,6 +54,11 @@ func _apply_safe_area() -> void:
 	_host.add_theme_constant_override("margin_top", roundi(top))
 	_host.add_theme_constant_override("margin_right", roundi(right))
 	_host.add_theme_constant_override("margin_bottom", roundi(bottom))
+
+
+func _on_node_added(node: Node) -> void:
+	if node is BaseButton:
+		node.pressed.connect(func() -> void: _audio.play("click"))
 
 
 func _notification(what: int) -> void:
@@ -85,6 +96,6 @@ func _start_level(index: int) -> void:
 	_last_index = index
 	var screen := GameScreen.new()
 	_swap(screen)
-	screen.setup(_repo.levels, index, _save.progress, _save)
+	screen.setup(_repo.levels, index, _save.progress, _save, _audio)
 	screen.menu_requested.connect(_show_select)
 	screen.next_requested.connect(_start_level)
