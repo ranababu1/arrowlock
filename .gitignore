@@ -1,0 +1,24 @@
+# Godot
+.godot/
+.import/
+*.translation
+export_presets.cfg
+export_credentials.cfg
+
+# Build output
+build/
+*.apk
+*.aab
+*.idsig
+
+# Signing / secrets
+*.keystore
+*.jks
+.env
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.tmp
