@@ -18,6 +18,11 @@ func _initialize() -> void:
 	_test_solver_detects_cycle()
 	_test_repository_validation()
 	_test_shipped_levels()
+	_test_stars()
+	_test_rewards()
+	_test_world_unlock_and_bonus()
+	_test_wallet()
+	_test_helpers()
 	_test_save_roundtrip_and_corruption()
 	print("Tests: %d passed, %d failed" % [_passed, _failed])
 	quit(1 if _failed > 0 else 0)
@@ -148,26 +153,123 @@ func _test_shipped_levels() -> void:
 func _test_save_roundtrip_and_corruption() -> void:
 	var path := "user://test_save.json"
 	var s := SaveService.new(path)
-	s.record_completion(3, 9)
-	s.record_completion(3, 5)
-	s.record_completion(3, 7)
-	s.sound_enabled = false
+	s.progress.record_result(3, 6, 12, 9, 3)
+	s.progress.record_result(3, 6, 12, 6, 0)
+	s.progress.sound_enabled = false
+	s.progress.coins = 77
 	_check(s.save_data(), "save succeeds")
 	var loaded := SaveService.new(path)
 	loaded.load_data()
-	_check(loaded.completed.get(3, -1) == 5, "best move count kept")
-	_check(not loaded.sound_enabled and loaded.load_error == "", "settings round-trip")
-	# Overwrite with garbage: must fall back to defaults, not crash.
-	var f := FileAccess.open(path, FileAccess.WRITE)
-	f.store_string("{{ not json")
-	f.close()
+	_check(loaded.progress.stars_of(3) == 3 and loaded.progress.levels[3]["best_moves"] == 6, "stars and best moves kept")
+	_check(loaded.progress.coins == 77 and not loaded.progress.sound_enabled and loaded.load_error == "", "coins and settings round-trip")
+	_check(loaded.progress.badges.has("first_clear"), "badges round-trip")
+	_write_text(path, "{{ not json")
 	var corrupt := SaveService.new(path)
 	corrupt.load_data()
-	_check(corrupt.completed.is_empty() and corrupt.sound_enabled and corrupt.load_error != "", "corrupt save falls back safely")
+	_check(corrupt.progress.levels.is_empty() and corrupt.progress.coins == Economy.START_COINS and corrupt.load_error != "", "corrupt save falls back safely")
+	_write_text(path, '{"version":99}')
+	var future := SaveService.new(path)
+	future.load_data()
+	_check(future.load_error != "" and future.progress.levels.is_empty(), "unknown version falls back safely")
+	# v1 save migrates: completed levels become 1 star, unknown wasted taps.
+	_write_text(path, '{"version":1,"completed":{"1":3,"2":7,"x":4,"3":-1},"sound_enabled":false}')
+	var old := SaveService.new(path)
+	old.load_data()
+	_check(old.load_error == "" and old.progress.cleared_count() == 2 and old.progress.stars_of(2) == 1, "v1 save migrates")
+	_check(old.progress.levels[2]["best_wasted"] == -1 and not old.progress.sound_enabled, "migrated data keeps unknown wasted taps and settings")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 	var missing := SaveService.new("user://does_not_exist.json")
 	missing.load_data()
-	_check(missing.completed.is_empty() and missing.load_error == "", "missing save is a clean default")
+	_check(missing.progress.levels.is_empty() and missing.load_error == "", "missing save is a clean default")
+
+
+func _write_text(path: String, text: String) -> void:
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	f.store_string(text)
+	f.close()
+
+
+func _test_stars() -> void:
+	_check(Economy.stars_for(0, 0) == 3 and Economy.stars_for(0, 10) == 3, "no wasted taps is 3 stars")
+	_check(Economy.stars_for(2, 4) == 2, "wasted taps at half the slack is 2 stars")
+	_check(Economy.stars_for(3, 4) == 1, "wasted taps above half the slack is 1 star")
+	_check(Economy.stars_for(1, 0) == 1, "any waste with zero slack is 1 star")
+
+
+func _test_rewards() -> void:
+	var p := Progress.new()
+	_check(p.coins == Economy.START_COINS, "starting coins")
+	var r := p.record_result(1, 3, 6, 3, 0)
+	_check(r["stars"] == 3 and r["first_clear"] and r["coins_earned"] == 10 + 5 * 3, "first clear pays base + stars")
+	_check(r["new_badges"].has("first_clear") and r["new_badges"].has("perfect_clear"), "first clear and perfect badges awarded")
+	var again := p.record_result(1, 3, 6, 3, 0)
+	_check(again["coins_earned"] == 0 and not again["first_clear"], "replay with no improvement pays nothing")
+	_check(again["new_badges"].is_empty(), "badges are awarded once")
+	var before := p.coins
+	var worse := p.record_result(1, 3, 6, 6, 3)
+	_check(worse["coins_earned"] == 0 and p.coins == before and p.stars_of(1) == 3, "worse replay never lowers stars or coins")
+	p.record_result(2, 5, 10, 8, 3)
+	_check(p.stars_of(2) == 1, "wasteful clear is 1 star")
+	var up := p.record_result(2, 5, 10, 6, 1)
+	_check(up["improved"] and up["coins_earned"] == 5 and p.stars_of(2) == 2, "improving stars pays the difference")
+	_check(p.levels[2]["best_wasted"] == 1 and p.levels[2]["best_moves"] == 6, "best results tracked")
+	_check(p.record_result(3, 3, 2, 3, 0).is_empty() and not p.is_cleared(3), "limit below arrow count rejected")
+	_check(p.record_result(3, 3, 6, 2, 0).is_empty(), "moves used below arrow count rejected")
+	_check(p.record_result(3, 3, 6, 4, 5).is_empty(), "wasted taps above moves used rejected")
+	_check(p.total_stars() == 5, "total stars summed")
+
+
+func _test_world_unlock_and_bonus() -> void:
+	var p := Progress.new()
+	_check(p.is_level_unlocked(1) and p.is_level_unlocked(10) and not p.is_level_unlocked(11), "only world 1 unlocked at start")
+	for id in range(1, 8):
+		p.record_result(id, 3, 6, 3, 0)
+	_check(not p.is_world_unlocked(1), "7 clears do not unlock the next world")
+	p.record_result(8, 3, 6, 3, 0)
+	_check(p.is_world_unlocked(1) and p.is_level_unlocked(11) and not p.is_world_unlocked(2), "8 of 10 clears unlock the next world")
+	p.record_result(9, 3, 6, 3, 0)
+	var last := p.record_result(10, 3, 6, 3, 0)
+	_check(last["world_bonus"] == Economy.WORLD_COMPLETE_BONUS, "completing a world pays the bonus")
+	_check(last["new_badges"].has("clears_10") and last["new_badges"].has("world_perfect"), "10 clears and a perfect world earn badges")
+	var replay := p.record_result(10, 3, 6, 3, 0)
+	_check(replay["world_bonus"] == 0, "world bonus paid once")
+
+
+func _test_wallet() -> void:
+	var p := Progress.new()
+	p.coins = 25
+	_check(p.spend(Economy.PRICE_UNDO) and p.coins == 5, "spend deducts coins")
+	_check(not p.spend(Economy.PRICE_UNDO) and p.coins == 5, "cannot overspend, balance unchanged")
+	_check(not p.can_afford(-1), "negative price rejected")
+	var bad := Progress.from_dict({
+		"coins": -50,
+		"levels": {"1": {"stars": 9}, "2": {"stars": 2, "best_moves": -4, "best_wasted": -9}, "abc": {"stars": 1}, "0": {"stars": 1}, "5": "oops"},
+		"badges": ["first_clear", "hacker", "first_clear", 7],
+	})
+	_check(bad.coins == 0, "negative coins clamped to zero")
+	_check(bad.cleared_count() == 1 and bad.stars_of(2) == 2, "invalid level entries dropped")
+	_check(bad.levels[2]["best_moves"] == 0 and bad.levels[2]["best_wasted"] == -1, "level numbers clamped")
+	_check(bad.badges.size() == 1 and bad.badges[0] == "first_clear", "unknown and duplicate badges dropped")
+
+
+func _test_helpers() -> void:
+	var rows := [[0, 0, "right"], [1, 0, "up"]]
+	var c := _controller_for(_board(3, 1, rows), 2)
+	_check(c.hint() == 1, "hint points at a clear arrow")
+	_check(c.moves_used == 0, "hint costs no move")
+	c.tap(Vector2i(0, 0))
+	c.tap(Vector2i(0, 0))
+	_check(c.state == GameController.State.LOST and c.hint() == -1, "no hint after loss")
+	_check(c.grant_extra_moves(Economy.EXTRA_MOVES), "extra moves continue a lost level")
+	_check(c.state == GameController.State.PLAYING and c.moves_left() == Economy.EXTRA_MOVES, "extra moves added to the budget")
+	_check(not c.grant_extra_moves(Economy.EXTRA_MOVES), "extra moves only once per attempt")
+	c.tap(Vector2i(1, 0))
+	c.tap(Vector2i(0, 0))
+	_check(c.state == GameController.State.WON, "level can be won after extra moves")
+	var notlost := _controller_for(_board(3, 1, rows), 4)
+	_check(not notlost.grant_extra_moves(3), "extra moves refused while still playing")
+	c.restart()
+	_check(c.moves_limit == 2 and c.extra_moves_granted == 0, "restart drops extra moves")
 
 
 func _test_move_limit() -> void:

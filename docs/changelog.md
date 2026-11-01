@@ -2,6 +2,23 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-01 — R2: save v2, stars, coins, helpers (logic)
+
+### Added
+- `Economy` (tuning constants: start coins 100, clear 10 + 5/star, world bonus 25, prices Undo 20 / Hint 30 / Extra moves 50 for +3 moves, 8-of-10 world unlock) and `stars_for`.
+- `Progress` (pure rules, no IO): per-level stars / best moves / best wasted taps, coins with `spend` (cannot overspend), world unlock, first-clear and improvement payouts, world-complete bonus (paid once), badges (first_clear, clears_10/50/100, perfect_clear, world_perfect), sanitising `from_dict` (clamps negatives, drops invalid levels and unknown badges), `from_v1` migration.
+- `GameController.hint()` (a clear arrow, no move cost) and `grant_extra_moves()` (only after a loss, once per attempt; restart resets).
+- `SaveService` now persists `Progress` as save schema v2; v1 saves migrate (completed levels become 1 star, unknown wasted taps); corrupt or unknown-version saves fall back to defaults.
+- `main.gd`: shows coins; a win records stars and coins; Undo now costs 20 coins and saves immediately.
+
+### Not done yet (R4 UI)
+- No Hint or Extra-moves buttons, level select, badge screen or star display; the logic and tests exist, the buttons do not.
+
+### Verification
+- `godot_console --headless --path . -s tests/run_tests.gd`: 108 passed, 0 failed.
+- Emulator (Pixel_10a): cleared level 1 with no wasted taps -> "3 star(s), +25 coins"; force-stop and relaunch -> opens level 2 with Coins: 125 (save persisted). Undo coin spend and game-over flow with coins not re-checked on device.
+- adb on the emulator went offline several times; two runs were discarded as invalid and repeated.
+
 ## 2026-11-01 — R1: move limits and game over
 
 ### Changed

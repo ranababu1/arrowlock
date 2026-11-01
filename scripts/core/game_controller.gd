@@ -20,8 +20,11 @@ var state: State = State.PLAYING
 var moves_limit: int = 0
 var moves_used: int = 0
 var wasted_taps: int = 0
+## Moves added by continuing after a loss in this attempt (0 = none yet).
+var extra_moves_granted: int = 0
 
 var _initial: BoardState
+var _original_limit: int = 0
 ## Stack of {"id": int, "info": Dictionary}; removals only.
 var _history: Array[Dictionary] = []
 
@@ -33,7 +36,7 @@ func start(puzzle: BoardState, p_moves_limit: int) -> bool:
 		push_error("moves_limit %d is below arrow count %d" % [p_moves_limit, puzzle.remaining_count()])
 		return false
 	_initial = puzzle.duplicate_state()
-	moves_limit = p_moves_limit
+	_original_limit = p_moves_limit
 	restart()
 	return true
 
@@ -44,6 +47,8 @@ func restart() -> void:
 	state = State.PLAYING
 	moves_used = 0
 	wasted_taps = 0
+	extra_moves_granted = 0
+	moves_limit = _original_limit
 
 
 func moves_left() -> int:
@@ -77,6 +82,25 @@ func tap(pos: Vector2i) -> bool:
 		completed.emit(moves_used)
 	else:
 		_check_loss()
+	return true
+
+
+## ID of a currently clear arrow, or -1 if none. Costs no move; the caller
+## charges coins.
+func hint() -> int:
+	if state != State.PLAYING:
+		return -1
+	var options := MoveValidator.removable_ids(board)
+	return options[0] if not options.is_empty() else -1
+
+
+## Continue a lost level with `count` more moves, once per attempt.
+func grant_extra_moves(count: int) -> bool:
+	if state != State.LOST or extra_moves_granted > 0 or count <= 0:
+		return false
+	moves_limit += count
+	extra_moves_granted = count
+	state = State.PLAYING
 	return true
 
 

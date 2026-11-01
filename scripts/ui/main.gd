@@ -29,7 +29,7 @@ func _ready() -> void:
 
 func _first_incomplete_index() -> int:
 	for i in _repo.levels.size():
-		if not _save.is_completed(_repo.levels[i]["id"]):
+		if not _save.progress.is_cleared(_repo.levels[i]["id"]):
 			return i
 	return 0
 
@@ -99,7 +99,8 @@ func _start_level(index: int) -> void:
 
 func _refresh_status() -> void:
 	if not _controller.is_over():
-		_status.text = "Moves left: %d   Arrows: %d" % [_controller.moves_left(), _controller.board.remaining_count()]
+		_status.text = "Moves left: %d   Arrows: %d   Coins: %d" % [
+			_controller.moves_left(), _controller.board.remaining_count(), _save.progress.coins]
 	_undo_button.disabled = not _controller.can_undo()
 
 
@@ -110,7 +111,13 @@ func _on_cell_tapped(cell: Vector2i) -> void:
 
 
 func _on_undo() -> void:
+	if not _controller.can_undo():
+		return
+	if not _save.progress.spend(Economy.PRICE_UNDO):
+		_status.text = "Undo costs %d coins (you have %d)" % [Economy.PRICE_UNDO, _save.progress.coins]
+		return
 	_controller.undo()
+	_save.save_data()
 	_refresh_status()
 	_board_view.queue_redraw()
 
@@ -132,8 +139,12 @@ func _on_lost(_wasted: int) -> void:
 
 
 func _on_completed(moves: int) -> void:
+	var level: Dictionary = _repo.levels[_level_index]
+	var result := _save.progress.record_result(
+		level["id"], level["board"].remaining_count(), level["moves_limit"], moves, _controller.wasted_taps)
 	_status.text = "Cleared in %d moves!" % moves
-	_save.record_completion(_repo.levels[_level_index]["id"], moves)
+	if not result.is_empty():
+		_status.text += "  %d star(s), +%d coins" % [result["stars"], result["coins_earned"]]
 	if not _save.save_data():
 		_status.text += " (progress could not be saved)"
 	_next_button.disabled = false
