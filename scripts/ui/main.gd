@@ -87,7 +87,10 @@ func _start_level(index: int) -> void:
 	var level: Dictionary = _repo.levels[index]
 	_controller = GameController.new()
 	_controller.completed.connect(_on_completed)
-	_controller.start(level["board"])
+	_controller.lost.connect(_on_lost)
+	if not _controller.start(level["board"], level["moves_limit"]):
+		_status.text = "This level is misconfigured."
+		return
 	_board_view.bind(_controller)
 	_title.text = "%d. %s" % [level["id"], level["name"]]
 	_next_button.disabled = true
@@ -95,8 +98,8 @@ func _start_level(index: int) -> void:
 
 
 func _refresh_status() -> void:
-	if not _controller.is_complete:
-		_status.text = "Moves: %d   Left: %d" % [_controller.move_count, _controller.board.remaining_count()]
+	if not _controller.is_over():
+		_status.text = "Moves left: %d   Arrows: %d" % [_controller.moves_left(), _controller.board.remaining_count()]
 	_undo_button.disabled = not _controller.can_undo()
 
 
@@ -121,6 +124,11 @@ func _on_restart() -> void:
 
 func _on_next() -> void:
 	_start_level((_level_index + 1) % _repo.levels.size())
+
+
+func _on_lost(_wasted: int) -> void:
+	_status.text = "Out of moves! Tap Restart."
+	_undo_button.disabled = true
 
 
 func _on_completed(moves: int) -> void:

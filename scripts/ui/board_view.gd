@@ -52,17 +52,11 @@ func _process(delta: float) -> void:
 func _gui_input(event: InputEvent) -> void:
 	if _controller == null:
 		return
-	var pressed := false
-	var pos := Vector2.ZERO
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		pressed = true
-		pos = event.position
-	elif event is InputEventScreenTouch and event.pressed:
-		pressed = true
-		pos = event.position
-	if not pressed:
+	# Touches arrive as emulated mouse clicks (project default). Handling
+	# InputEventScreenTouch as well would count every tap twice, and taps cost moves.
+	if not (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
 		return
-	var cell := _cell_at(pos)
+	var cell := _cell_at(event.position)
 	if _controller.board.in_bounds(cell):
 		cell_tapped.emit(cell)
 

@@ -1,6 +1,6 @@
 # Current State
 
-**Phase:** M1 and M3 core done and tested; M2 screen written but not visually checked. **Last updated:** 2026-11-01.
+**Phase:** Release 1 plan (`docs/level-plan-100.md`), milestone R1 (move limits) done; R2 (save v2 and rewards) is next. **Last updated:** 2026-11-01.
 **Branch/commit:** `main`, remote `origin` = https://github.com/ranababu1/arrowlock.git
 
 ## Feature status
@@ -9,9 +9,9 @@
 | Godot project scaffold | Implemented; loads and starts headless |
 | Rules engine (M1) | Implemented; automated tests pass |
 | Solver + independent cross-check | Implemented; automated tests pass |
-| Puzzle screen, undo/restart (M2) | Implemented; automated tests pass; no blocked-move sound/haptics |
+| Puzzle screen, undo/restart, move limit, game over (M2/R1) | Implemented; tests pass; verified on emulator; no sound/haptics, minimal game-over UI |
 | Level loading + validation (M3) | Implemented; automated tests pass |
-| Content | Partial: 4 of ~40 levels; no tutorial text |
+| Content | Partial: 4 of 100 levels (release 1 target); no tutorial text |
 | Save/progress (M3) | Implemented; automated tests pass; no level-select screen, resumes at first incomplete level |
 | Settings/pause menu, audio, haptics | Planned (`sound_enabled` flag is saved but unused) |
 | Safe-area insets | Planned (fixed 16px margins only) |
@@ -21,22 +21,26 @@
 - `scripts/core/` — pure logic, no Node dependencies: `board_state.gd`, `move_validator.gd`, `puzzle_solver.gd`, `game_controller.gd`.
 - `scripts/services/` — `puzzle_repository.gd`, `save_service.gd`.
 - `scripts/ui/` — `main.gd` (screen wiring), `board_view.gd` (drawing/input only).
-- `data/levels.json` — versioned level data (schema version 1). `tests/run_tests.gd` — test runner.
+- `data/levels.json` — versioned level data (schema version 2, `moves_limit` required). `tests/run_tests.gd` — test runner.
 
 ## Toolchain
 Godot 4.7.2 stable (winget). `config/features` says 4.3; project runs on 4.7.2.
 
 ## Build/test status
-Verified 2026-11-01: `godot_console --headless --path . -s tests/run_tests.gd` -> 55 passed, 0 failed. Headless startup of the main scene: no errors. Android debug export + install + launch + tap-through of level 1 verified on the Pixel_10a emulator (2026-11-01). Not verified: physical device, pause/resume, save persistence across restarts.
+Verified 2026-11-01: `godot_console --headless --path . -s tests/run_tests.gd` -> 65 passed, 0 failed. Headless startup of the main scene: no errors. Android debug export + install + launch, tap-through of level 1 incl. move limit and game over, verified on the Pixel_10a emulator (2026-11-01). Not verified: physical device, pause/resume, save persistence across restarts.
 
 ## Known issues / risks
+- Project has no icon (export warns); needed before release.
+- A level is lost only at 0 moves even if it is already unwinnable.
+- Undo is free until the coin system (R2) exists.
 - `DirAccess.rename_absolute` overwrite behaviour on Windows is unconfirmed; save atomicity is unverified.
 - Board view has no minimum cell size check for large boards.
 
 ## Next steps
-1. Run the game in the editor; check touch/mouse input and layout at phone aspect ratios.
-2. Add level select, tutorial prompts, settings/pause, and grow content to ~40 levels.
-3. Android check on a physical device (M0); test pause/resume and save persistence.
+1. Owner: answer the open questions in `docs/level-plan-100.md` section 11.
+2. R2: save v2, stars, coins, helpers as pure logic with tests.
+3. R3: level generator + validation; then UI (R4) and the 100 levels.
+4. Android check on a physical device (M0); test pause/resume and save persistence.
 
 ## Decisions needing owner approval
 - Release 1 scope is `docs/level-plan-100.md` (100 levels, move limits, rewards, leaderboard). Open questions are in its section 11; the online leaderboard needs explicit approval. `docs/level-plan-500.md` is deferred. Nothing from these plans is implemented; the running build has unlimited moves and 4 levels.

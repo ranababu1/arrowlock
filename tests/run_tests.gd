@@ -14,6 +14,7 @@ func _initialize() -> void:
 	_test_controller_flow()
 	_test_completion_fires_once()
 	_test_undo_restart()
+	_test_move_limit()
 	_test_solver_detects_cycle()
 	_test_repository_validation()
 	_test_shipped_levels()
@@ -67,19 +68,20 @@ func _test_empty_and_invalid() -> void:
 	_check(not MoveValidator.can_remove(b, 99), "unknown id is not removable")
 
 
-func _controller_for(b: BoardState) -> GameController:
+func _controller_for(b: BoardState, limit: int = -1) -> GameController:
 	var c := GameController.new()
-	c.start(b)
+	# Default: generous limit so rule tests are not affected by the budget.
+	c.start(b, limit if limit >= 0 else b.remaining_count() * 2)
 	return c
 
 
 func _test_controller_flow() -> void:
 	var c := _controller_for(_board(3, 1, [[0, 0, "right"], [1, 0, "up"]]))
 	_check(not c.tap(Vector2i(0, 0)), "blocked tap does nothing")
-	_check(c.move_count == 0 and c.board.remaining_count() == 2, "blocked tap leaves state unchanged")
+	_check(c.board.remaining_count() == 2 and c.wasted_taps == 1, "blocked tap leaves board unchanged and is counted as wasted")
 	_check(not c.tap(Vector2i(2, 0)), "tap on empty cell ignored")
 	_check(c.tap(Vector2i(1, 0)), "clear tap removes arrow")
-	_check(c.move_count == 1, "move counted")
+	_check(c.moves_used == 2, "blocked tap and clear tap each cost a move")
 
 
 func _test_completion_fires_once() -> void:
@@ -89,7 +91,7 @@ func _test_completion_fires_once() -> void:
 	c.tap(Vector2i(0, 0))
 	c.tap(Vector2i(1, 0))
 	c.tap(Vector2i(1, 0))
-	_check(c.is_complete and count[0] == 1, "completion emitted exactly once")
+	_check(c.state == GameController.State.WON and count[0] == 1, "completion emitted exactly once")
 	_check(not c.undo(), "undo disabled after completion")
 
 
@@ -97,11 +99,11 @@ func _test_undo_restart() -> void:
 	var c := _controller_for(_board(3, 1, [[0, 0, "right"], [1, 0, "up"]]))
 	c.tap(Vector2i(1, 0))
 	_check(c.undo(), "undo succeeds")
-	_check(c.board.remaining_count() == 2 and c.move_count == 0, "undo restores arrow and count")
+	_check(c.board.remaining_count() == 2 and c.moves_used == 0, "undo restores arrow and refunds its move")
 	_check(not c.undo(), "undo with empty history fails")
 	c.tap(Vector2i(1, 0))
 	c.restart()
-	_check(c.board.remaining_count() == 2 and c.move_count == 0 and not c.is_complete, "restart resets")
+	_check(c.board.remaining_count() == 2 and c.moves_used == 0 and c.wasted_taps == 0 and c.state == GameController.State.PLAYING, "restart resets")
 
 
 func _test_solver_detects_cycle() -> void:
@@ -113,16 +115,16 @@ func _test_solver_detects_cycle() -> void:
 
 
 func _test_repository_validation() -> void:
-	var good := '{"version":1,"levels":[{"id":1,"width":2,"height":2,"arrows":[{"x":0,"y":0,"dir":"up"}]}]}'
+	var good := '{"version":2,"levels":[{"id":1,"moves_limit":4,"width":2,"height":2,"arrows":[{"x":0,"y":0,"dir":"up"}]}]}'
 	var repo := PuzzleRepository.new()
 	_check(repo.load_text(good) and repo.levels.size() == 1, "valid level loads")
 	var bad_inputs := [
 		"not json",
-		'{"version":2,"levels":[]}',
-		'{"version":1,"levels":[{"id":1,"width":2,"height":2,"arrows":[{"x":5,"y":0,"dir":"up"}]}]}',
-		'{"version":1,"levels":[{"id":1,"width":2,"height":2,"arrows":[{"x":0,"y":0,"dir":"sideways"}]}]}',
-		'{"version":1,"levels":[{"id":1,"width":2,"height":2,"arrows":[{"x":0,"y":0,"dir":"up"},{"x":0,"y":0,"dir":"down"}]}]}',
-		'{"version":1,"levels":[{"id":1,"width":0,"height":2,"arrows":[]}]}',
+		'{"version":1,"levels":[]}',
+		'{"version":2,"levels":[{"id":1,"moves_limit":4,"width":2,"height":2,"arrows":[{"x":5,"y":0,"dir":"up"}]}]}',
+		'{"version":2,"levels":[{"id":1,"moves_limit":4,"width":2,"height":2,"arrows":[{"x":0,"y":0,"dir":"sideways"}]}]}',
+		'{"version":2,"levels":[{"id":1,"moves_limit":4,"width":2,"height":2,"arrows":[{"x":0,"y":0,"dir":"up"},{"x":0,"y":0,"dir":"down"}]}]}',
+		'{"version":2,"levels":[{"id":1,"width":0,"height":2,"arrows":[]}]}',
 	]
 	for text in bad_inputs:
 		var r := PuzzleRepository.new()
@@ -137,10 +139,10 @@ func _test_shipped_levels() -> void:
 		_check(PuzzleSolver.is_solvable(board), "level %d solvable (greedy)" % level["id"])
 		_check(PuzzleSolver.solve_exhaustive(board) == 1, "level %d solvable (exhaustive)" % level["id"])
 		# Replaying the reference solution through the controller must complete it.
-		var c := _controller_for(board)
+		var c := _controller_for(board, level["moves_limit"])
 		for id in PuzzleSolver.solve(board):
 			c.tap(board.arrow_position(id))
-		_check(c.is_complete, "level %d reference solution completes" % level["id"])
+		_check(c.state == GameController.State.WON, "level %d reference solution completes" % level["id"])
 
 
 func _test_save_roundtrip_and_corruption() -> void:
@@ -166,3 +168,41 @@ func _test_save_roundtrip_and_corruption() -> void:
 	var missing := SaveService.new("user://does_not_exist.json")
 	missing.load_data()
 	_check(missing.completed.is_empty() and missing.load_error == "", "missing save is a clean default")
+
+
+func _test_move_limit() -> void:
+	# Two arrows; arrow 0 is blocked by arrow 1 until arrow 1 leaves.
+	var rows := [[0, 0, "right"], [1, 0, "up"]]
+	var c := _controller_for(_board(3, 1, rows), 3)
+	var lost_count := [0]
+	c.lost.connect(func(_w: int) -> void: lost_count[0] += 1)
+	_check(not c.tap(Vector2i(2, 0)) and c.moves_used == 0, "tap on empty cell is free")
+	c.tap(Vector2i(0, 0))
+	c.tap(Vector2i(0, 0))
+	_check(c.moves_used == 2 and c.wasted_taps == 2 and c.moves_left() == 1, "repeated blocked taps burn moves")
+	c.tap(Vector2i(1, 0))
+	_check(c.state == GameController.State.LOST and lost_count[0] == 1, "out of moves with arrows left is a loss, fired once")
+	_check(not c.tap(Vector2i(0, 0)) and c.moves_used == 3, "taps ignored after loss")
+	_check(not c.undo(), "undo disabled after loss")
+	c.restart()
+	_check(c.state == GameController.State.PLAYING and c.moves_left() == 3, "restart after loss resets budget")
+
+	# Winning on the very last allowed move is a win, not a loss.
+	var w := _controller_for(_board(3, 1, rows), 2)
+	var won := [0]
+	w.completed.connect(func(_m: int) -> void: won[0] += 1)
+	w.tap(Vector2i(1, 0))
+	w.tap(Vector2i(0, 0))
+	_check(w.state == GameController.State.WON and won[0] == 1 and w.moves_left() == 0, "win on last allowed move")
+
+	# Undo refunds the removal but not earlier wasted taps.
+	var u := _controller_for(_board(3, 1, rows), 4)
+	u.tap(Vector2i(0, 0))
+	u.tap(Vector2i(1, 0))
+	_check(u.moves_used == 2, "two moves used before undo")
+	u.undo()
+	_check(u.moves_used == 1 and u.wasted_taps == 1, "undo refunds removal only")
+
+	# A limit below the arrow count can never be won and is rejected.
+	var bad := GameController.new()
+	_check(not bad.start(_board(3, 1, rows), 1), "limit below arrow count rejected")

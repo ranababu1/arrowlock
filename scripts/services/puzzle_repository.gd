@@ -2,10 +2,10 @@ class_name PuzzleRepository
 extends RefCounted
 ## Loads and validates curated level data. Level files are data only.
 
-const SUPPORTED_VERSION := 1
+const SUPPORTED_VERSION := 2
 const MAX_BOARD_SIZE := 16
 
-## Parsed levels: {"id": int, "name": String, "board": BoardState}.
+## Parsed levels: {"id": int, "name": String, "board": BoardState, "moves_limit": int}.
 var levels: Array[Dictionary] = []
 ## Human-readable validation errors from the last load.
 var errors: Array[String] = []
@@ -68,4 +68,8 @@ func _parse_level(raw: Variant) -> Dictionary:
 			errors.append("Level %d has an invalid, duplicate or out-of-bounds arrow" % id)
 			return {}
 		next_id += 1
-	return {"id": id, "name": str(raw.get("name", "Level %d" % id)), "board": board}
+	var moves_limit := int(raw.get("moves_limit", 0))
+	if moves_limit < board.remaining_count():
+		errors.append("Level %d moves_limit %d is below arrow count %d" % [id, moves_limit, board.remaining_count()])
+		return {}
+	return {"id": id, "name": str(raw.get("name", "Level %d" % id)), "board": board, "moves_limit": moves_limit}

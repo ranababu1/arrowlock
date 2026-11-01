@@ -2,6 +2,27 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-01 — R1: move limits and game over
+
+### Changed
+- `GameController`: every tap on an arrow costs a move (blocked or clear); taps on empty cells are free. New `State` (PLAYING/WON/LOST), `moves_limit`, `moves_used`, `wasted_taps`, `moves_left()`, `lost` signal. A win on the last allowed move is a win. Undo refunds the removed arrow's move only and is disabled after win/loss. `start()` rejects a limit below the arrow count.
+- Level schema bumped to version 2: `moves_limit` is required and validated against the arrow count. The 4 levels now use 100% slack (6, 10, 12, 16 moves). Version 1 files are rejected, not migrated (no v1 content exists besides this repo's own file).
+- UI shows "Moves left / Arrows" and "Out of moves! Tap Restart."
+
+### Fixed
+- Each touch counted as two taps because `BoardView` handled both the touch and its emulated mouse click. Harmless before taps cost moves; now only the mouse event is handled. Found on the emulator (one tap showed 6 -> 4 moves left).
+
+### Decisions applied (owner has not yet answered the open questions in `level-plan-100.md`; recommended defaults used)
+- Empty-cell taps are free. Undo refunds one move and is free for now (coin cost arrives with the reward system, R2).
+
+### Verification
+- `godot_console --headless --path . -s tests/run_tests.gd`: 65 passed, 0 failed.
+- Emulator (Pixel_10a), debug APK rebuilt: one blocked tap -> "Moves left: 5" of 6; 5 blocked taps -> "Moves left: 1"; 6th -> "Out of moves! Tap Restart."; Restart then the 3 clear taps -> "Cleared in 3 moves!".
+- Note: Godot export prints "No project icon specified" as an error but still produces a signed APK; an icon is still to do before release.
+
+### Known gap
+- The game is declared lost only when moves hit 0, even if fewer moves remain than arrows (an already-unwinnable state). Left as the literal rule; an earlier "cannot win" check is an option.
+
 ## 2026-11-01 — Release 1 scope: 100 levels, move limits, rewards (docs only)
 
 - Owner decisions (from chat): first release is 100 levels; layouts may be reused under a new name; every tap on an arrow is a move; a blocked tap wastes a move; limited moves cause game over; plan rewards and a leaderboard.

@@ -1,8 +1,8 @@
 {
-	"version": 1,
+	"version": 2,
 	"levels": [
 		{
-			"id": 1, "name": "First Exit", "width": 3, "height": 3,
+			"id": 1, "moves_limit": 6, "name": "First Exit", "width": 3, "height": 3,
 			"arrows": [
 				{"x": 1, "y": 1, "dir": "up"},
 				{"x": 0, "y": 1, "dir": "right"},
@@ -10,7 +10,7 @@
 			]
 		},
 		{
-			"id": 2, "name": "Chain", "width": 4, "height": 4,
+			"id": 2, "moves_limit": 10, "name": "Chain", "width": 4, "height": 4,
 			"arrows": [
 				{"x": 0, "y": 0, "dir": "right"},
 				{"x": 1, "y": 0, "dir": "right"},
@@ -20,7 +20,7 @@
 			]
 		},
 		{
-			"id": 3, "name": "Corner Turn", "width": 4, "height": 4,
+			"id": 3, "moves_limit": 12, "name": "Corner Turn", "width": 4, "height": 4,
 			"arrows": [
 				{"x": 0, "y": 3, "dir": "up"},
 				{"x": 0, "y": 1, "dir": "right"},
@@ -31,7 +31,7 @@
 			]
 		},
 		{
-			"id": 4, "name": "Long Way Round", "width": 5, "height": 5,
+			"id": 4, "moves_limit": 16, "name": "Long Way Round", "width": 5, "height": 5,
 			"arrows": [
 				{"x": 0, "y": 0, "dir": "down"},
 				{"x": 0, "y": 2, "dir": "right"},
