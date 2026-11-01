@@ -21,11 +21,25 @@ var music_volume: float = 1.0
 var sfx_volume: float = 1.0
 ## Coaching on the first levels; switches off once level 3 is cleared.
 var tips_enabled: bool = true
-## The tier shown on the level-select screen (a Difficulty constant).
+## The one tier the player is playing (a Difficulty constant). Changing it
+## with switch_difficulty() wipes progress, so a save only ever holds one tier.
 var difficulty: int = Difficulty.EASY
 
 
 ## World index (0-based) within the level's own tier.
+## Starts over in `tier`: clears levels, badges and coins (back to the starting
+## amount). Sound, volume and tips settings are kept. Returns false and changes
+## nothing when `tier` is already the current one or is not a tier.
+func switch_difficulty(tier: int) -> bool:
+	if tier == difficulty or tier < 0 or tier >= Difficulty.COUNT:
+		return false
+	difficulty = tier
+	levels.clear()
+	badges.clear()
+	coins = Economy.START_COINS
+	return true
+
+
 static func world_of(level_id: int) -> int:
 	return (Difficulty.local_id(level_id) - 1) / Economy.LEVELS_PER_WORLD
 

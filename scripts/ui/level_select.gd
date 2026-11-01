@@ -5,7 +5,6 @@ extends Control
 
 signal level_chosen(index: int)
 signal settings_requested
-signal difficulty_chosen(difficulty: int)
 
 const COLUMNS := 5
 ## Pixels of vertical movement before a press becomes a scroll drag.
@@ -14,8 +13,7 @@ const DRAG_THRESHOLD := 12.0
 var _repo: PuzzleRepository
 var _progress: Progress
 var _level_buttons: Array[Button] = []
-## One button per tier, index = Difficulty constant.
-var difficulty_buttons: Array[Button] = []
+var mode_label: Label
 var _scroll: ScrollContainer
 var _tracking := false
 var _dragging := false
@@ -101,7 +99,7 @@ func _build(focus_index: int) -> void:
 
 	root.add_child(_header())
 	root.add_child(_chips())
-	root.add_child(_difficulty_switch())
+	root.add_child(_mode_line())
 	root.add_child(_continue_button(focus_index))
 
 	_scroll = ScrollContainer.new()
@@ -147,27 +145,18 @@ func _chips() -> Control:
 	return row
 
 
-## Easy | Difficult, with a line below describing the selected tier's rules.
-func _difficulty_switch() -> Control:
+## The tier being played and its rules. It is changed in Settings, because
+## switching wipes progress.
+func _mode_line() -> Control:
 	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 6)
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 10)
-	box.add_child(row)
-	difficulty_buttons.clear()
-	for tier in Difficulty.COUNT:
-		var button := Button.new()
-		button.text = Difficulty.name_of(tier)
-		button.focus_mode = Control.FOCUS_NONE
-		button.custom_minimum_size = Vector2(0, 52)
-		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		if tier == _progress.difficulty:
-			button.theme_type_variation = "DangerButton" if tier == Difficulty.DIFFICULT else "PrimaryButton"
-		button.pressed.connect(func() -> void:
-			if not _suppress_press and tier != _progress.difficulty:
-				difficulty_chosen.emit(tier))
-		difficulty_buttons.append(button)
-		row.add_child(button)
+	box.add_theme_constant_override("separation", 2)
+	mode_label = Label.new()
+	mode_label.text = "%s mode" % Difficulty.name_of(_progress.difficulty)
+	mode_label.theme_type_variation = "Subheading"
+	mode_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	if _progress.difficulty == Difficulty.DIFFICULT:
+		mode_label.add_theme_color_override("font_color", Palette.RED)
+	box.add_child(mode_label)
 	var rules := Label.new()
 	rules.text = Difficulty.rule_text(_progress.difficulty)
 	rules.theme_type_variation = "Caption"

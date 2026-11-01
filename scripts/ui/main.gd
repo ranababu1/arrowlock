@@ -103,20 +103,12 @@ func _select_tier(tier: int) -> void:
 	_repo = _repos[tier]
 
 
-func _change_difficulty(tier: int) -> void:
-	_select_tier(tier)
-	_last_index = -1
-	_save.save_data()
-	_show_select()
-
-
 func _show_select() -> void:
 	var select := LevelSelect.new()
 	_swap(select)
 	select.setup(_repo, _save.progress, _last_index if _last_index >= 0 else _first_uncleared_index())
 	select.level_chosen.connect(_start_level)
 	select.settings_requested.connect(_show_settings)
-	select.difficulty_chosen.connect(_change_difficulty)
 
 
 func _show_settings() -> void:
@@ -124,6 +116,10 @@ func _show_settings() -> void:
 	_swap(settings)
 	settings.setup(_save.progress, _save, _audio)
 	settings.back_requested.connect(_show_select)
+	# Settings has already reset the progress; point the menus at the new pack.
+	settings.difficulty_switched.connect(func(_tier: int) -> void:
+		_select_tier(_save.progress.difficulty)
+		_last_index = -1)
 
 
 ## First level the player has not cleared yet (the last level if all are done).

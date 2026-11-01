@@ -1256,15 +1256,8 @@ func _test_difficulty_ui() -> void:
 	root.add_child(select)
 	select.setup(hard, progress, 0)
 	await process_frame
-	_check(select.difficulty_buttons.size() == 2, "the menu has an Easy and a Difficult button")
-	_check(select.difficulty_buttons[1].theme_type_variation == "DangerButton" and select.difficulty_buttons[0].theme_type_variation == "", "the active tier is highlighted")
+	_check(select.mode_label.text == "Difficult mode", "the menu names the mode being played")
 	_check(select.level_button_count() == 100 and select.enabled_level_count() == 10, "Difficult starts with its first world open")
-	var chosen: Array = []
-	select.difficulty_chosen.connect(func(tier: int) -> void: chosen.append(tier))
-	select.difficulty_buttons[1].pressed.emit()
-	_check(chosen.is_empty(), "choosing the tier already shown does nothing")
-	select.difficulty_buttons[0].pressed.emit()
-	_check(chosen == [Difficulty.EASY], "choosing Easy asks for the Easy pack")
 	var picked: Array = []
 	select.level_chosen.connect(func(index: int) -> void: picked.append(index))
 	select.press_level(3)
@@ -1276,11 +1269,53 @@ func _test_difficulty_ui() -> void:
 	root.add_child(easy_select)
 	easy_select.setup(_pack_repo(), Progress.new(), 0)
 	await process_frame
-	var tiers: Array = []
-	easy_select.difficulty_chosen.connect(func(tier: int) -> void: tiers.append(tier))
-	easy_select.difficulty_buttons[1].pressed.emit()
-	_check(tiers == [Difficulty.DIFFICULT] and easy_select.difficulty_buttons[0].theme_type_variation == "PrimaryButton", "Easy is the default and can switch to Difficult")
+	_check(easy_select.mode_label.text == "Easy mode", "Easy is the default mode")
 	easy_select.queue_free()
+
+	# Switching mode lives in Settings and wipes progress after a warning.
+	var path := "user://test_switch_save.json"
+	var save := SaveService.new(path)
+	save.progress.coins = 640
+	save.progress.record_result(1, 3, 4, 3, 0)
+	save.progress.record_result(2, 3, 4, 4, 1)
+	save.progress.music_volume = 0.4
+	save.progress.sound_enabled = false
+	var audio := AudioManager.new()
+	root.add_child(audio)
+	var screen := SettingsScreen.new()
+	root.add_child(screen)
+	screen.setup(save.progress, save, audio)
+	var switched: Array = []
+	screen.difficulty_switched.connect(func(tier: int) -> void: switched.append(tier))
+	_check(screen.difficulty_buttons.size() == 2 and screen.difficulty_buttons[0].text.contains("playing"), "Settings shows which mode is being played")
+	_check(not screen.confirm_visible(), "no warning is shown at first")
+	screen.request_difficulty(Difficulty.EASY)
+	_check(not screen.confirm_visible(), "choosing the current mode does nothing")
+	screen.difficulty_buttons[1].pressed.emit()
+	_check(screen.confirm_visible(), "choosing the other mode asks first")
+	var warning := SettingsScreen.warning_text(Difficulty.DIFFICULT)
+	_check(warning.contains("erased") and warning.contains("Easy mode is locked") and warning.contains("cannot be undone"), "the warning says progress is erased and the old mode is locked")
+	_check(save.progress.difficulty == Difficulty.EASY and save.progress.cleared_count() == 2 and save.progress.coins > 640 - 1, "nothing changes while the warning is open")
+	screen.cancel_button.pressed.emit()
+	_check(not screen.confirm_visible() and save.progress.cleared_count() == 2 and switched.is_empty(), "keeping progress changes nothing")
+	screen.difficulty_buttons[1].pressed.emit()
+	screen.confirm_button.pressed.emit()
+	_check(not screen.confirm_visible() and switched == [Difficulty.DIFFICULT], "confirming switches and tells the app")
+	_check(save.progress.difficulty == Difficulty.DIFFICULT and save.progress.cleared_count() == 0 and save.progress.badges.is_empty(), "levels and badges are erased")
+	_check(save.progress.coins == Economy.START_COINS, "coins go back to the starting amount")
+	_check(is_equal_approx(save.progress.music_volume, 0.4) and not save.progress.sound_enabled, "audio settings are kept")
+	_check(screen.difficulty_buttons[1].text.contains("playing") and screen.difficulty_buttons[1].theme_type_variation == "DangerButton", "Settings now shows Difficult as the mode in play")
+	var reloaded := SaveService.new(path)
+	reloaded.load_data()
+	_check(reloaded.progress.difficulty == Difficulty.DIFFICULT and reloaded.progress.cleared_count() == 0, "the switch is saved")
+	save.progress.record_result(1001, 3, 4, 3, 0)
+	screen.request_difficulty(Difficulty.EASY)
+	screen.confirm_switch()
+	_check(save.progress.difficulty == Difficulty.EASY and save.progress.cleared_count() == 0 and switched.size() == 2, "switching back also starts over")
+	_check(not save.progress.switch_difficulty(Difficulty.EASY) and not save.progress.switch_difficulty(7), "switching to the current or an unknown mode is refused")
+	screen.queue_free()
+	audio.queue_free()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 
 
 func _test_countdown_screen() -> void:
