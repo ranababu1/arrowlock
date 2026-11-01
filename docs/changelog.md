@@ -2,6 +2,29 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-01 — Audio, settings and visual redesign
+
+Pushed in small steps (10 commits, `8941d5c` to `467cd94`).
+
+### Audio
+- `tools/make_audio.py` synthesises everything from scratch (numpy/scipy, ffmpeg for Ogg): 10 sound effects (`tap_clear`, `tap_blocked`, `hint`, `coin`, `star1-3`, `win`, `lose`, `click`) and a 49 s calm A-minor ambient loop (`assets/audio/`). Original audio, so no third-party licence. Deterministic; rerun to regenerate.
+- `AudioManager`: Music and SFX buses, a pool of effect players, looping music, mute per bus, pauses music when the app loses focus. A click sound plays on every button. Win plays a fanfare, then one rising ding per star, then a coin ding if coins were paid.
+- Settings screen (gear on the level select): Music and Sound effects toggles, saved immediately (`music_enabled`, `sound_enabled` in the save). About text with version and credits.
+
+### Visual redesign
+- Poppins font (SIL OFL, licence in `assets/fonts/`), a palette, a theme with glass, primary and icon button variations, cards, and text styles.
+- Vector icons drawn in code (no icon files), animated backdrop (gradient, glow textures, faint drifting arrows on menus only), toggle switch, icon button, progress pill.
+- Level select: logo, star and coin chips, Continue button (opens at the first uncleared level), a card per world with its own accent colour, name, progress and tiles (cleared / current with pulse / open / locked with a lock icon).
+- Game screen: back button, level and world caption, coin chip, big moves counter with a bar that turns gold then red, board inside a card, helper buttons with icon and coin price, win and game-over panels with animated star pop-in, confetti, and fades between screens.
+- Arrows: one flat rounded silhouette per arrow, coloured by direction (cyan up, mint right, coral down, lavender left), with a soft shadow; sparks when an arrow leaves; shake plus red when blocked; gold outline for hints.
+
+### Verification
+- `godot_console --headless --path . -s tests/run_tests.gd`: 266 passed, 0 failed. New tests cover the audio manager (buses, mute, unknown sound), sounds fired by game events, settings toggles and saving, design components, level-select states, and the arrow outline.
+- Audio files checked objectively (not by ear): no clipping, no start/end clicks, music loop seam jump 0.0076, the "clear" effect spectrum softened after the first check showed it was hissy.
+- Emulator: level select, settings (toggle off saved `"music_enabled": false`), game screen on a 3x3 and an 8x9 board, win panel with stars and confetti, menu opening at the right level. Android reports active audio players for the app.
+- **Not verified:** how the audio sounds (no listening possible here), confetti and the star pop-in animation as motion (screenshots only), the blocked shake, haptics (not implemented), behaviour on a phone with a notch.
+- adb on the emulator is unreliable; one run used a stale app process and showed the wrong Continue level, which a clean rerun disproved.
+
 ## 2026-11-01 — R4: interface (level select, game screen, panels, helpers)
 
 ### Added
