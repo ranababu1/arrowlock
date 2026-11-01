@@ -1,0 +1,695 @@
+{
+	"levels": [
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 4
+				}
+			],
+			"generator_version": 1,
+			"height": 5,
+			"id": 21,
+			"metrics": {
+				"arrows": 8,
+				"bait": 1,
+				"blocked_at_start": 5,
+				"depth": 3,
+				"free_at_start": 3,
+				"height": 5,
+				"width": 5
+			},
+			"moves_limit": 13,
+			"name": "Narrow Island",
+			"seed": 20261161804492,
+			"width": 5
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 4
+				}
+			],
+			"generator_version": 1,
+			"height": 5,
+			"id": 22,
+			"metrics": {
+				"arrows": 8,
+				"bait": 0,
+				"blocked_at_start": 4,
+				"depth": 3,
+				"free_at_start": 4,
+				"height": 5,
+				"width": 5
+			},
+			"moves_limit": 13,
+			"name": "Iron Gate",
+			"seed": 20261161805504,
+			"width": 5
+		},
+		{
+			"arrows": [
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 0
+				}
+			],
+			"generator_version": 1,
+			"height": 5,
+			"id": 23,
+			"metrics": {
+				"arrows": 9,
+				"bait": 0,
+				"blocked_at_start": 5,
+				"depth": 4,
+				"free_at_start": 4,
+				"height": 5,
+				"width": 5
+			},
+			"moves_limit": 15,
+			"name": "Crimson Maze",
+			"seed": 20261161806515,
+			"width": 5
+		},
+		{
+			"arrows": [
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 3
+				}
+			],
+			"generator_version": 1,
+			"height": 5,
+			"id": 24,
+			"metrics": {
+				"arrows": 9,
+				"bait": 0,
+				"blocked_at_start": 6,
+				"depth": 4,
+				"free_at_start": 3,
+				"height": 5,
+				"width": 5
+			},
+			"moves_limit": 15,
+			"name": "Bright Orbit",
+			"seed": 20261161807522,
+			"width": 5
+		},
+		{
+			"arrows": [
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 2
+				}
+			],
+			"generator_version": 1,
+			"height": 5,
+			"id": 25,
+			"metrics": {
+				"arrows": 8,
+				"bait": 0,
+				"blocked_at_start": 4,
+				"depth": 3,
+				"free_at_start": 4,
+				"height": 5,
+				"width": 5
+			},
+			"moves_limit": 13,
+			"name": "Winding Quarry",
+			"seed": 20261161808530,
+			"width": 5
+		},
+		{
+			"arrows": [
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 2
+				}
+			],
+			"generator_version": 1,
+			"height": 6,
+			"id": 26,
+			"metrics": {
+				"arrows": 10,
+				"bait": 1,
+				"blocked_at_start": 5,
+				"depth": 4,
+				"free_at_start": 5,
+				"height": 6,
+				"width": 5
+			},
+			"moves_limit": 16,
+			"name": "Tidy Signal",
+			"seed": 20261161809545,
+			"width": 5
+		},
+		{
+			"arrows": [
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 3
+				}
+			],
+			"generator_version": 1,
+			"height": 6,
+			"id": 27,
+			"metrics": {
+				"arrows": 11,
+				"bait": 1,
+				"blocked_at_start": 4,
+				"depth": 4,
+				"free_at_start": 7,
+				"height": 6,
+				"width": 5
+			},
+			"moves_limit": 18,
+			"name": "Pale Valley",
+			"seed": 20261161810547,
+			"width": 5
+		},
+		{
+			"arrows": [
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 3
+				}
+			],
+			"generator_version": 1,
+			"height": 6,
+			"id": 28,
+			"metrics": {
+				"arrows": 11,
+				"bait": 0,
+				"blocked_at_start": 5,
+				"depth": 4,
+				"free_at_start": 6,
+				"height": 6,
+				"width": 5
+			},
+			"moves_limit": 18,
+			"name": "Misty Anchor",
+			"seed": 20261161811557,
+			"width": 5
+		},
+		{
+			"arrows": [
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 3
+				}
+			],
+			"generator_version": 1,
+			"height": 6,
+			"id": 29,
+			"metrics": {
+				"arrows": 12,
+				"bait": 0,
+				"blocked_at_start": 7,
+				"depth": 5,
+				"free_at_start": 5,
+				"height": 6,
+				"width": 5
+			},
+			"moves_limit": 20,
+			"name": "Hidden Canyon",
+			"seed": 20261161812602,
+			"width": 5
+		},
+		{
+			"arrows": [
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 1
+				}
+			],
+			"generator_version": 1,
+			"height": 6,
+			"id": 30,
+			"metrics": {
+				"arrows": 12,
+				"bait": 1,
+				"blocked_at_start": 7,
+				"depth": 5,
+				"free_at_start": 5,
+				"height": 6,
+				"width": 5
+			},
+			"moves_limit": 20,
+			"name": "Quiet Ember",
+			"seed": 20261161813587,
+			"width": 5
+		}
+	],
+	"version": 2
+}

@@ -1,0 +1,820 @@
+{
+	"levels": [
+		{
+			"arrows": [
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 0
+				}
+			],
+			"generator_version": 1,
+			"height": 6,
+			"id": 31,
+			"metrics": {
+				"arrows": 10,
+				"bait": 1,
+				"blocked_at_start": 6,
+				"depth": 5,
+				"free_at_start": 4,
+				"height": 6,
+				"width": 5
+			},
+			"moves_limit": 15,
+			"name": "Zesty Forest",
+			"seed": 20261161814592,
+			"width": 5
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 2
+				}
+			],
+			"generator_version": 1,
+			"height": 6,
+			"id": 32,
+			"metrics": {
+				"arrows": 11,
+				"bait": 0,
+				"blocked_at_start": 6,
+				"depth": 5,
+				"free_at_start": 5,
+				"height": 6,
+				"width": 5
+			},
+			"moves_limit": 17,
+			"name": "Velvet Island",
+			"seed": 20261161815613,
+			"width": 5
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 4
+				}
+			],
+			"generator_version": 1,
+			"height": 6,
+			"id": 33,
+			"metrics": {
+				"arrows": 11,
+				"bait": 1,
+				"blocked_at_start": 6,
+				"depth": 4,
+				"free_at_start": 5,
+				"height": 6,
+				"width": 5
+			},
+			"moves_limit": 17,
+			"name": "Silver Gate",
+			"seed": 20261161816605,
+			"width": 5
+		},
+		{
+			"arrows": [
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 0
+				}
+			],
+			"generator_version": 1,
+			"height": 6,
+			"id": 34,
+			"metrics": {
+				"arrows": 12,
+				"bait": 0,
+				"blocked_at_start": 6,
+				"depth": 5,
+				"free_at_start": 6,
+				"height": 6,
+				"width": 5
+			},
+			"moves_limit": 18,
+			"name": "Open Maze",
+			"seed": 20261161817610,
+			"width": 5
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 4
+				}
+			],
+			"generator_version": 1,
+			"height": 6,
+			"id": 35,
+			"metrics": {
+				"arrows": 10,
+				"bait": 1,
+				"blocked_at_start": 7,
+				"depth": 5,
+				"free_at_start": 3,
+				"height": 6,
+				"width": 5
+			},
+			"moves_limit": 15,
+			"name": "Lunar Path",
+			"seed": 20261161818654,
+			"width": 5
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 6
+				}
+			],
+			"generator_version": 1,
+			"height": 7,
+			"id": 36,
+			"metrics": {
+				"arrows": 13,
+				"bait": 1,
+				"blocked_at_start": 7,
+				"depth": 5,
+				"free_at_start": 6,
+				"height": 7,
+				"width": 6
+			},
+			"moves_limit": 20,
+			"name": "Gentle Ridge",
+			"seed": 20261161819638,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 6
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 3
+				}
+			],
+			"generator_version": 1,
+			"height": 7,
+			"id": 37,
+			"metrics": {
+				"arrows": 13,
+				"bait": 3,
+				"blocked_at_start": 7,
+				"depth": 5,
+				"free_at_start": 6,
+				"height": 7,
+				"width": 6
+			},
+			"moves_limit": 20,
+			"name": "Amber Tower",
+			"seed": 20261161820640,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "up",
+					"x": 5,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 5
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 6
+				}
+			],
+			"generator_version": 1,
+			"height": 7,
+			"id": 38,
+			"metrics": {
+				"arrows": 14,
+				"bait": 3,
+				"blocked_at_start": 8,
+				"depth": 6,
+				"free_at_start": 6,
+				"height": 7,
+				"width": 6
+			},
+			"moves_limit": 21,
+			"name": "Young Valley",
+			"seed": 20261161821659,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 5
+				},
+				{
+					"dir": "up",
+					"x": 5,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 4
+				}
+			],
+			"generator_version": 1,
+			"height": 7,
+			"id": 39,
+			"metrics": {
+				"arrows": 14,
+				"bait": 2,
+				"blocked_at_start": 8,
+				"depth": 6,
+				"free_at_start": 6,
+				"height": 7,
+				"width": 6
+			},
+			"moves_limit": 21,
+			"name": "Upper Anchor",
+			"seed": 20261161822672,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 6
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 5
+				}
+			],
+			"generator_version": 1,
+			"height": 7,
+			"id": 40,
+			"metrics": {
+				"arrows": 15,
+				"bait": 0,
+				"blocked_at_start": 8,
+				"depth": 5,
+				"free_at_start": 7,
+				"height": 7,
+				"width": 6
+			},
+			"moves_limit": 23,
+			"name": "Rapid Canyon",
+			"seed": 20261161823672,
+			"width": 6
+		}
+	],
+	"version": 2
+}

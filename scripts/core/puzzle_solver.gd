@@ -22,6 +22,33 @@ static func solve(board: BoardState) -> Array[int]:
 	return order
 
 
+## Independent check used on boards too large for the exhaustive search:
+## builds the full dependency graph (an arrow waits for every arrow on its
+## ray) and runs Kahn's algorithm. Solvable iff the graph has no cycle.
+static func topo_solvable(board: BoardState) -> bool:
+	var waiting: Dictionary = {}
+	var dependents: Dictionary = {}
+	var ready: Array[int] = []
+	for id in board.arrow_ids():
+		var deps := MoveValidator.ray_arrows(board, id)
+		waiting[id] = deps.size()
+		for d in deps:
+			if not dependents.has(d):
+				dependents[d] = []
+			dependents[d].append(id)
+		if deps.is_empty():
+			ready.append(id)
+	var done := 0
+	while not ready.is_empty():
+		var id: int = ready.pop_back()
+		done += 1
+		for other in dependents.get(id, []):
+			waiting[other] -= 1
+			if waiting[other] == 0:
+				ready.append(other)
+	return done == board.remaining_count()
+
+
 static func is_solvable(board: BoardState) -> bool:
 	return board.is_empty() or not solve(board).is_empty()
 

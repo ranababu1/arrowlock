@@ -19,6 +19,21 @@ static func first_blocker(board: BoardState, id: int) -> int:
 	return -1
 
 
+## Every remaining arrow on the ray, nearest first.
+static func ray_arrows(board: BoardState, id: int) -> Array[int]:
+	var found: Array[int] = []
+	if not board.has_arrow(id):
+		return found
+	var step: Vector2i = BoardState.DIRECTIONS[board.arrow_direction(id)]
+	var pos: Vector2i = board.arrow_position(id) + step
+	while board.in_bounds(pos):
+		var other: int = board.arrow_at(pos)
+		if other != -1:
+			found.append(other)
+		pos += step
+	return found
+
+
 static func can_remove(board: BoardState, id: int) -> bool:
 	return board.has_arrow(id) and first_blocker(board, id) == -1
 

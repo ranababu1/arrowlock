@@ -2,6 +2,26 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-01 — R3: level generator, validator, reuse tooling, draft 100-level pack
+
+### Added
+- `LevelGenerator` (seeded, offline): builds boards backwards from a removal order; each new arrow's ray must be clear of arrows already placed, so boards are solvable by construction and removing arrow IDs in ascending order is a valid solution. Candidates are scored on dependency depth versus a per-world target; layouts already used are skipped. `make_variant` makes a rotated or mirrored copy under a new name (`variant_of`).
+- `BoardCanon` (8 rotations/mirrors, canonical layout key for reuse detection), `LevelMetrics` (arrows, free/blocked at start, dependency depth, bait count).
+- `LevelValidator`: per-level (limit >= arrows, greedy + topological + exhaustive solvers) and per-pack (unique ids and names, undeclared duplicate layouts, variant policy: max 15, none in the first 10 levels, at least 10 levels from the source, must truly be a rotation or mirror).
+- `PuzzleSolver.topo_solvable` (Kahn's algorithm over the full dependency graph), `MoveValidator.ray_arrows`, `PuzzleRepository.load_dir` and `variant_of` parsing.
+- `tools/world_specs.json` (10-world curve from `level-plan-100.md`, master seed 20261101) and `tools/generate_levels.gd` (writes `data/packs/world_01..10.json`, then validates).
+- **Draft** pack: 100 levels in `data/packs/`, 100 unique layouts, 0 variants needed. Not owner-reviewed and not yet used by the game; the game still loads `data/levels.json` (4 levels).
+
+### Verification
+- `godot_console --headless --path . -s tools/generate_levels.gd`: "Generated 100 levels (0 variants), failures: 0", validator clean (about 16 s).
+- `godot_console --headless --path . -s tests/run_tests.gd`: 176 passed, 0 failed (about 5 s). Covers: 1000 generated boards all solvable and solved by ascending IDs; greedy, topological and exhaustive solvers agree on 300 random boards (including unsolvable ones); canonical form stable under all 8 transforms; metrics on known boards; each validator rule; generation determinism; the draft pack files.
+- Curve check (printed from the generated metrics): level 1 is 3x3 with 3 arrows and limit 6; level 100 is 8x10 with 34 arrows, depth 9, 17 free at start, limit 40. Arrow count, depth and bait rise by world; the 5th level of each world is a breather.
+
+### Notes and limits
+- The chain-depth target (`0.3 x arrows + 0.5 x world`) and bias values are guesses; whether levels feel good is unknown until played. World 1 levels are very small (level 1 has one blocked arrow); the plan's "blocked tap taught on level 3" is not guaranteed by generation and needs a look in review.
+- Only the dependency chain is optimised; "visual difficulty" (bait, near-misses) is measured but not targeted.
+- No code path uses `data/packs/` yet (R4/R5).
+
 ## 2026-11-01 — R2: save v2, stars, coins, helpers (logic)
 
 ### Added

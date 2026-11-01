@@ -5,7 +5,7 @@ extends RefCounted
 const SUPPORTED_VERSION := 2
 const MAX_BOARD_SIZE := 16
 
-## Parsed levels: {"id": int, "name": String, "board": BoardState, "moves_limit": int}.
+## Parsed levels: {"id": int, "name": String, "board": BoardState, "moves_limit": int, "variant_of": int (-1 if none)}.
 var levels: Array[Dictionary] = []
 ## Human-readable validation errors from the last load.
 var errors: Array[String] = []
@@ -17,6 +17,35 @@ func load_file(path: String) -> bool:
 		errors.append("Cannot open %s (error %d)" % [path, FileAccess.get_open_error()])
 		return false
 	return load_text(file.get_as_text())
+
+
+## Loads every *.json file in `dir_path` (sorted by name) into one level list.
+## Duplicate level ids across files are reported as errors.
+func load_dir(dir_path: String) -> bool:
+	levels.clear()
+	errors.clear()
+	var files := DirAccess.get_files_at(dir_path)
+	if files.is_empty():
+		errors.append("No level files in %s" % dir_path)
+		return false
+	var names := Array(files).filter(func(f: String) -> bool: return f.ends_with(".json"))
+	names.sort()
+	var merged: Array[Dictionary] = []
+	var seen: Dictionary = {}
+	for file_name in names:
+		var part := PuzzleRepository.new()
+		if not part.load_file(dir_path.path_join(file_name)):
+			for e in part.errors:
+				errors.append("%s: %s" % [file_name, e])
+			continue
+		for level in part.levels:
+			if seen.has(level["id"]):
+				errors.append("%s: duplicate level id %d" % [file_name, level["id"]])
+				continue
+			seen[level["id"]] = true
+			merged.append(level)
+	levels = merged
+	return errors.is_empty()
 
 
 func load_text(text: String) -> bool:
@@ -72,4 +101,5 @@ func _parse_level(raw: Variant) -> Dictionary:
 	if moves_limit < board.remaining_count():
 		errors.append("Level %d moves_limit %d is below arrow count %d" % [id, moves_limit, board.remaining_count()])
 		return {}
-	return {"id": id, "name": str(raw.get("name", "Level %d" % id)), "board": board, "moves_limit": moves_limit}
+	return {"id": id, "name": str(raw.get("name", "Level %d" % id)), "board": board, "moves_limit": moves_limit,
+		"variant_of": int(raw.get("variant_of", -1))}

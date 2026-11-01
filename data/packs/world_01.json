@@ -1,0 +1,425 @@
+{
+	"levels": [
+		{
+			"arrows": [
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 0
+				}
+			],
+			"generator_version": 1,
+			"height": 3,
+			"id": 1,
+			"metrics": {
+				"arrows": 3,
+				"bait": 0,
+				"blocked_at_start": 1,
+				"depth": 1,
+				"free_at_start": 2,
+				"height": 3,
+				"width": 3
+			},
+			"moves_limit": 6,
+			"name": "Narrow Harbor",
+			"seed": 20261161784312,
+			"width": 3
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 0
+				}
+			],
+			"generator_version": 1,
+			"height": 3,
+			"id": 2,
+			"metrics": {
+				"arrows": 3,
+				"bait": 0,
+				"blocked_at_start": 1,
+				"depth": 1,
+				"free_at_start": 2,
+				"height": 3,
+				"width": 3
+			},
+			"moves_limit": 6,
+			"name": "Iron Orbit",
+			"seed": 20261161785321,
+			"width": 3
+		},
+		{
+			"arrows": [
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 2
+				}
+			],
+			"generator_version": 1,
+			"height": 3,
+			"id": 3,
+			"metrics": {
+				"arrows": 4,
+				"bait": 0,
+				"blocked_at_start": 2,
+				"depth": 1,
+				"free_at_start": 2,
+				"height": 3,
+				"width": 3
+			},
+			"moves_limit": 8,
+			"name": "Crimson Quarry",
+			"seed": 20261161786330,
+			"width": 3
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 1
+				}
+			],
+			"generator_version": 1,
+			"height": 3,
+			"id": 4,
+			"metrics": {
+				"arrows": 4,
+				"bait": 0,
+				"blocked_at_start": 1,
+				"depth": 1,
+				"free_at_start": 3,
+				"height": 3,
+				"width": 3
+			},
+			"moves_limit": 8,
+			"name": "Bright Ridge",
+			"seed": 20261161787340,
+			"width": 3
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 1
+				}
+			],
+			"generator_version": 1,
+			"height": 3,
+			"id": 5,
+			"metrics": {
+				"arrows": 3,
+				"bait": 0,
+				"blocked_at_start": 1,
+				"depth": 1,
+				"free_at_start": 2,
+				"height": 3,
+				"width": 3
+			},
+			"moves_limit": 6,
+			"name": "Winding Tower",
+			"seed": 20261161788348,
+			"width": 3
+		},
+		{
+			"arrows": [
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 1
+				}
+			],
+			"generator_version": 1,
+			"height": 4,
+			"id": 6,
+			"metrics": {
+				"arrows": 5,
+				"bait": 0,
+				"blocked_at_start": 3,
+				"depth": 2,
+				"free_at_start": 2,
+				"height": 4,
+				"width": 4
+			},
+			"moves_limit": 10,
+			"name": "Tidy Window",
+			"seed": 20261161789357,
+			"width": 4
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 2
+				}
+			],
+			"generator_version": 1,
+			"height": 4,
+			"id": 7,
+			"metrics": {
+				"arrows": 5,
+				"bait": 0,
+				"blocked_at_start": 3,
+				"depth": 2,
+				"free_at_start": 2,
+				"height": 4,
+				"width": 4
+			},
+			"moves_limit": 10,
+			"name": "Pale Bridge",
+			"seed": 20261161790371,
+			"width": 4
+		},
+		{
+			"arrows": [
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 3
+				}
+			],
+			"generator_version": 1,
+			"height": 4,
+			"id": 8,
+			"metrics": {
+				"arrows": 5,
+				"bait": 0,
+				"blocked_at_start": 2,
+				"depth": 2,
+				"free_at_start": 3,
+				"height": 4,
+				"width": 4
+			},
+			"moves_limit": 10,
+			"name": "Misty Delta",
+			"seed": 20261161791381,
+			"width": 4
+		},
+		{
+			"arrows": [
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 0
+				}
+			],
+			"generator_version": 1,
+			"height": 4,
+			"id": 9,
+			"metrics": {
+				"arrows": 6,
+				"bait": 0,
+				"blocked_at_start": 3,
+				"depth": 2,
+				"free_at_start": 3,
+				"height": 4,
+				"width": 4
+			},
+			"moves_limit": 12,
+			"name": "Hidden Forest",
+			"seed": 20261161792387,
+			"width": 4
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 0
+				}
+			],
+			"generator_version": 1,
+			"height": 4,
+			"id": 10,
+			"metrics": {
+				"arrows": 6,
+				"bait": 0,
+				"blocked_at_start": 3,
+				"depth": 2,
+				"free_at_start": 3,
+				"height": 4,
+				"width": 4
+			},
+			"moves_limit": 12,
+			"name": "Quiet Island",
+			"seed": 20261161793396,
+			"width": 4
+		}
+	],
+	"version": 2
+}
