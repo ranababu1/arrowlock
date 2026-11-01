@@ -35,6 +35,7 @@ var _sparks: Array[Array] = []
 var _hint_id: int = -1
 var _coach_id: int = -1
 var _coach_kind := ""
+var _coach_blocker: int = -1
 var _clock: float = 0.0
 var _rng := RandomNumberGenerator.new()
 var _tile_style := StyleBoxFlat.new()
@@ -62,6 +63,7 @@ func clear_animations() -> void:
 	_sparks.clear()
 	_hint_id = -1
 	_coach_id = -1
+	_coach_blocker = -1
 	queue_redraw()
 
 
@@ -77,14 +79,19 @@ func clear_hint() -> void:
 
 
 ## Tutorial pointer: a pulsing outline, mint for "tap this", red for "blocked".
-func set_coach(id: int, kind: String) -> void:
+func set_coach(id: int, kind: String, blocker: int = -1) -> void:
 	_coach_id = id
 	_coach_kind = kind
+	_coach_blocker = blocker
 	queue_redraw()
 
 
 func coach_id() -> int:
 	return _coach_id
+
+
+func coach_blocker() -> int:
+	return _coach_blocker
 
 
 func hint_id() -> int:
@@ -174,6 +181,8 @@ func _draw() -> void:
 			color = BLOCKED_COLOR
 			var strength: float = _flashing[id] / BLOCKED_FLASH_SECONDS
 			offset = Vector2(sin(_clock * SHAKE_HZ * TAU) * SHAKE_CELLS * cell * strength, 0.0)
+		if id == _coach_blocker and _coach_id != -1:
+			_draw_frame(origin, cell, b.arrow_position(id), Color.WHITE, 2.0)
 		if id == _coach_id:
 			_draw_frame(origin, cell, b.arrow_position(id), Palette.RED if _coach_kind == "blocked" else Palette.MINT, 2.0)
 		if id == _hint_id:
@@ -192,7 +201,7 @@ func _draw() -> void:
 
 ## A pulsing outline, so a pointer is visible without relying on colour.
 func _draw_frame(origin: Vector2, cell: float, pos: Vector2i, color: Color, pulse_hz: float) -> void:
-	var pulse := 0.6 + 0.4 * sin(_clock * pulse_hz * TAU)
+	var pulse := 0.75 + 0.25 * sin(_clock * pulse_hz * TAU)
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(color, 0.14 * pulse)
 	style.border_color = Color(color, pulse)

@@ -372,10 +372,10 @@ func _update_coach() -> void:
 		step = Tutorial.step_for(_levels[_index]["id"], controller.board, controller.moves_used, _progress.tips_enabled)
 	_coach.visible = not step.is_empty()
 	if step.is_empty():
-		board_view.set_coach(-1, "")
+		board_view.set_coach(-1, "", -1)
 		return
 	_coach_label.text = step["text"]
-	board_view.set_coach(step["target"], step["kind"])
+	board_view.set_coach(step["target"], step["kind"], step["blocker"])
 
 
 func _hide_overlay() -> void:

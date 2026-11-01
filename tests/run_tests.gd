@@ -872,7 +872,7 @@ func _test_tutorial_steps() -> void:
 	_check(MoveValidator.can_remove(board, 2) and not MoveValidator.can_remove(board, 1), "level 1 layout is as the tutorial expects")
 	board.remove_arrow(2)
 	var second := Tutorial.step_for(1, board, 1, true)
-	_check(second["text"] == Tutorial.TEXT_BLOCKED and second["kind"] == Tutorial.KIND_BLOCKED and second["target"] == 1, "after one tap it points at the blocked arrow")
+	_check(second["text"] == Tutorial.TEXT_BLOCKED and second["kind"] == Tutorial.KIND_BLOCKED and second["target"] == 1 and second["blocker"] == 0, "after one tap it points at the blocked arrow and at what blocks it")
 	board.remove_arrow(0)
 	var third := Tutorial.step_for(1, board, 2, true)
 	_check(third["text"] == Tutorial.TEXT_REST and third["target"] == -1, "once nothing is blocked it just encourages")
@@ -911,7 +911,7 @@ func _test_coach_ui() -> void:
 	var board: BoardState = repo.levels[0]["board"]
 	_check(screen.coach_text() == Tutorial.TEXT_TAP and screen.board_view.coach_id() == 2, "level 1 opens with a tip and a pointer on the free arrow")
 	screen.tap_cell(board.arrow_position(2))
-	_check(screen.coach_text() == Tutorial.TEXT_BLOCKED and screen.board_view.coach_id() == 1, "after the first tap it explains the blocked arrow")
+	_check(screen.coach_text() == Tutorial.TEXT_BLOCKED and screen.board_view.coach_id() == 1 and screen.board_view.coach_blocker() == 0, "after the first tap it outlines the blocked arrow and its blocker")
 	screen.tap_cell(board.arrow_position(0))
 	_check(screen.coach_text() == Tutorial.TEXT_REST and screen.board_view.coach_id() == -1, "once the blocker is gone it encourages")
 	screen.tap_cell(board.arrow_position(1))
