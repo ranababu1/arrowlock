@@ -88,7 +88,7 @@ def sfx():
 
     # A clear arrow slides away: a soft pluck with a short airy sweep.
     t = t_axis(0.24)
-    air = highpass(rng.standard_normal(len(t)), 2500) * np.exp(-t * 28) * 0.22
+    air = lowpass(highpass(rng.standard_normal(len(t)), 1800), 5500) * np.exp(-t * 30) * 0.07
     clear = pluck(hz(76), 0.24, 13.0) * 0.8 + air
     write_wav("tap_clear", normalise(clear, 0.7))
 

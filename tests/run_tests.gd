@@ -32,6 +32,7 @@ func _initialize() -> void:
 	_test_generated_pack_files()
 	_test_generation_is_deterministic()
 	await _test_level_select_ui()
+	_test_audio_manager()
 	_test_game_screen_ui()
 	print("Tests: %d passed, %d failed" % [_passed, _failed])
 	quit(1 if _failed > 0 else 0)
@@ -165,12 +166,14 @@ func _test_save_roundtrip_and_corruption() -> void:
 	s.progress.record_result(3, 6, 12, 9, 3)
 	s.progress.record_result(3, 6, 12, 6, 0)
 	s.progress.sound_enabled = false
+	s.progress.music_enabled = false
 	s.progress.coins = 77
 	_check(s.save_data(), "save succeeds")
 	var loaded := SaveService.new(path)
 	loaded.load_data()
 	_check(loaded.progress.stars_of(3) == 3 and loaded.progress.levels[3]["best_moves"] == 6, "stars and best moves kept")
-	_check(loaded.progress.coins == 77 and not loaded.progress.sound_enabled and loaded.load_error == "", "coins and settings round-trip")
+	_check(loaded.progress.coins == 77 and not loaded.progress.sound_enabled and not loaded.progress.music_enabled and loaded.load_error == "", "coins and audio settings round-trip")
+	_check(Progress.from_dict({}).music_enabled and Progress.from_dict({}).sound_enabled, "audio settings default to on")
 	_check(loaded.progress.badges.has("first_clear"), "badges round-trip")
 	_write_text(path, "{{ not json")
 	var corrupt := SaveService.new(path)
@@ -652,6 +655,30 @@ func _test_game_screen_ui() -> void:
 		_check(edge.overlay_kind() == "won" and menu_calls[0] == 1 and next_calls[0] == 0, "Next returns to the menu when nothing is unlocked after level %d" % repo.levels[index]["id"])
 		edge.queue_free()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_ui_save.json"))
+
+
+func _test_audio_manager() -> void:
+	var audio := AudioManager.new()
+	root.add_child(audio)
+	_check(AudioServer.get_bus_index("Music") != -1 and AudioServer.get_bus_index("SFX") != -1, "music and effects buses exist")
+	for sound_name in AudioManager.SOUNDS:
+		_check(audio.play(sound_name), "sound '%s' loads and plays" % sound_name)
+	_check(audio.sfx_played == AudioManager.SOUNDS.size() and audio.last_sfx == "click", "played sounds are counted")
+	_check(not audio.play("no_such_sound"), "unknown sound is ignored")
+	audio.start_music()
+	_check(audio.is_music_playing(), "music starts")
+	audio.apply_settings(true, false)
+	_check(audio.sfx_muted() and not audio.music_muted(), "effects can be muted without muting music")
+	var before := audio.sfx_played
+	_check(not audio.play("tap_clear") and audio.sfx_played == before, "no effect plays while effects are off")
+	audio.apply_settings(false, true)
+	_check(audio.music_muted() and not audio.sfx_muted(), "music can be muted without muting effects")
+	_check(audio.play("tap_clear"), "effects play again when switched on")
+	audio.apply_settings(true, true)
+	_check(not audio.music_muted() and not audio.sfx_muted(), "both buses unmute")
+	var stream: AudioStream = load(AudioManager.MUSIC_PATH)
+	_check(stream is AudioStreamOggVorbis and stream.get_length() > 40.0, "music loop is a 40+ second Ogg Vorbis file")
+	audio.queue_free()
 
 
 func _test_move_limit() -> void:

@@ -12,7 +12,9 @@ var coins: int = Economy.START_COINS
 ## best_wasted is -1 when unknown (migrated from save v1).
 var levels: Dictionary = {}
 var badges: Array[String] = []
+## Sound effects on/off.
 var sound_enabled: bool = true
+var music_enabled: bool = true
 
 
 static func world_of(level_id: int) -> int:
@@ -154,6 +156,7 @@ func to_dict() -> Dictionary:
 		"levels": out,
 		"badges": badges.duplicate(),
 		"sound_enabled": sound_enabled,
+		"music_enabled": music_enabled,
 	}
 
 
@@ -184,6 +187,7 @@ static func from_dict(data: Dictionary) -> Progress:
 			if typeof(b) == TYPE_STRING and BADGES.has(b) and not p.badges.has(b):
 				p.badges.append(b)
 	p.sound_enabled = bool(data.get("sound_enabled", true))
+	p.music_enabled = bool(data.get("music_enabled", true))
 	return p
 
 
