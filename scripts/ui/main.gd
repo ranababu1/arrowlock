@@ -15,6 +15,7 @@ var _audio := AudioManager.new()
 
 func _ready() -> void:
 	theme = AppTheme.build()
+	add_child(Backdrop.new())
 	# Android back goes to the menu from a level instead of quitting the app.
 	get_tree().set_auto_accept_quit(false)
 	_save.load_data()

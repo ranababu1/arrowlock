@@ -35,6 +35,7 @@ func _initialize() -> void:
 	_test_audio_manager()
 	_test_game_screen_sounds()
 	_test_game_screen_ui()
+	_test_design_components()
 	print("Tests: %d passed, %d failed" % [_passed, _failed])
 	quit(1 if _failed > 0 else 0)
 
@@ -716,6 +717,46 @@ func _test_audio_manager() -> void:
 	var stream: AudioStream = load(AudioManager.MUSIC_PATH)
 	_check(stream is AudioStreamOggVorbis and stream.get_length() > 40.0, "music loop is a 40+ second Ogg Vorbis file")
 	audio.queue_free()
+
+
+func _test_design_components() -> void:
+	_check(Palette.world_color(0) == Palette.WORLD_COLORS[0] and Palette.world_color(10) == Palette.WORLD_COLORS[0], "world colours wrap around")
+	_check(Palette.world_name(0) == "First Steps" and Palette.world_name(9) == "Gridlock", "world names")
+	var seen: Dictionary = {}
+	for dir in ["up", "down", "left", "right"]:
+		seen[Palette.direction_color(dir)] = true
+	_check(seen.size() == 4, "each direction has its own colour")
+
+	var toggle := ToggleSwitch.new()
+	root.add_child(toggle)
+	var changes: Array = []
+	toggle.toggled.connect(func(v: bool) -> void: changes.append(v))
+	toggle.set_on(true, false)
+	_check(toggle.on and toggle.knob_position() == 1.0 and changes.is_empty(), "set_on moves the knob without emitting")
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	toggle._gui_input(click)
+	_check(not toggle.on and changes == [false], "a click flips the switch and emits once")
+	toggle._gui_input(click)
+	_check(toggle.on and changes == [false, true], "a second click flips it back")
+	toggle.queue_free()
+
+	var button := IconButton.new("gear")
+	root.add_child(button)
+	_check(button.glyph == "gear" and button.theme_type_variation == "IconButton" and button.custom_minimum_size.x >= 44.0, "icon button has a glyph and a touch-sized minimum")
+	button.queue_free()
+	_check(Glyphs.NAMES.has("back") and Glyphs.NAMES.has("note") and Glyphs.NAMES.has("speaker"), "glyph set covers navigation and audio icons")
+
+	var theme := AppTheme.build()
+	_check(theme.has_stylebox("normal", "PrimaryButton") and theme.has_stylebox("panel", "Card"), "theme defines the button and card variations")
+	_check(theme.is_type_variation("PrimaryButton", "Button") and theme.is_type_variation("Heading", "Label"), "theme variations extend their base types")
+	_check(theme.default_font != null and theme.default_font.get_font_name() == "Poppins", "theme uses the bundled Poppins font")
+
+	var backdrop := Backdrop.new()
+	root.add_child(backdrop)
+	_check(backdrop.mouse_filter == Control.MOUSE_FILTER_IGNORE, "backdrop never captures input")
+	backdrop.queue_free()
 
 
 func _test_move_limit() -> void:
