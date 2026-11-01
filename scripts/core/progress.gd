@@ -5,6 +5,7 @@ extends RefCounted
 
 const BADGES: Array[String] = [
 	"first_clear", "clears_10", "clears_50", "clears_100", "perfect_clear", "world_perfect",
+	"hard_clear",
 ]
 
 var coins: int = Economy.START_COINS
@@ -20,10 +21,13 @@ var music_volume: float = 1.0
 var sfx_volume: float = 1.0
 ## Coaching on the first levels; switches off once level 3 is cleared.
 var tips_enabled: bool = true
+## The tier shown on the level-select screen (a Difficulty constant).
+var difficulty: int = Difficulty.EASY
 
 
+## World index (0-based) within the level's own tier.
 static func world_of(level_id: int) -> int:
-	return (level_id - 1) / Economy.LEVELS_PER_WORLD
+	return (Difficulty.local_id(level_id) - 1) / Economy.LEVELS_PER_WORLD
 
 
 func is_cleared(level_id: int) -> bool:
@@ -34,39 +38,48 @@ func stars_of(level_id: int) -> int:
 	return levels[level_id]["stars"] if levels.has(level_id) else 0
 
 
-func cleared_count() -> int:
-	return levels.size()
+## Cleared levels in one tier, or in both when `tier` is -1.
+func cleared_count(tier: int = -1) -> int:
+	if tier < 0:
+		return levels.size()
+	var count := 0
+	for id in levels.keys():
+		if Difficulty.of_level(id) == tier:
+			count += 1
+	return count
 
 
-func total_stars() -> int:
+## Stars earned in one tier, or in both when `tier` is -1.
+func total_stars(tier: int = -1) -> int:
 	var total := 0
-	for entry in levels.values():
-		total += entry["stars"]
+	for id in levels.keys():
+		if tier < 0 or Difficulty.of_level(id) == tier:
+			total += levels[id]["stars"]
 	return total
 
 
-func world_clears(world: int) -> int:
+func world_clears(world: int, tier: int = Difficulty.EASY) -> int:
 	var count := 0
 	for id in levels.keys():
-		if world_of(id) == world:
+		if world_of(id) == world and Difficulty.of_level(id) == tier:
 			count += 1
 	return count
 
 
-func _world_perfect_count(world: int) -> int:
+func _world_perfect_count(world: int, tier: int) -> int:
 	var count := 0
 	for id in levels.keys():
-		if world_of(id) == world and levels[id]["stars"] == Economy.MAX_STARS:
+		if world_of(id) == world and Difficulty.of_level(id) == tier 				and levels[id]["stars"] == Economy.MAX_STARS:
 			count += 1
 	return count
 
 
-func is_world_unlocked(world: int) -> bool:
-	return world <= 0 or world_clears(world - 1) >= Economy.WORLD_UNLOCK_CLEARS
+func is_world_unlocked(world: int, tier: int = Difficulty.EASY) -> bool:
+	return world <= 0 or world_clears(world - 1, tier) >= Economy.WORLD_UNLOCK_CLEARS
 
 
 func is_level_unlocked(level_id: int) -> bool:
-	return level_id >= 1 and is_world_unlocked(world_of(level_id))
+	return Difficulty.local_id(level_id) >= 1 and is_world_unlocked(world_of(level_id), Difficulty.of_level(level_id))
 
 
 func can_afford(price: int) -> bool:
@@ -92,24 +105,26 @@ func record_result(level_id: int, arrow_count: int, moves_limit: int, moves_used
 		return {}
 	var stars := Economy.stars_for(wasted_taps, moves_limit - arrow_count)
 	var world := world_of(level_id)
-	var clears_before := world_clears(world)
+	var tier := Difficulty.of_level(level_id)
+	var multiplier := Economy.HARD_REWARD_MULTIPLIER if tier == Difficulty.DIFFICULT else 1
+	var clears_before := world_clears(world, tier)
 	var first := not levels.has(level_id)
 	var old_stars := stars_of(level_id)
 	var earned := 0
 	if first:
-		earned = Economy.CLEAR_BASE_COINS + Economy.COINS_PER_STAR * stars
+		earned = (Economy.CLEAR_BASE_COINS + Economy.COINS_PER_STAR * stars) * multiplier
 		levels[level_id] = {"stars": stars, "best_moves": moves_used, "best_wasted": wasted_taps}
 	else:
 		var entry: Dictionary = levels[level_id]
 		if stars > old_stars:
-			earned = Economy.COINS_PER_STAR * (stars - old_stars)
+			earned = Economy.COINS_PER_STAR * (stars - old_stars) * multiplier
 			entry["stars"] = stars
 		entry["best_moves"] = mini(entry["best_moves"], moves_used)
 		if entry["best_wasted"] < 0 or wasted_taps < entry["best_wasted"]:
 			entry["best_wasted"] = wasted_taps
 	var world_bonus := 0
-	if clears_before < Economy.LEVELS_PER_WORLD and world_clears(world) == Economy.LEVELS_PER_WORLD:
-		world_bonus = Economy.WORLD_COMPLETE_BONUS
+	if clears_before < Economy.LEVELS_PER_WORLD and world_clears(world, tier) == Economy.LEVELS_PER_WORLD:
+		world_bonus = Economy.WORLD_COMPLETE_BONUS * multiplier
 	coins += earned + world_bonus
 	if first and level_id == Tutorial.LAST_TIP_LEVEL:
 		tips_enabled = false
@@ -119,11 +134,11 @@ func record_result(level_id: int, arrow_count: int, moves_limit: int, moves_used
 		"first_clear": first,
 		"improved": stars > old_stars,
 		"world_bonus": world_bonus,
-		"new_badges": _award_badges(world),
+		"new_badges": _award_badges(world, tier),
 	}
 
 
-func _award_badges(world: int) -> Array[String]:
+func _award_badges(world: int, tier: int) -> Array[String]:
 	var earned: Array[String] = []
 	var wanted: Array[String] = []
 	var cleared := cleared_count()
@@ -133,11 +148,13 @@ func _award_badges(world: int) -> Array[String]:
 		wanted.append("clears_10")
 	if cleared >= 50:
 		wanted.append("clears_50")
-	if cleared >= 100:
+	if maxi(cleared_count(Difficulty.EASY), cleared_count(Difficulty.DIFFICULT)) >= 100:
 		wanted.append("clears_100")
+	if cleared_count(Difficulty.DIFFICULT) >= 1:
+		wanted.append("hard_clear")
 	if _perfect_level_count() > 0:
 		wanted.append("perfect_clear")
-	if _world_perfect_count(world) == Economy.LEVELS_PER_WORLD:
+	if _world_perfect_count(world, tier) == Economy.LEVELS_PER_WORLD:
 		wanted.append("world_perfect")
 	for b in wanted:
 		if not badges.has(b):
@@ -167,6 +184,7 @@ func to_dict() -> Dictionary:
 		"tips_enabled": tips_enabled,
 		"music_volume": music_volume,
 		"sfx_volume": sfx_volume,
+		"difficulty": difficulty,
 	}
 
 
@@ -201,6 +219,7 @@ static func from_dict(data: Dictionary) -> Progress:
 	p.tips_enabled = bool(data.get("tips_enabled", true))
 	p.music_volume = clampf(float(data.get("music_volume", 1.0)), 0.0, 1.0)
 	p.sfx_volume = clampf(float(data.get("sfx_volume", 1.0)), 0.0, 1.0)
+	p.difficulty = clampi(int(data.get("difficulty", Difficulty.EASY)), 0, Difficulty.COUNT - 1)
 	return p
 
 

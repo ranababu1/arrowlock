@@ -43,6 +43,9 @@ func _initialize() -> void:
 	_test_coach_ui()
 	_test_tips_setting_toggle()
 	_test_volume()
+	_test_difficulty_ids()
+	_test_countdown()
+	_test_difficulty_progress()
 	print("Tests: %d passed, %d failed" % [_passed, _failed])
 	quit(1 if _failed > 0 else 0)
 
@@ -1093,3 +1096,101 @@ func _test_move_limit() -> void:
 	# A limit below the arrow count can never be won and is rejected.
 	var bad := GameController.new()
 	_check(not bad.start(_board(3, 1, rows), 1), "limit below arrow count rejected")
+
+
+func _test_difficulty_ids() -> void:
+	_check(Difficulty.of_level(100) == Difficulty.EASY and Difficulty.of_level(1001) == Difficulty.DIFFICULT, "ids above 1000 are Difficult")
+	_check(Difficulty.local_id(1007) == 7 and Difficulty.local_id(7) == 7, "local id strips the Difficult offset")
+	_check(Difficulty.make_id(Difficulty.DIFFICULT, 12) == 1012 and Difficulty.make_id(Difficulty.EASY, 12) == 12, "make_id round-trips")
+	_check(Difficulty.countdown_for(1) == 0.0 and Difficulty.countdown_for(30) == 0.0, "Easy has no clock through level 30")
+	_check(Difficulty.countdown_for(31) == 20.0 and Difficulty.countdown_for(100) == 20.0, "Easy uses 20 s from level 31")
+	_check(Difficulty.countdown_for(1001) == 10.0 and Difficulty.countdown_for(1100) == 10.0, "Difficult uses 10 s on every level")
+	_check(Progress.world_of(1011) == 1 and Progress.world_of(11) == 1 and Progress.world_of(1010) == 0, "worlds are counted within a tier")
+
+
+func _test_countdown() -> void:
+	# Arrow 0 is blocked by arrow 1; arrow 2 is free.
+	var rows := [[0, 0, "right"], [1, 0, "up"], [0, 2, "left"]]
+	var c := GameController.new()
+	c.start(_board(3, 3, rows), 6, 10.0)
+	_check(c.has_clock() and is_equal_approx(c.time_left, 10.0) and not c.clock_running(), "clock is full but idle before the first tap")
+	c.tick(30.0)
+	_check(c.state == GameController.State.PLAYING and is_equal_approx(c.time_left, 10.0), "the clock does not run before the first tap")
+	c.tap(Vector2i(0, 2))
+	_check(c.clock_running(), "the first tap starts the clock")
+	c.tick(4.0)
+	_check(is_equal_approx(c.time_left, 6.0), "time counts down")
+	c.tap(Vector2i(1, 1))
+	_check(is_equal_approx(c.time_left, 6.0), "a tap on an empty cell does not refill the clock")
+	c.tap(Vector2i(0, 0))
+	_check(is_equal_approx(c.time_left, 10.0) and c.wasted_taps == 1, "a blocked tap also refills the clock")
+	c.tick(9.9)
+	_check(c.state == GameController.State.PLAYING, "still playing just before zero")
+	var lost_count := [0]
+	c.lost.connect(func(_w: int) -> void: lost_count[0] += 1)
+	c.tick(0.2)
+	_check(c.state == GameController.State.LOST and c.lost_by_time and lost_count[0] == 1, "running out of time loses the level once")
+	c.tick(5.0)
+	_check(lost_count[0] == 1, "no second loss after the clock is out")
+	_check(not c.grant_extra_moves(3), "extra moves cannot rescue a timeout")
+	c.restart()
+	_check(c.state == GameController.State.PLAYING and not c.lost_by_time and is_equal_approx(c.time_left, 10.0) and not c.clock_running(), "restart resets the clock")
+
+	c.tap(Vector2i(0, 2))
+	c.tick(8.0)
+	c.refill_clock()
+	_check(is_equal_approx(c.time_left, 10.0), "refill_clock restores the full time")
+	c.tap(Vector2i(1, 0))
+	c.tick(7.0)
+	c.undo()
+	_check(is_equal_approx(c.time_left, 10.0), "undo refills the clock")
+
+	var plain := _controller_for(_board(3, 3, rows), 6)
+	plain.tap(Vector2i(0, 2))
+	plain.tick(1000.0)
+	_check(not plain.has_clock() and plain.state == GameController.State.PLAYING, "a level without a countdown never times out")
+
+	# Running out of moves is still its own loss and may be extended.
+	var moves := GameController.new()
+	moves.start(_board(3, 3, rows), 3, 10.0)
+	moves.tap(Vector2i(0, 0))
+	moves.tap(Vector2i(0, 0))
+	moves.tap(Vector2i(0, 0))
+	_check(moves.state == GameController.State.LOST and not moves.lost_by_time, "a move-limit loss is not a timeout")
+	_check(moves.grant_extra_moves(3) and is_equal_approx(moves.time_left, 10.0), "extra moves after a move-limit loss refill the clock")
+
+	# Winning on the last tap ends the clock.
+	var won := GameController.new()
+	var single := _board(2, 1, [[0, 0, "left"]])
+	won.start(single, 1, 5.0)
+	won.tap(Vector2i(0, 0))
+	won.tick(100.0)
+	_check(won.state == GameController.State.WON and not won.lost_by_time, "a win stops the clock")
+
+
+func _test_difficulty_progress() -> void:
+	var p := Progress.new()
+	_check(p.difficulty == Difficulty.EASY, "Easy is the default tier")
+	var easy := p.record_result(1, 3, 4, 3, 0)
+	_check(easy["coins_earned"] == Economy.CLEAR_BASE_COINS + Economy.COINS_PER_STAR * 3, "Easy pays the base reward")
+	var hard := p.record_result(1001, 3, 4, 3, 0)
+	_check(hard["coins_earned"] == (Economy.CLEAR_BASE_COINS + Economy.COINS_PER_STAR * 3) * Economy.HARD_REWARD_MULTIPLIER, "Difficult pays double")
+	_check(p.is_cleared(1) and p.is_cleared(1001) and p.cleared_count() == 2, "both tiers are tracked separately")
+	_check(p.cleared_count(Difficulty.EASY) == 1 and p.cleared_count(Difficulty.DIFFICULT) == 1, "cleared_count can filter by tier")
+	_check(p.total_stars(Difficulty.DIFFICULT) == 3 and p.total_stars() == 6, "stars can be totalled by tier")
+	_check(p.badges.has("hard_clear"), "the first Difficult clear awards its badge")
+	_check(p.is_level_unlocked(1001) and not p.is_level_unlocked(1011), "Difficult world 2 starts locked")
+	for n in range(2, 9):
+		p.record_result(Difficulty.make_id(Difficulty.DIFFICULT, n), 3, 4, 4, 1)
+	_check(p.world_clears(0, Difficulty.DIFFICULT) == 8 and p.world_clears(0, Difficulty.EASY) == 1, "world clears are counted per tier")
+	_check(p.is_level_unlocked(1011) and not p.is_level_unlocked(11), "clearing Difficult world 1 does not unlock Easy world 2")
+	for n in range(9, 11):
+		p.record_result(Difficulty.make_id(Difficulty.DIFFICULT, n), 3, 4, 3, 0)
+	var last := p.record_result(1010, 3, 4, 3, 0)
+	_check(last["world_bonus"] == 0, "re-clearing a finished world pays no second bonus")
+
+	p.difficulty = Difficulty.DIFFICULT
+	var again := Progress.from_dict(p.to_dict())
+	_check(again.difficulty == Difficulty.DIFFICULT and again.is_cleared(1005), "the chosen tier and Difficult clears are saved")
+	_check(Progress.from_dict({"difficulty": 9}).difficulty == Difficulty.DIFFICULT and Progress.from_dict({"difficulty": -4}).difficulty == Difficulty.EASY, "a damaged tier value is clamped")
+	_check(Progress.from_dict({}).difficulty == Difficulty.EASY, "old saves start on Easy")

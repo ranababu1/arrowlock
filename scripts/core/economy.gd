@@ -9,6 +9,9 @@ const CLEAR_BASE_COINS := 10
 const COINS_PER_STAR := 5
 const WORLD_COMPLETE_BONUS := 25
 
+## Difficult levels pay this many times the Easy reward.
+const HARD_REWARD_MULTIPLIER := 2
+
 const PRICE_UNDO := 20
 const PRICE_HINT := 30
 const PRICE_EXTRA_MOVES := 50

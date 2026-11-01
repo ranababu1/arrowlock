@@ -6,6 +6,10 @@ extends RefCounted
 ## Rules: every tap that lands on an arrow costs one move, whether or not the
 ## arrow can leave. Taps on empty cells are free. The level is lost when the
 ## moves run out while arrows remain.
+##
+## Optional countdown: the clock starts at the first tap on an arrow and is
+## refilled by every later one (and by Undo and Hint). Running out of time
+## loses the level.
 
 enum State { PLAYING, WON, LOST }
 
@@ -22,7 +26,12 @@ var moves_used: int = 0
 var wasted_taps: int = 0
 ## Moves added by continuing after a loss in this attempt (0 = none yet).
 var extra_moves_granted: int = 0
+## Seconds allowed between taps; 0 means the level has no clock.
+var countdown: float = 0.0
+var time_left: float = 0.0
+var lost_by_time := false
 
+var _clock_running := false
 var _initial: BoardState
 var _original_limit: int = 0
 ## Stack of {"id": int, "info": Dictionary}; removals only.
@@ -31,12 +40,13 @@ var _history: Array[Dictionary] = []
 
 ## Returns false (and leaves the controller unusable) when the limit is below
 ## the arrow count, because such a level could never be won.
-func start(puzzle: BoardState, p_moves_limit: int) -> bool:
+func start(puzzle: BoardState, p_moves_limit: int, p_countdown: float = 0.0) -> bool:
 	if p_moves_limit < puzzle.remaining_count():
 		push_error("moves_limit %d is below arrow count %d" % [p_moves_limit, puzzle.remaining_count()])
 		return false
 	_initial = puzzle.duplicate_state()
 	_original_limit = p_moves_limit
+	countdown = maxf(0.0, p_countdown)
 	restart()
 	return true
 
@@ -49,6 +59,9 @@ func restart() -> void:
 	wasted_taps = 0
 	extra_moves_granted = 0
 	moves_limit = _original_limit
+	time_left = countdown
+	lost_by_time = false
+	_clock_running = false
 
 
 func moves_left() -> int:
@@ -59,6 +72,33 @@ func is_over() -> bool:
 	return state != State.PLAYING
 
 
+func has_clock() -> bool:
+	return countdown > 0.0
+
+
+## True once the first arrow has been tapped and the clock is running.
+func clock_running() -> bool:
+	return _clock_running and state == State.PLAYING
+
+
+## Advances the clock by `delta` seconds. Does nothing before the first tap,
+## without a countdown, or once the level is over.
+func tick(delta: float) -> void:
+	if state != State.PLAYING or countdown <= 0.0 or not _clock_running:
+		return
+	time_left = maxf(0.0, time_left - delta)
+	if time_left <= 0.0:
+		state = State.LOST
+		lost_by_time = true
+		lost.emit(wasted_taps)
+
+
+## Refills the clock (Undo and Hint are deliberate actions, not stalling).
+func refill_clock() -> void:
+	if countdown > 0.0 and _clock_running and state == State.PLAYING:
+		time_left = countdown
+
+
 ## Handles a tap on cell `pos`. Returns true if an arrow was removed.
 func tap(pos: Vector2i) -> bool:
 	if state != State.PLAYING:
@@ -67,6 +107,9 @@ func tap(pos: Vector2i) -> bool:
 	if id == -1:
 		return false
 	moves_used += 1
+	if countdown > 0.0:
+		_clock_running = true
+		time_left = countdown
 	var blocker := MoveValidator.first_blocker(board, id)
 	if blocker != -1:
 		wasted_taps += 1
@@ -95,12 +138,14 @@ func hint() -> int:
 
 
 ## Continue a lost level with `count` more moves, once per attempt.
+## Not possible after a timeout: more moves would not give back the time.
 func grant_extra_moves(count: int) -> bool:
-	if state != State.LOST or extra_moves_granted > 0 or count <= 0:
+	if state != State.LOST or lost_by_time or extra_moves_granted > 0 or count <= 0:
 		return false
 	moves_limit += count
 	extra_moves_granted = count
 	state = State.PLAYING
+	time_left = countdown
 	return true
 
 
@@ -116,6 +161,7 @@ func undo() -> bool:
 	var entry: Dictionary = _history.pop_back()
 	board.restore_arrow(entry["id"], entry["info"])
 	moves_used -= 1
+	refill_clock()
 	arrow_restored.emit(entry["id"])
 	return true
 
