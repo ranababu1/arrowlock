@@ -1,13 +1,17 @@
 class_name Economy
 extends RefCounted
 ## Tuning constants for rewards. Kept in one place so balancing never touches
-## gameplay code. Values come from docs/level-plan-100.md and are untested
-## against real players.
+## gameplay code. Not yet tested against real players.
+##
+## Balance rule (checked by the tests): a player who scrapes through every
+## level with one star earns about one Hint per level (20 + 5 = 25 per level,
+## plus 50 per finished world, against a 30-coin Hint), so a struggling player
+## is never locked out of help. A perfect player earns roughly twice that.
 
 const START_COINS := 100
-const CLEAR_BASE_COINS := 10
+const CLEAR_BASE_COINS := 20
 const COINS_PER_STAR := 5
-const WORLD_COMPLETE_BONUS := 25
+const WORLD_COMPLETE_BONUS := 50
 
 ## Difficult levels pay this many times the Easy reward.
 const HARD_REWARD_MULTIPLIER := 2

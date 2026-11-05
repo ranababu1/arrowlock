@@ -3,77 +3,12 @@
 		{
 			"arrows": [
 				{
-					"dir": "right",
+					"dir": "down",
 					"x": 5,
 					"y": 7
 				},
 				{
-					"dir": "right",
-					"x": 4,
-					"y": 7
-				},
-				{
-					"dir": "right",
-					"x": 0,
-					"y": 7
-				},
-				{
 					"dir": "down",
-					"x": 0,
-					"y": 6
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 6
-				},
-				{
-					"dir": "down",
-					"x": 1,
-					"y": 3
-				},
-				{
-					"dir": "down",
-					"x": 1,
-					"y": 2
-				},
-				{
-					"dir": "down",
-					"x": 1,
-					"y": 1
-				},
-				{
-					"dir": "left",
-					"x": 2,
-					"y": 1
-				},
-				{
-					"dir": "left",
-					"x": 3,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 0,
-					"y": 0
-				},
-				{
-					"dir": "left",
-					"x": 3,
-					"y": 0
-				},
-				{
-					"dir": "left",
-					"x": 5,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 5,
-					"y": 1
-				},
-				{
-					"dir": "up",
 					"x": 5,
 					"y": 3
 				},
@@ -88,19 +23,84 @@
 					"y": 3
 				},
 				{
-					"dir": "up",
+					"dir": "down",
 					"x": 3,
-					"y": 4
+					"y": 2
 				},
 				{
-					"dir": "right",
-					"x": 2,
+					"dir": "left",
+					"x": 0,
+					"y": 7
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 7
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 4,
 					"y": 4
 				},
 				{
 					"dir": "down",
+					"x": 4,
+					"y": 2
+				},
+				{
+					"dir": "right",
 					"x": 2,
 					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 7
 				}
 			],
 			"generator_version": 1,
@@ -109,78 +109,83 @@
 			"metrics": {
 				"arrows": 20,
 				"bait": 3,
-				"blocked_at_start": 18,
-				"depth": 12,
-				"free_at_start": 2,
+				"blocked_at_start": 17,
+				"depth": 8,
+				"free_at_start": 3,
 				"height": 8,
 				"width": 6
 			},
 			"moves_limit": 21,
 			"name": "Zesty Drift",
-			"seed": 20261162794434,
+			"seed": 20261166794482,
 			"width": 6
 		},
 		{
 			"arrows": [
 				{
-					"dir": "up",
-					"x": 3,
-					"y": 2
+					"dir": "left",
+					"x": 0,
+					"y": 6
 				},
 				{
 					"dir": "up",
-					"x": 3,
-					"y": 3
+					"x": 0,
+					"y": 0
 				},
 				{
-					"dir": "right",
-					"x": 2,
-					"y": 3
-				},
-				{
-					"dir": "up",
+					"dir": "left",
 					"x": 1,
 					"y": 0
 				},
 				{
-					"dir": "down",
+					"dir": "right",
+					"x": 5,
+					"y": 7
+				},
+				{
+					"dir": "right",
 					"x": 4,
 					"y": 7
 				},
 				{
 					"dir": "right",
-					"x": 3,
-					"y": 7
+					"x": 4,
+					"y": 4
 				},
 				{
 					"dir": "down",
-					"x": 3,
-					"y": 6
+					"x": 4,
+					"y": 0
 				},
 				{
-					"dir": "up",
+					"dir": "right",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "right",
 					"x": 2,
 					"y": 0
 				},
 				{
-					"dir": "left",
-					"x": 5,
-					"y": 0
-				},
-				{
 					"dir": "up",
-					"x": 5,
-					"y": 1
-				},
-				{
-					"dir": "right",
 					"x": 2,
 					"y": 1
 				},
 				{
 					"dir": "down",
 					"x": 0,
-					"y": 7
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 3
 				},
 				{
 					"dir": "up",
@@ -188,67 +193,132 @@
 					"y": 6
 				},
 				{
-					"dir": "left",
-					"x": 4,
+					"dir": "right",
+					"x": 1,
 					"y": 6
 				},
 				{
-					"dir": "down",
-					"x": 4,
-					"y": 4
+					"dir": "left",
+					"x": 0,
+					"y": 1
 				},
 				{
-					"dir": "right",
-					"x": 3,
-					"y": 4
+					"dir": "up",
+					"x": 0,
+					"y": 2
 				},
 				{
-					"dir": "right",
+					"dir": "left",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "up",
 					"x": 1,
 					"y": 4
 				},
 				{
-					"dir": "right",
-					"x": 0,
-					"y": 4
-				},
-				{
-					"dir": "left",
-					"x": 0,
-					"y": 5
-				},
-				{
-					"dir": "down",
-					"x": 0,
-					"y": 3
-				},
-				{
-					"dir": "down",
-					"x": 0,
-					"y": 2
+					"dir": "up",
+					"x": 1,
+					"y": 7
 				}
 			],
 			"generator_version": 1,
 			"height": 8,
 			"id": 12,
 			"metrics": {
-				"arrows": 21,
+				"arrows": 20,
 				"bait": 3,
 				"blocked_at_start": 15,
-				"depth": 11,
-				"free_at_start": 6,
+				"depth": 8,
+				"free_at_start": 5,
 				"height": 8,
 				"width": 6
 			},
-			"moves_limit": 22,
+			"moves_limit": 21,
 			"name": "Velvet Harbor",
-			"seed": 20261162795443,
+			"seed": 20261166795452,
 			"width": 6
 		},
 		{
 			"arrows": [
 				{
+					"dir": "right",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 6
+				},
+				{
 					"dir": "down",
+					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "up",
+					"x": 5,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 5,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 5,
+					"y": 5
+				},
+				{
+					"dir": "right",
 					"x": 5,
 					"y": 7
 				},
@@ -258,44 +328,14 @@
 					"y": 7
 				},
 				{
-					"dir": "right",
-					"x": 3,
-					"y": 7
-				},
-				{
-					"dir": "left",
-					"x": 0,
-					"y": 5
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 5
-				},
-				{
-					"dir": "left",
-					"x": 2,
+					"dir": "down",
+					"x": 4,
 					"y": 5
 				},
 				{
 					"dir": "right",
-					"x": 5,
-					"y": 0
-				},
-				{
-					"dir": "left",
 					"x": 0,
-					"y": 2
-				},
-				{
-					"dir": "left",
-					"x": 2,
-					"y": 2
-				},
-				{
-					"dir": "left",
-					"x": 3,
-					"y": 2
+					"y": 5
 				},
 				{
 					"dir": "left",
@@ -303,54 +343,9 @@
 					"y": 6
 				},
 				{
-					"dir": "left",
-					"x": 3,
-					"y": 6
-				},
-				{
-					"dir": "down",
-					"x": 3,
-					"y": 1
-				},
-				{
-					"dir": "down",
-					"x": 3,
-					"y": 0
-				},
-				{
-					"dir": "right",
-					"x": 1,
-					"y": 0
-				},
-				{
-					"dir": "right",
-					"x": 0,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 0,
-					"y": 1
-				},
-				{
 					"dir": "up",
 					"x": 0,
 					"y": 7
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 7
-				},
-				{
-					"dir": "left",
-					"x": 2,
-					"y": 7
-				},
-				{
-					"dir": "down",
-					"x": 2,
-					"y": 3
 				}
 			],
 			"generator_version": 1,
@@ -360,62 +355,157 @@
 				"arrows": 21,
 				"bait": 1,
 				"blocked_at_start": 16,
-				"depth": 11,
+				"depth": 8,
 				"free_at_start": 5,
 				"height": 8,
 				"width": 6
 			},
 			"moves_limit": 22,
 			"name": "Silver Orbit",
-			"seed": 20261162796451,
+			"seed": 20261166796635,
 			"width": 6
 		},
 		{
 			"arrows": [
 				{
-					"dir": "down",
-					"x": 0,
-					"y": 4
+					"dir": "right",
+					"x": 4,
+					"y": 5
 				},
 				{
 					"dir": "down",
-					"x": 0,
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 7
+				},
+				{
+					"dir": "right",
+					"x": 5,
 					"y": 2
 				},
 				{
-					"dir": "up",
-					"x": 4,
-					"y": 0
+					"dir": "down",
+					"x": 5,
+					"y": 6
 				},
 				{
-					"dir": "up",
+					"dir": "down",
 					"x": 5,
-					"y": 0
+					"y": 3
 				},
 				{
-					"dir": "up",
+					"dir": "down",
 					"x": 5,
-					"y": 1
+					"y": 0
 				},
 				{
 					"dir": "right",
 					"x": 4,
-					"y": 1
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 0
 				},
 				{
 					"dir": "up",
-					"x": 4,
-					"y": 2
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 7
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 7
 				},
 				{
 					"dir": "up",
-					"x": 4,
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 2,
 					"y": 4
 				},
 				{
 					"dir": "up",
-					"x": 4,
+					"x": 2,
 					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 2
+				}
+			],
+			"generator_version": 1,
+			"height": 8,
+			"id": 14,
+			"metrics": {
+				"arrows": 21,
+				"bait": 3,
+				"blocked_at_start": 16,
+				"depth": 8,
+				"free_at_start": 5,
+				"height": 8,
+				"width": 6
+			},
+			"moves_limit": 22,
+			"name": "Open Quarry",
+			"seed": 20261166797444,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 6
 				},
 				{
 					"dir": "right",
@@ -425,187 +515,87 @@
 				{
 					"dir": "down",
 					"x": 5,
-					"y": 5
-				},
-				{
-					"dir": "right",
-					"x": 1,
-					"y": 5
-				},
-				{
-					"dir": "down",
-					"x": 1,
 					"y": 2
 				},
 				{
-					"dir": "left",
-					"x": 5,
-					"y": 2
-				},
-				{
-					"dir": "up",
-					"x": 5,
-					"y": 3
-				},
-				{
-					"dir": "up",
-					"x": 5,
-					"y": 4
-				},
-				{
-					"dir": "right",
-					"x": 2,
-					"y": 4
-				},
-				{
 					"dir": "down",
-					"x": 2,
-					"y": 3
-				},
-				{
-					"dir": "up",
-					"x": 3,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 3,
+					"x": 5,
 					"y": 1
 				},
 				{
-					"dir": "up",
-					"x": 1,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 1,
-					"y": 1
-				}
-			],
-			"generator_version": 1,
-			"height": 8,
-			"id": 14,
-			"metrics": {
-				"arrows": 22,
-				"bait": 2,
-				"blocked_at_start": 16,
-				"depth": 12,
-				"free_at_start": 6,
-				"height": 8,
-				"width": 6
-			},
-			"moves_limit": 23,
-			"name": "Open Quarry",
-			"seed": 20261162797460,
-			"width": 6
-		},
-		{
-			"arrows": [
-				{
 					"dir": "left",
-					"x": 5,
-					"y": 5
-				},
-				{
-					"dir": "right",
-					"x": 5,
-					"y": 2
-				},
-				{
-					"dir": "up",
-					"x": 4,
-					"y": 2
-				},
-				{
-					"dir": "down",
-					"x": 2,
+					"x": 0,
 					"y": 7
 				},
 				{
 					"dir": "down",
-					"x": 2,
-					"y": 3
+					"x": 0,
+					"y": 5
 				},
 				{
 					"dir": "down",
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 7
+				},
+				{
+					"dir": "up",
+					"x": 5,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 7
+				},
+				{
+					"dir": "left",
 					"x": 3,
 					"y": 7
 				},
 				{
-					"dir": "right",
-					"x": 5,
-					"y": 1
-				},
-				{
-					"dir": "left",
-					"x": 0,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 0,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 0,
-					"y": 2
-				},
-				{
-					"dir": "left",
-					"x": 2,
-					"y": 2
-				},
-				{
-					"dir": "left",
-					"x": 3,
-					"y": 2
-				},
-				{
 					"dir": "down",
 					"x": 3,
-					"y": 0
-				},
-				{
-					"dir": "right",
-					"x": 5,
 					"y": 4
 				},
 				{
 					"dir": "down",
-					"x": 5,
-					"y": 0
-				},
-				{
-					"dir": "right",
-					"x": 2,
-					"y": 0
-				},
-				{
-					"dir": "right",
-					"x": 1,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 1,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 1,
+					"x": 3,
 					"y": 3
-				},
-				{
-					"dir": "left",
-					"x": 4,
-					"y": 3
-				},
-				{
-					"dir": "up",
-					"x": 4,
-					"y": 4
 				}
 			],
 			"generator_version": 1,
@@ -613,262 +603,197 @@
 			"id": 15,
 			"metrics": {
 				"arrows": 21,
-				"bait": 1,
-				"blocked_at_start": 13,
-				"depth": 11,
-				"free_at_start": 8,
+				"bait": 3,
+				"blocked_at_start": 17,
+				"depth": 8,
+				"free_at_start": 4,
 				"height": 8,
 				"width": 6
 			},
 			"moves_limit": 22,
 			"name": "Lunar Signal",
-			"seed": 20261162798465,
+			"seed": 20261166798572,
 			"width": 6
 		},
 		{
 			"arrows": [
 				{
 					"dir": "down",
-					"x": 3,
-					"y": 7
-				},
-				{
-					"dir": "down",
-					"x": 3,
-					"y": 6
-				},
-				{
-					"dir": "up",
-					"x": 0,
-					"y": 0
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 4,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 4,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 4,
-					"y": 5
-				},
-				{
-					"dir": "up",
-					"x": 4,
-					"y": 6
-				},
-				{
-					"dir": "down",
-					"x": 0,
-					"y": 7
-				},
-				{
-					"dir": "down",
-					"x": 0,
-					"y": 6
-				},
-				{
-					"dir": "down",
-					"x": 0,
-					"y": 3
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 3
-				},
-				{
-					"dir": "left",
 					"x": 2,
-					"y": 3
-				},
-				{
-					"dir": "up",
-					"x": 2,
-					"y": 6
-				},
-				{
-					"dir": "right",
-					"x": 1,
-					"y": 6
-				},
-				{
-					"dir": "up",
-					"x": 1,
-					"y": 7
-				},
-				{
-					"dir": "left",
-					"x": 5,
-					"y": 7
-				},
-				{
-					"dir": "down",
-					"x": 5,
-					"y": 5
-				},
-				{
-					"dir": "right",
-					"x": 5,
 					"y": 4
 				},
 				{
 					"dir": "down",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "down",
 					"x": 5,
-					"y": 1
+					"y": 7
 				},
 				{
 					"dir": "right",
-					"x": 0,
-					"y": 1
+					"x": 3,
+					"y": 7
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 4
 				},
 				{
 					"dir": "up",
-					"x": 0,
-					"y": 2
+					"x": 2,
+					"y": 0
 				},
 				{
 					"dir": "left",
 					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 3,
 					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 7
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 5,
+					"y": 3
 				}
 			],
 			"generator_version": 1,
 			"height": 8,
 			"id": 16,
 			"metrics": {
-				"arrows": 23,
-				"bait": 6,
-				"blocked_at_start": 18,
-				"depth": 13,
+				"arrows": 22,
+				"bait": 3,
+				"blocked_at_start": 17,
+				"depth": 9,
 				"free_at_start": 5,
 				"height": 8,
 				"width": 6
 			},
-			"moves_limit": 24,
+			"moves_limit": 23,
 			"name": "Gentle Valley",
-			"seed": 20261162799488,
+			"seed": 20261166799485,
 			"width": 6
 		},
 		{
 			"arrows": [
 				{
-					"dir": "up",
+					"dir": "down",
+					"x": 5,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 3
+				},
+				{
+					"dir": "right",
 					"x": 3,
-					"y": 1
-				},
-				{
-					"dir": "right",
-					"x": 5,
-					"y": 5
-				},
-				{
-					"dir": "right",
-					"x": 4,
-					"y": 5
-				},
-				{
-					"dir": "left",
-					"x": 0,
-					"y": 3
-				},
-				{
-					"dir": "down",
-					"x": 5,
-					"y": 7
-				},
-				{
-					"dir": "down",
-					"x": 5,
-					"y": 4
-				},
-				{
-					"dir": "right",
-					"x": 4,
-					"y": 4
-				},
-				{
-					"dir": "left",
-					"x": 0,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 0,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 0,
-					"y": 4
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 4
-				},
-				{
-					"dir": "left",
-					"x": 0,
-					"y": 5
-				},
-				{
-					"dir": "up",
-					"x": 0,
-					"y": 7
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 7
-				},
-				{
-					"dir": "down",
-					"x": 1,
-					"y": 1
-				},
-				{
-					"dir": "left",
-					"x": 4,
-					"y": 1
-				},
-				{
-					"dir": "right",
-					"x": 5,
-					"y": 0
-				},
-				{
-					"dir": "right",
-					"x": 4,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 4,
-					"y": 2
-				},
-				{
-					"dir": "up",
-					"x": 4,
 					"y": 3
 				},
 				{
 					"dir": "up",
-					"x": 4,
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 7
+				},
+				{
+					"dir": "down",
+					"x": 1,
 					"y": 6
 				},
 				{
-					"dir": "right",
+					"dir": "left",
 					"x": 3,
 					"y": 6
 				},
@@ -881,313 +806,338 @@
 					"dir": "right",
 					"x": 2,
 					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 7
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 7
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 2
 				}
 			],
 			"generator_version": 1,
 			"height": 8,
 			"id": 17,
 			"metrics": {
-				"arrows": 24,
-				"bait": 1,
-				"blocked_at_start": 17,
-				"depth": 12,
-				"free_at_start": 7,
+				"arrows": 22,
+				"bait": 2,
+				"blocked_at_start": 18,
+				"depth": 9,
+				"free_at_start": 4,
 				"height": 8,
 				"width": 6
 			},
-			"moves_limit": 25,
+			"moves_limit": 23,
 			"name": "Amber Anchor",
-			"seed": 20261162800479,
+			"seed": 20261166800698,
 			"width": 6
 		},
 		{
 			"arrows": [
 				{
-					"dir": "down",
-					"x": 1,
-					"y": 7
-				},
-				{
 					"dir": "right",
-					"x": 5,
-					"y": 0
-				},
-				{
-					"dir": "right",
-					"x": 0,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 0,
-					"y": 1
-				},
-				{
-					"dir": "right",
-					"x": 5,
+					"x": 4,
 					"y": 3
 				},
 				{
 					"dir": "right",
-					"x": 2,
+					"x": 3,
 					"y": 3
 				},
 				{
-					"dir": "right",
-					"x": 0,
-					"y": 3
-				},
-				{
-					"dir": "up",
-					"x": 0,
-					"y": 4
-				},
-				{
-					"dir": "left",
-					"x": 2,
-					"y": 4
-				},
-				{
 					"dir": "left",
 					"x": 0,
-					"y": 5
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 5
-				},
-				{
-					"dir": "left",
-					"x": 2,
-					"y": 5
-				},
-				{
-					"dir": "left",
-					"x": 0,
-					"y": 7
-				},
-				{
-					"dir": "right",
-					"x": 5,
-					"y": 2
-				},
-				{
-					"dir": "right",
-					"x": 3,
-					"y": 2
-				},
-				{
-					"dir": "down",
-					"x": 2,
-					"y": 7
-				},
-				{
-					"dir": "down",
-					"x": 2,
-					"y": 2
-				},
-				{
-					"dir": "down",
-					"x": 2,
-					"y": 1
-				},
-				{
-					"dir": "left",
-					"x": 4,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 4,
-					"y": 5
-				},
-				{
-					"dir": "right",
-					"x": 3,
-					"y": 5
-				},
-				{
-					"dir": "up",
-					"x": 3,
-					"y": 7
-				},
-				{
-					"dir": "left",
-					"x": 4,
-					"y": 7
-				},
-				{
-					"dir": "left",
-					"x": 5,
-					"y": 7
-				},
-				{
-					"dir": "down",
-					"x": 5,
 					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 4
 				}
 			],
 			"generator_version": 1,
 			"height": 8,
 			"id": 18,
 			"metrics": {
-				"arrows": 25,
-				"bait": 3,
-				"blocked_at_start": 18,
-				"depth": 13,
-				"free_at_start": 7,
+				"arrows": 22,
+				"bait": 1,
+				"blocked_at_start": 17,
+				"depth": 9,
+				"free_at_start": 5,
 				"height": 8,
 				"width": 6
 			},
-			"moves_limit": 26,
+			"moves_limit": 23,
 			"name": "Young Bridge",
-			"seed": 20261162801497,
+			"seed": 20261166801666,
 			"width": 6
 		},
 		{
 			"arrows": [
 				{
 					"dir": "up",
-					"x": 5,
+					"x": 4,
 					"y": 0
 				},
 				{
 					"dir": "up",
 					"x": 5,
-					"y": 1
-				},
-				{
-					"dir": "down",
-					"x": 2,
-					"y": 7
-				},
-				{
-					"dir": "left",
-					"x": 0,
-					"y": 2
-				},
-				{
-					"dir": "down",
-					"x": 3,
-					"y": 7
-				},
-				{
-					"dir": "down",
-					"x": 3,
-					"y": 6
-				},
-				{
-					"dir": "down",
-					"x": 1,
-					"y": 7
-				},
-				{
-					"dir": "left",
-					"x": 0,
-					"y": 1
-				},
-				{
-					"dir": "down",
-					"x": 5,
-					"y": 7
+					"y": 0
 				},
 				{
 					"dir": "right",
-					"x": 0,
-					"y": 7
+					"x": 5,
+					"y": 4
 				},
 				{
-					"dir": "down",
-					"x": 0,
-					"y": 6
-				},
-				{
-					"dir": "left",
-					"x": 2,
-					"y": 6
-				},
-				{
-					"dir": "left",
+					"dir": "right",
 					"x": 4,
-					"y": 6
+					"y": 4
 				},
 				{
-					"dir": "down",
+					"dir": "up",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "up",
 					"x": 4,
 					"y": 5
 				},
 				{
-					"dir": "down",
-					"x": 4,
-					"y": 1
+					"dir": "right",
+					"x": 3,
+					"y": 5
 				},
 				{
 					"dir": "right",
-					"x": 3,
-					"y": 1
+					"x": 2,
+					"y": 5
 				},
 				{
 					"dir": "left",
 					"x": 0,
-					"y": 0
-				},
-				{
-					"dir": "left",
-					"x": 3,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 3,
-					"y": 2
-				},
-				{
-					"dir": "up",
-					"x": 3,
-					"y": 3
-				},
-				{
-					"dir": "right",
-					"x": 0,
-					"y": 3
-				},
-				{
-					"dir": "up",
-					"x": 0,
-					"y": 4
+					"y": 1
 				},
 				{
 					"dir": "left",
 					"x": 1,
-					"y": 4
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 2
 				},
 				{
 					"dir": "left",
 					"x": 2,
-					"y": 4
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 5,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 7
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 7
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 6
 				},
 				{
 					"dir": "left",
 					"x": 3,
-					"y": 4
+					"y": 6
 				}
 			],
 			"generator_version": 1,
 			"height": 8,
 			"id": 19,
 			"metrics": {
-				"arrows": 25,
-				"bait": 3,
+				"arrows": 23,
+				"bait": 1,
 				"blocked_at_start": 17,
-				"depth": 14,
-				"free_at_start": 8,
+				"depth": 9,
+				"free_at_start": 6,
 				"height": 8,
 				"width": 6
 			},
-			"moves_limit": 26,
+			"moves_limit": 24,
 			"name": "Upper Delta",
-			"seed": 20261162802495,
+			"seed": 20261166802584,
 			"width": 6
 		},
 		{
@@ -1195,149 +1145,134 @@
 				{
 					"dir": "left",
 					"x": 0,
-					"y": 4
-				},
-				{
-					"dir": "left",
-					"x": 0,
-					"y": 5
+					"y": 0
 				},
 				{
 					"dir": "left",
 					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 5,
 					"y": 5
 				},
 				{
-					"dir": "left",
-					"x": 0,
-					"y": 2
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 2
-				},
-				{
-					"dir": "left",
-					"x": 3,
-					"y": 2
-				},
-				{
-					"dir": "left",
+					"dir": "right",
 					"x": 4,
-					"y": 2
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 4
 				},
 				{
 					"dir": "up",
+					"x": 2,
+					"y": 7
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 7
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 4
+				},
+				{
+					"dir": "right",
 					"x": 4,
 					"y": 4
 				},
 				{
-					"dir": "left",
-					"x": 5,
-					"y": 4
+					"dir": "down",
+					"x": 4,
+					"y": 3
 				},
 				{
 					"dir": "right",
 					"x": 5,
-					"y": 5
+					"y": 3
 				},
 				{
-					"dir": "left",
+					"dir": "right",
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "right",
 					"x": 0,
-					"y": 6
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 6
+					"y": 3
 				},
 				{
 					"dir": "down",
-					"x": 5,
-					"y": 7
-				},
-				{
-					"dir": "down",
-					"x": 5,
-					"y": 6
-				},
-				{
-					"dir": "down",
-					"x": 5,
-					"y": 1
-				},
-				{
-					"dir": "down",
-					"x": 5,
-					"y": 0
-				},
-				{
-					"dir": "right",
-					"x": 3,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 3,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 2,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 2,
-					"y": 1
-				},
-				{
-					"dir": "right",
-					"x": 1,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 1,
-					"y": 7
-				},
-				{
-					"dir": "left",
 					"x": 0,
-					"y": 7
+					"y": 1
 				},
 				{
-					"dir": "left",
-					"x": 2,
-					"y": 7
+					"dir": "up",
+					"x": 5,
+					"y": 0
 				},
 				{
-					"dir": "left",
-					"x": 3,
-					"y": 7
+					"dir": "right",
+					"x": 4,
+					"y": 0
 				},
 				{
-					"dir": "down",
-					"x": 3,
-					"y": 5
+					"dir": "up",
+					"x": 4,
+					"y": 1
 				}
 			],
 			"generator_version": 1,
 			"height": 8,
 			"id": 20,
 			"metrics": {
-				"arrows": 26,
-				"bait": 1,
+				"arrows": 23,
+				"bait": 3,
 				"blocked_at_start": 18,
-				"depth": 14,
-				"free_at_start": 8,
+				"depth": 9,
+				"free_at_start": 5,
 				"height": 8,
 				"width": 6
 			},
-			"moves_limit": 27,
+			"moves_limit": 24,
 			"name": "Rapid Forest",
-			"seed": 20261162803514,
+			"seed": 20261166803509,
 			"width": 6
 		}
 	],

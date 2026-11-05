@@ -3,48 +3,53 @@
 		{
 			"arrows": [
 				{
-					"dir": "up",
-					"x": 4,
-					"y": 0
+					"dir": "left",
+					"x": 0,
+					"y": 4
 				},
 				{
-					"dir": "up",
-					"x": 4,
-					"y": 1
+					"dir": "left",
+					"x": 1,
+					"y": 4
 				},
 				{
-					"dir": "right",
+					"dir": "down",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 2
+				},
+				{
+					"dir": "down",
 					"x": 3,
 					"y": 1
 				},
 				{
-					"dir": "up",
-					"x": 3,
+					"dir": "left",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 0,
 					"y": 6
 				},
 				{
-					"dir": "up",
+					"dir": "left",
 					"x": 2,
-					"y": 0
+					"y": 6
 				},
 				{
-					"dir": "up",
+					"dir": "down",
 					"x": 2,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 2,
-					"y": 2
-				},
-				{
-					"dir": "right",
-					"x": 0,
-					"y": 2
-				},
-				{
-					"dir": "up",
-					"x": 0,
 					"y": 3
 				},
 				{
@@ -53,34 +58,29 @@
 					"y": 3
 				},
 				{
-					"dir": "down",
-					"x": 1,
-					"y": 6
-				},
-				{
-					"dir": "down",
-					"x": 1,
-					"y": 4
+					"dir": "left",
+					"x": 0,
+					"y": 0
 				},
 				{
 					"dir": "left",
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "up",
 					"x": 2,
-					"y": 4
+					"y": 0
 				},
 				{
 					"dir": "left",
 					"x": 4,
-					"y": 4
+					"y": 0
 				},
 				{
 					"dir": "up",
 					"x": 4,
-					"y": 6
-				},
-				{
-					"dir": "right",
-					"x": 2,
-					"y": 6
+					"y": 5
 				}
 			],
 			"generator_version": 1,
@@ -88,16 +88,16 @@
 			"id": 1,
 			"metrics": {
 				"arrows": 16,
-				"bait": 2,
-				"blocked_at_start": 13,
+				"bait": 1,
+				"blocked_at_start": 12,
 				"depth": 7,
-				"free_at_start": 3,
+				"free_at_start": 4,
 				"height": 7,
 				"width": 5
 			},
 			"moves_limit": 17,
 			"name": "Narrow Harbor",
-			"seed": 20261162784337,
+			"seed": 20261166784349,
 			"width": 5
 		},
 		{
@@ -105,31 +105,41 @@
 				{
 					"dir": "up",
 					"x": 2,
-					"y": 5
-				},
-				{
-					"dir": "left",
-					"x": 0,
 					"y": 2
 				},
 				{
-					"dir": "right",
-					"x": 4,
-					"y": 6
+					"dir": "up",
+					"x": 2,
+					"y": 3
 				},
 				{
 					"dir": "up",
-					"x": 0,
-					"y": 0
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 6
 				},
 				{
 					"dir": "right",
 					"x": 4,
-					"y": 1
+					"y": 4
 				},
 				{
 					"dir": "right",
 					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 1,
 					"y": 1
 				},
 				{
@@ -140,51 +150,36 @@
 				{
 					"dir": "up",
 					"x": 0,
-					"y": 4
+					"y": 3
 				},
 				{
 					"dir": "left",
-					"x": 1,
-					"y": 4
-				},
-				{
-					"dir": "left",
-					"x": 4,
-					"y": 4
-				},
-				{
-					"dir": "left",
-					"x": 0,
-					"y": 5
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 5
-				},
-				{
-					"dir": "left",
-					"x": 4,
-					"y": 5
-				},
-				{
-					"dir": "right",
-					"x": 4,
+					"x": 3,
 					"y": 3
 				},
 				{
 					"dir": "down",
-					"x": 4,
-					"y": 0
+					"x": 1,
+					"y": 6
 				},
 				{
-					"dir": "right",
+					"dir": "left",
+					"x": 3,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "down",
 					"x": 3,
 					"y": 0
 				},
 				{
-					"dir": "right",
-					"x": 1,
+					"dir": "left",
+					"x": 4,
 					"y": 0
 				}
 			],
@@ -192,104 +187,104 @@
 			"height": 7,
 			"id": 2,
 			"metrics": {
-				"arrows": 17,
-				"bait": 2,
-				"blocked_at_start": 10,
-				"depth": 8,
-				"free_at_start": 7,
+				"arrows": 16,
+				"bait": 1,
+				"blocked_at_start": 12,
+				"depth": 7,
+				"free_at_start": 4,
 				"height": 7,
 				"width": 5
 			},
-			"moves_limit": 18,
+			"moves_limit": 17,
 			"name": "Iron Orbit",
-			"seed": 20261162785344,
+			"seed": 20261166785412,
 			"width": 5
 		},
 		{
 			"arrows": [
 				{
 					"dir": "left",
-					"x": 0,
-					"y": 2
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 2
-				},
-				{
-					"dir": "left",
-					"x": 2,
-					"y": 2
-				},
-				{
-					"dir": "left",
 					"x": 4,
-					"y": 2
+					"y": 4
 				},
 				{
 					"dir": "up",
 					"x": 4,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 4,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 4,
-					"y": 3
+					"y": 5
 				},
 				{
 					"dir": "right",
-					"x": 3,
-					"y": 3
-				},
-				{
-					"dir": "left",
-					"x": 0,
-					"y": 3
-				},
-				{
-					"dir": "left",
-					"x": 0,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 0,
-					"y": 4
-				},
-				{
-					"dir": "left",
 					"x": 1,
-					"y": 4
-				},
-				{
-					"dir": "left",
-					"x": 2,
-					"y": 4
-				},
-				{
-					"dir": "left",
-					"x": 3,
-					"y": 4
+					"y": 5
 				},
 				{
 					"dir": "down",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "left",
 					"x": 3,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 0,
 					"y": 0
 				},
 				{
-					"dir": "right",
+					"dir": "left",
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "left",
 					"x": 2,
 					"y": 0
 				},
 				{
 					"dir": "up",
 					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 3,
 					"y": 6
 				}
 			],
@@ -298,16 +293,16 @@
 			"id": 3,
 			"metrics": {
 				"arrows": 17,
-				"bait": 1,
+				"bait": 3,
 				"blocked_at_start": 13,
-				"depth": 8,
+				"depth": 7,
 				"free_at_start": 4,
 				"height": 7,
 				"width": 5
 			},
 			"moves_limit": 18,
 			"name": "Crimson Quarry",
-			"seed": 20261162786351,
+			"seed": 20261166786365,
 			"width": 5
 		},
 		{
@@ -315,75 +310,70 @@
 				{
 					"dir": "right",
 					"x": 4,
-					"y": 1
-				},
-				{
-					"dir": "right",
-					"x": 3,
-					"y": 1
-				},
-				{
-					"dir": "down",
-					"x": 2,
-					"y": 6
-				},
-				{
-					"dir": "down",
-					"x": 2,
-					"y": 5
-				},
-				{
-					"dir": "right",
-					"x": 0,
-					"y": 5
-				},
-				{
-					"dir": "down",
-					"x": 0,
-					"y": 4
-				},
-				{
-					"dir": "down",
-					"x": 0,
 					"y": 0
 				},
 				{
 					"dir": "right",
-					"x": 4,
-					"y": 4
+					"x": 3,
+					"y": 0
 				},
 				{
-					"dir": "right",
-					"x": 1,
-					"y": 4
+					"dir": "up",
+					"x": 3,
+					"y": 5
 				},
 				{
-					"dir": "down",
-					"x": 1,
-					"y": 6
-				},
-				{
-					"dir": "down",
-					"x": 1,
+					"dir": "up",
+					"x": 0,
 					"y": 0
 				},
 				{
 					"dir": "left",
-					"x": 3,
+					"x": 1,
 					"y": 0
 				},
 				{
 					"dir": "up",
-					"x": 3,
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 0,
 					"y": 2
 				},
 				{
 					"dir": "up",
-					"x": 3,
-					"y": 3
+					"x": 0,
+					"y": 5
 				},
 				{
-					"dir": "right",
+					"dir": "left",
+					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "down",
 					"x": 4,
 					"y": 3
 				},
@@ -393,119 +383,119 @@
 					"y": 3
 				},
 				{
-					"dir": "down",
-					"x": 4,
-					"y": 6
+					"dir": "right",
+					"x": 1,
+					"y": 3
 				},
 				{
-					"dir": "right",
-					"x": 3,
-					"y": 6
+					"dir": "up",
+					"x": 1,
+					"y": 4
 				}
 			],
 			"generator_version": 1,
 			"height": 7,
 			"id": 4,
 			"metrics": {
-				"arrows": 18,
+				"arrows": 17,
 				"bait": 3,
-				"blocked_at_start": 12,
-				"depth": 8,
-				"free_at_start": 6,
+				"blocked_at_start": 13,
+				"depth": 7,
+				"free_at_start": 4,
 				"height": 7,
 				"width": 5
 			},
-			"moves_limit": 19,
+			"moves_limit": 18,
 			"name": "Bright Ridge",
-			"seed": 20261162787354,
+			"seed": 20261166787571,
 			"width": 5
 		},
 		{
 			"arrows": [
 				{
 					"dir": "down",
-					"x": 4,
-					"y": 4
-				},
-				{
-					"dir": "down",
-					"x": 4,
-					"y": 2
-				},
-				{
-					"dir": "down",
-					"x": 4,
-					"y": 1
-				},
-				{
-					"dir": "down",
-					"x": 4,
-					"y": 0
-				},
-				{
-					"dir": "right",
-					"x": 3,
-					"y": 0
-				},
-				{
-					"dir": "up",
 					"x": 3,
 					"y": 6
 				},
 				{
+					"dir": "right",
+					"x": 2,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 5
+				},
+				{
 					"dir": "left",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "right",
 					"x": 0,
 					"y": 4
 				},
 				{
 					"dir": "up",
 					"x": 0,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 0,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 0,
-					"y": 2
-				},
-				{
-					"dir": "left",
-					"x": 2,
-					"y": 2
-				},
-				{
-					"dir": "down",
-					"x": 2,
-					"y": 0
-				},
-				{
-					"dir": "right",
-					"x": 1,
-					"y": 0
-				},
-				{
-					"dir": "down",
-					"x": 1,
 					"y": 6
-				},
-				{
-					"dir": "right",
-					"x": 0,
-					"y": 6
-				},
-				{
-					"dir": "down",
-					"x": 0,
-					"y": 3
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 3
 				}
 			],
 			"generator_version": 1,
@@ -515,70 +505,80 @@
 				"arrows": 17,
 				"bait": 1,
 				"blocked_at_start": 13,
-				"depth": 8,
+				"depth": 7,
 				"free_at_start": 4,
 				"height": 7,
 				"width": 5
 			},
 			"moves_limit": 18,
 			"name": "Winding Tower",
-			"seed": 20261162788354,
+			"seed": 20261166788365,
 			"width": 5
 		},
 		{
 			"arrows": [
 				{
-					"dir": "up",
-					"x": 3,
-					"y": 0
-				},
-				{
-					"dir": "left",
-					"x": 5,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 5,
-					"y": 1
-				},
-				{
-					"dir": "left",
-					"x": 0,
-					"y": 7
-				},
-				{
-					"dir": "left",
-					"x": 3,
+					"dir": "down",
+					"x": 4,
 					"y": 7
 				},
 				{
 					"dir": "down",
-					"x": 3,
-					"y": 4
+					"x": 4,
+					"y": 6
 				},
 				{
-					"dir": "up",
-					"x": 5,
+					"dir": "down",
+					"x": 4,
 					"y": 2
 				},
 				{
 					"dir": "right",
-					"x": 2,
+					"x": 0,
 					"y": 2
 				},
 				{
 					"dir": "up",
-					"x": 2,
+					"x": 0,
 					"y": 3
 				},
 				{
+					"dir": "right",
+					"x": 5,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 0
+				},
+				{
 					"dir": "up",
-					"x": 2,
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 7
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 5,
 					"y": 4
 				},
 				{
-					"dir": "left",
+					"dir": "right",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "up",
 					"x": 0,
 					"y": 5
 				},
@@ -589,37 +589,22 @@
 				},
 				{
 					"dir": "left",
-					"x": 4,
+					"x": 2,
 					"y": 5
 				},
 				{
-					"dir": "left",
-					"x": 0,
-					"y": 6
-				},
-				{
-					"dir": "down",
-					"x": 0,
-					"y": 4
-				},
-				{
-					"dir": "left",
-					"x": 4,
-					"y": 4
-				},
-				{
-					"dir": "down",
-					"x": 4,
-					"y": 1
-				},
-				{
 					"dir": "right",
-					"x": 3,
+					"x": 2,
 					"y": 1
 				},
 				{
-					"dir": "down",
-					"x": 5,
+					"dir": "up",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 2,
 					"y": 7
 				}
 			],
@@ -627,40 +612,25 @@
 			"height": 8,
 			"id": 6,
 			"metrics": {
-				"arrows": 19,
-				"bait": 5,
-				"blocked_at_start": 14,
-				"depth": 9,
-				"free_at_start": 5,
+				"arrows": 18,
+				"bait": 3,
+				"blocked_at_start": 15,
+				"depth": 8,
+				"free_at_start": 3,
 				"height": 8,
 				"width": 6
 			},
-			"moves_limit": 20,
+			"moves_limit": 19,
 			"name": "Tidy Window",
-			"seed": 20261162789370,
+			"seed": 20261166789541,
 			"width": 6
 		},
 		{
 			"arrows": [
 				{
 					"dir": "left",
-					"x": 1,
-					"y": 1
-				},
-				{
-					"dir": "left",
 					"x": 3,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 3,
-					"y": 3
-				},
-				{
-					"dir": "up",
-					"x": 3,
-					"y": 5
+					"y": 2
 				},
 				{
 					"dir": "down",
@@ -670,65 +640,40 @@
 				{
 					"dir": "down",
 					"x": 0,
-					"y": 4
-				},
-				{
-					"dir": "right",
-					"x": 5,
-					"y": 7
-				},
-				{
-					"dir": "down",
-					"x": 5,
 					"y": 6
 				},
 				{
 					"dir": "down",
-					"x": 5,
+					"x": 0,
 					"y": 5
-				},
-				{
-					"dir": "right",
-					"x": 1,
-					"y": 5
-				},
-				{
-					"dir": "down",
-					"x": 1,
-					"y": 3
 				},
 				{
 					"dir": "left",
-					"x": 4,
-					"y": 3
+					"x": 1,
+					"y": 5
 				},
 				{
-					"dir": "right",
+					"dir": "left",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "left",
 					"x": 5,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 5,
-					"y": 1
-				},
-				{
-					"dir": "right",
-					"x": 4,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 4,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 4,
 					"y": 2
 				},
 				{
 					"dir": "up",
+					"x": 5,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 5,
+					"y": 4
+				},
+				{
+					"dir": "right",
 					"x": 4,
 					"y": 4
 				},
@@ -739,31 +684,66 @@
 				},
 				{
 					"dir": "right",
+					"x": 5,
+					"y": 7
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 7
+				},
+				{
+					"dir": "down",
 					"x": 3,
 					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 1
 				}
 			],
 			"generator_version": 1,
 			"height": 8,
 			"id": 7,
 			"metrics": {
-				"arrows": 20,
+				"arrows": 18,
 				"bait": 1,
 				"blocked_at_start": 15,
-				"depth": 9,
-				"free_at_start": 5,
+				"depth": 8,
+				"free_at_start": 3,
 				"height": 8,
 				"width": 6
 			},
-			"moves_limit": 21,
+			"moves_limit": 19,
 			"name": "Pale Bridge",
-			"seed": 20261162790399,
+			"seed": 20261166790532,
 			"width": 6
 		},
 		{
 			"arrows": [
 				{
-					"dir": "right",
+					"dir": "left",
+					"x": 2,
+					"y": 7
+				},
+				{
+					"dir": "left",
 					"x": 5,
 					"y": 7
 				},
@@ -773,78 +753,53 @@
 					"y": 6
 				},
 				{
-					"dir": "up",
-					"x": 2,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 2,
-					"y": 1
-				},
-				{
 					"dir": "left",
-					"x": 3,
-					"y": 1
-				},
-				{
-					"dir": "left",
-					"x": 4,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 4,
+					"x": 0,
 					"y": 3
-				},
-				{
-					"dir": "down",
-					"x": 0,
-					"y": 7
-				},
-				{
-					"dir": "left",
-					"x": 4,
-					"y": 7
-				},
-				{
-					"dir": "left",
-					"x": 2,
-					"y": 5
-				},
-				{
-					"dir": "left",
-					"x": 3,
-					"y": 5
-				},
-				{
-					"dir": "left",
-					"x": 4,
-					"y": 5
-				},
-				{
-					"dir": "up",
-					"x": 4,
-					"y": 6
-				},
-				{
-					"dir": "right",
-					"x": 3,
-					"y": 6
-				},
-				{
-					"dir": "down",
-					"x": 3,
-					"y": 4
-				},
-				{
-					"dir": "left",
-					"x": 0,
-					"y": 4
 				},
 				{
 					"dir": "left",
 					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 2,
 					"y": 4
 				},
 				{
@@ -853,53 +808,48 @@
 					"y": 4
 				},
 				{
-					"dir": "right",
+					"dir": "up",
 					"x": 5,
-					"y": 3
+					"y": 5
 				},
 				{
-					"dir": "down",
-					"x": 5,
-					"y": 2
+					"dir": "right",
+					"x": 4,
+					"y": 5
 				},
 				{
 					"dir": "up",
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "right",
 					"x": 0,
-					"y": 0
+					"y": 6
 				}
 			],
 			"generator_version": 1,
 			"height": 8,
 			"id": 8,
 			"metrics": {
-				"arrows": 21,
-				"bait": 1,
+				"arrows": 18,
+				"bait": 4,
 				"blocked_at_start": 14,
-				"depth": 9,
-				"free_at_start": 7,
+				"depth": 8,
+				"free_at_start": 4,
 				"height": 8,
 				"width": 6
 			},
-			"moves_limit": 22,
+			"moves_limit": 19,
 			"name": "Misty Delta",
-			"seed": 20261162791405,
+			"seed": 20261166791431,
 			"width": 6
 		},
 		{
 			"arrows": [
 				{
-					"dir": "left",
-					"x": 0,
-					"y": 2
-				},
-				{
-					"dir": "down",
-					"x": 5,
-					"y": 7
-				},
-				{
 					"dir": "right",
-					"x": 2,
+					"x": 3,
 					"y": 7
 				},
 				{
@@ -915,6 +865,46 @@
 				{
 					"dir": "down",
 					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 0,
 					"y": 0
 				},
 				{
@@ -928,216 +918,161 @@
 					"y": 1
 				},
 				{
-					"dir": "up",
-					"x": 1,
-					"y": 2
-				},
-				{
-					"dir": "right",
-					"x": 5,
-					"y": 4
-				},
-				{
-					"dir": "right",
-					"x": 4,
-					"y": 4
-				},
-				{
-					"dir": "right",
-					"x": 5,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 2,
-					"y": 0
-				},
-				{
-					"dir": "up",
+					"dir": "left",
 					"x": 2,
 					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 2,
-					"y": 2
 				},
 				{
 					"dir": "left",
-					"x": 4,
+					"x": 5,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 5,
 					"y": 2
 				},
 				{
 					"dir": "up",
 					"x": 5,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 5,
-					"y": 5
+					"y": 4
 				},
 				{
 					"dir": "right",
-					"x": 4,
-					"y": 5
-				},
-				{
-					"dir": "down",
-					"x": 4,
-					"y": 1
-				},
-				{
-					"dir": "down",
-					"x": 4,
-					"y": 0
+					"x": 3,
+					"y": 4
 				}
 			],
 			"generator_version": 1,
 			"height": 8,
 			"id": 9,
 			"metrics": {
-				"arrows": 21,
-				"bait": 1,
-				"blocked_at_start": 16,
-				"depth": 10,
-				"free_at_start": 5,
+				"arrows": 19,
+				"bait": 3,
+				"blocked_at_start": 15,
+				"depth": 8,
+				"free_at_start": 4,
 				"height": 8,
 				"width": 6
 			},
-			"moves_limit": 22,
+			"moves_limit": 20,
 			"name": "Hidden Forest",
-			"seed": 20261162792403,
+			"seed": 20261166792412,
 			"width": 6
 		},
 		{
 			"arrows": [
 				{
-					"dir": "up",
+					"dir": "right",
 					"x": 5,
-					"y": 0
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 7
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 7
 				},
 				{
 					"dir": "right",
 					"x": 3,
-					"y": 0
+					"y": 7
 				},
 				{
-					"dir": "up",
+					"dir": "down",
 					"x": 3,
-					"y": 2
+					"y": 6
 				},
 				{
-					"dir": "up",
+					"dir": "down",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "down",
 					"x": 3,
 					"y": 4
 				},
 				{
 					"dir": "up",
 					"x": 3,
-					"y": 5
+					"y": 0
 				},
 				{
 					"dir": "right",
-					"x": 5,
-					"y": 1
-				},
-				{
-					"dir": "right",
-					"x": 5,
-					"y": 3
+					"x": 2,
+					"y": 0
 				},
 				{
 					"dir": "up",
-					"x": 5,
-					"y": 5
+					"x": 2,
+					"y": 1
 				},
 				{
-					"dir": "right",
-					"x": 4,
-					"y": 5
+					"dir": "up",
+					"x": 2,
+					"y": 3
 				},
 				{
 					"dir": "right",
 					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 0,
 					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 6
 				},
 				{
 					"dir": "down",
 					"x": 1,
-					"y": 7
-				},
-				{
-					"dir": "left",
-					"x": 2,
-					"y": 7
+					"y": 1
 				},
 				{
 					"dir": "left",
 					"x": 3,
-					"y": 7
-				},
-				{
-					"dir": "left",
-					"x": 4,
-					"y": 7
-				},
-				{
-					"dir": "down",
-					"x": 5,
-					"y": 7
-				},
-				{
-					"dir": "down",
-					"x": 5,
-					"y": 6
-				},
-				{
-					"dir": "right",
-					"x": 0,
-					"y": 6
-				},
-				{
-					"dir": "down",
-					"x": 0,
-					"y": 4
-				},
-				{
-					"dir": "left",
-					"x": 2,
-					"y": 4
-				},
-				{
-					"dir": "down",
-					"x": 2,
-					"y": 3
-				},
-				{
-					"dir": "left",
-					"x": 4,
-					"y": 3
-				},
-				{
-					"dir": "down",
-					"x": 4,
-					"y": 2
+					"y": 1
 				}
 			],
 			"generator_version": 1,
 			"height": 8,
 			"id": 10,
 			"metrics": {
-				"arrows": 22,
+				"arrows": 19,
 				"bait": 2,
-				"blocked_at_start": 17,
-				"depth": 10,
-				"free_at_start": 5,
+				"blocked_at_start": 15,
+				"depth": 8,
+				"free_at_start": 4,
 				"height": 8,
 				"width": 6
 			},
-			"moves_limit": 23,
+			"moves_limit": 20,
 			"name": "Quiet Island",
-			"seed": 20261162793399,
+			"seed": 20261166793495,
 			"width": 6
 		}
 	],

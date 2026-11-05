@@ -4,27 +4,32 @@
 			"arrows": [
 				{
 					"dir": "up",
-					"x": 3,
+					"x": 1,
 					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 2
 				},
 				{
 					"dir": "left",
 					"x": 0,
-					"y": 1
-				},
-				{
-					"dir": "down",
-					"x": 3,
 					"y": 3
 				},
 				{
-					"dir": "down",
-					"x": 3,
+					"dir": "left",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 0,
 					"y": 2
 				},
 				{
-					"dir": "right",
-					"x": 0,
+					"dir": "left",
+					"x": 3,
 					"y": 2
 				}
 			],
@@ -32,44 +37,49 @@
 			"height": 4,
 			"id": 11,
 			"metrics": {
-				"arrows": 5,
-				"bait": 1,
-				"blocked_at_start": 2,
+				"arrows": 6,
+				"bait": 0,
+				"blocked_at_start": 3,
 				"depth": 2,
 				"free_at_start": 3,
 				"height": 4,
 				"width": 4
 			},
-			"moves_limit": 9,
+			"moves_limit": 11,
 			"name": "Zesty Drift",
-			"seed": 20261161794403,
+			"seed": 20261165794414,
 			"width": 4
 		},
 		{
 			"arrows": [
 				{
-					"dir": "right",
-					"x": 3,
-					"y": 3
+					"dir": "left",
+					"x": 0,
+					"y": 1
 				},
 				{
-					"dir": "right",
+					"dir": "up",
 					"x": 3,
 					"y": 0
 				},
 				{
-					"dir": "down",
-					"x": 2,
+					"dir": "up",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 0,
 					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 0
 				},
 				{
 					"dir": "right",
-					"x": 0,
-					"y": 3
-				},
-				{
-					"dir": "down",
-					"x": 0,
+					"x": 2,
 					"y": 1
 				}
 			],
@@ -77,56 +87,6 @@
 			"height": 4,
 			"id": 12,
 			"metrics": {
-				"arrows": 5,
-				"bait": 0,
-				"blocked_at_start": 2,
-				"depth": 2,
-				"free_at_start": 3,
-				"height": 4,
-				"width": 4
-			},
-			"moves_limit": 9,
-			"name": "Velvet Harbor",
-			"seed": 20261161795411,
-			"width": 4
-		},
-		{
-			"arrows": [
-				{
-					"dir": "right",
-					"x": 1,
-					"y": 3
-				},
-				{
-					"dir": "right",
-					"x": 0,
-					"y": 2
-				},
-				{
-					"dir": "left",
-					"x": 0,
-					"y": 3
-				},
-				{
-					"dir": "down",
-					"x": 1,
-					"y": 1
-				},
-				{
-					"dir": "down",
-					"x": 0,
-					"y": 1
-				},
-				{
-					"dir": "left",
-					"x": 3,
-					"y": 1
-				}
-			],
-			"generator_version": 1,
-			"height": 4,
-			"id": 13,
-			"metrics": {
 				"arrows": 6,
 				"bait": 0,
 				"blocked_at_start": 3,
@@ -136,40 +96,100 @@
 				"width": 4
 			},
 			"moves_limit": 11,
+			"name": "Velvet Harbor",
+			"seed": 20261165795423,
+			"width": 4
+		},
+		{
+			"arrows": [
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 3
+				}
+			],
+			"generator_version": 1,
+			"height": 4,
+			"id": 13,
+			"metrics": {
+				"arrows": 7,
+				"bait": 0,
+				"blocked_at_start": 3,
+				"depth": 2,
+				"free_at_start": 4,
+				"height": 4,
+				"width": 4
+			},
+			"moves_limit": 12,
 			"name": "Silver Orbit",
-			"seed": 20261161796421,
+			"seed": 20261165796432,
 			"width": 4
 		},
 		{
 			"arrows": [
 				{
 					"dir": "right",
-					"x": 2,
-					"y": 2
+					"x": 3,
+					"y": 3
 				},
 				{
-					"dir": "up",
-					"x": 0,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 0,
-					"y": 2
-				},
-				{
-					"dir": "up",
+					"dir": "right",
 					"x": 2,
 					"y": 3
 				},
 				{
-					"dir": "left",
-					"x": 1,
+					"dir": "down",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 0,
 					"y": 2
 				},
 				{
-					"dir": "right",
-					"x": 3,
+					"dir": "down",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 1,
 					"y": 1
 				}
 			],
@@ -177,99 +197,114 @@
 			"height": 4,
 			"id": 14,
 			"metrics": {
-				"arrows": 6,
+				"arrows": 7,
 				"bait": 0,
-				"blocked_at_start": 3,
+				"blocked_at_start": 4,
 				"depth": 2,
 				"free_at_start": 3,
 				"height": 4,
 				"width": 4
 			},
-			"moves_limit": 11,
+			"moves_limit": 12,
 			"name": "Open Quarry",
-			"seed": 20261161797430,
+			"seed": 20261165797442,
 			"width": 4
 		},
 		{
 			"arrows": [
 				{
-					"dir": "right",
-					"x": 2,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 3,
-					"y": 2
+					"dir": "left",
+					"x": 1,
+					"y": 3
 				},
 				{
 					"dir": "right",
-					"x": 2,
+					"x": 0,
 					"y": 1
 				},
 				{
-					"dir": "up",
-					"x": 2,
-					"y": 2
+					"dir": "down",
+					"x": 0,
+					"y": 0
 				},
 				{
-					"dir": "right",
+					"dir": "down",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "up",
 					"x": 1,
-					"y": 2
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 0
 				}
 			],
 			"generator_version": 1,
 			"height": 4,
 			"id": 15,
 			"metrics": {
-				"arrows": 5,
+				"arrows": 7,
 				"bait": 0,
-				"blocked_at_start": 2,
+				"blocked_at_start": 3,
 				"depth": 2,
-				"free_at_start": 3,
+				"free_at_start": 4,
 				"height": 4,
 				"width": 4
 			},
-			"moves_limit": 9,
+			"moves_limit": 12,
 			"name": "Lunar Signal",
-			"seed": 20261161798441,
+			"seed": 20261165798450,
 			"width": 4
 		},
 		{
 			"arrows": [
 				{
-					"dir": "right",
-					"x": 1,
-					"y": 2
-				},
-				{
-					"dir": "right",
-					"x": 2,
-					"y": 4
-				},
-				{
-					"dir": "right",
-					"x": 0,
-					"y": 2
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 4
-				},
-				{
 					"dir": "up",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "right",
 					"x": 3,
 					"y": 0
 				},
 				{
 					"dir": "down",
-					"x": 0,
-					"y": 1
+					"x": 3,
+					"y": 4
 				},
 				{
-					"dir": "left",
+					"dir": "right",
 					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 1,
 					"y": 1
 				}
 			],
@@ -277,17 +312,17 @@
 			"height": 5,
 			"id": 16,
 			"metrics": {
-				"arrows": 7,
+				"arrows": 8,
 				"bait": 0,
-				"blocked_at_start": 3,
+				"blocked_at_start": 4,
 				"depth": 3,
 				"free_at_start": 4,
 				"height": 5,
 				"width": 5
 			},
-			"moves_limit": 13,
+			"moves_limit": 14,
 			"name": "Gentle Valley",
-			"seed": 20261161799450,
+			"seed": 20261165799459,
 			"width": 5
 		},
 		{
@@ -295,7 +330,27 @@
 				{
 					"dir": "right",
 					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 2,
 					"y": 1
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 3
 				},
 				{
 					"dir": "up",
@@ -303,33 +358,13 @@
 					"y": 2
 				},
 				{
-					"dir": "right",
-					"x": 0,
-					"y": 2
-				},
-				{
-					"dir": "left",
-					"x": 0,
-					"y": 0
-				},
-				{
-					"dir": "left",
-					"x": 0,
-					"y": 3
-				},
-				{
 					"dir": "up",
-					"x": 0,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 0,
+					"x": 2,
 					"y": 4
 				},
 				{
 					"dir": "up",
-					"x": 4,
+					"x": 0,
 					"y": 0
 				}
 			],
@@ -347,50 +382,50 @@
 			},
 			"moves_limit": 14,
 			"name": "Amber Anchor",
-			"seed": 20261161800461,
+			"seed": 20261165800475,
 			"width": 5
 		},
 		{
 			"arrows": [
 				{
-					"dir": "down",
+					"dir": "right",
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "up",
 					"x": 4,
 					"y": 4
 				},
 				{
 					"dir": "up",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "up",
 					"x": 0,
 					"y": 0
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 1,
-					"y": 1
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 3
-				},
-				{
-					"dir": "up",
-					"x": 1,
-					"y": 4
-				},
-				{
-					"dir": "down",
-					"x": 3,
-					"y": 4
-				},
-				{
-					"dir": "down",
-					"x": 3,
-					"y": 3
 				}
 			],
 			"generator_version": 1,
@@ -398,7 +433,7 @@
 			"id": 18,
 			"metrics": {
 				"arrows": 8,
-				"bait": 0,
+				"bait": 1,
 				"blocked_at_start": 4,
 				"depth": 3,
 				"free_at_start": 4,
@@ -407,11 +442,36 @@
 			},
 			"moves_limit": 14,
 			"name": "Young Bridge",
-			"seed": 20261161801467,
+			"seed": 20261165801477,
 			"width": 5
 		},
 		{
 			"arrows": [
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 4
+				},
 				{
 					"dir": "up",
 					"x": 0,
@@ -420,112 +480,22 @@
 				{
 					"dir": "left",
 					"x": 3,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 0,
-					"y": 4
-				},
-				{
-					"dir": "right",
-					"x": 4,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 4,
 					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 4
 				},
 				{
 					"dir": "up",
 					"x": 3,
-					"y": 4
-				},
-				{
-					"dir": "right",
-					"x": 2,
-					"y": 4
-				},
-				{
-					"dir": "down",
-					"x": 2,
 					"y": 3
-				},
-				{
-					"dir": "down",
-					"x": 1,
-					"y": 4
 				}
 			],
 			"generator_version": 1,
 			"height": 5,
 			"id": 19,
-			"metrics": {
-				"arrows": 9,
-				"bait": 1,
-				"blocked_at_start": 5,
-				"depth": 3,
-				"free_at_start": 4,
-				"height": 5,
-				"width": 5
-			},
-			"moves_limit": 16,
-			"name": "Upper Delta",
-			"seed": 20261161802480,
-			"width": 5
-		},
-		{
-			"arrows": [
-				{
-					"dir": "left",
-					"x": 2,
-					"y": 3
-				},
-				{
-					"dir": "right",
-					"x": 4,
-					"y": 0
-				},
-				{
-					"dir": "right",
-					"x": 4,
-					"y": 2
-				},
-				{
-					"dir": "left",
-					"x": 0,
-					"y": 2
-				},
-				{
-					"dir": "right",
-					"x": 3,
-					"y": 0
-				},
-				{
-					"dir": "right",
-					"x": 3,
-					"y": 3
-				},
-				{
-					"dir": "down",
-					"x": 3,
-					"y": 1
-				},
-				{
-					"dir": "right",
-					"x": 0,
-					"y": 1
-				},
-				{
-					"dir": "down",
-					"x": 0,
-					"y": 0
-				}
-			],
-			"generator_version": 1,
-			"height": 5,
-			"id": 20,
 			"metrics": {
 				"arrows": 9,
 				"bait": 1,
@@ -536,8 +506,73 @@
 				"width": 5
 			},
 			"moves_limit": 16,
+			"name": "Upper Delta",
+			"seed": 20261165802486,
+			"width": 5
+		},
+		{
+			"arrows": [
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 4
+				}
+			],
+			"generator_version": 1,
+			"height": 5,
+			"id": 20,
+			"metrics": {
+				"arrows": 9,
+				"bait": 1,
+				"blocked_at_start": 6,
+				"depth": 3,
+				"free_at_start": 3,
+				"height": 5,
+				"width": 5
+			},
+			"moves_limit": 16,
 			"name": "Rapid Forest",
-			"seed": 20261161803484,
+			"seed": 20261165803499,
 			"width": 5
 		}
 	],

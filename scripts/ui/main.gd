@@ -15,6 +15,7 @@ var _current: Control
 var _last_index := -1
 var _audio := AudioManager.new()
 var _backdrop: Backdrop
+var _play_games := PlayGames.new()
 
 
 func _ready() -> void:
@@ -27,6 +28,8 @@ func _ready() -> void:
 	add_child(_audio)
 	_audio.apply_progress(_save.progress)
 	_audio.start_music()
+	add_child(_play_games)
+	_play_games.start(_save.progress, _save)
 	# Every button, present and future, gets the click sound.
 	get_tree().node_added.connect(_on_node_added)
 	_host = MarginContainer.new()
@@ -76,7 +79,7 @@ func _on_node_added(node: Node) -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST or what == NOTIFICATION_WM_CLOSE_REQUEST:
-		if _current is GameScreen or _current is SettingsScreen:
+		if _current is GameScreen or _current is SettingsScreen or _current is TrophiesScreen:
 			_show_select()
 		else:
 			get_tree().quit()
@@ -109,6 +112,16 @@ func _show_select() -> void:
 	select.setup(_repo, _save.progress, _last_index if _last_index >= 0 else _first_uncleared_index())
 	select.level_chosen.connect(_start_level)
 	select.settings_requested.connect(_show_settings)
+	select.trophies_requested.connect(_show_trophies)
+	# Back on the menu after a level: post a new star total if there is one.
+	_play_games.sync(_save.progress.difficulty)
+
+
+func _show_trophies() -> void:
+	var trophies := TrophiesScreen.new()
+	_swap(trophies)
+	trophies.setup(_save.progress, _play_games, _repo.levels.size())
+	trophies.back_requested.connect(_show_select)
 
 
 func _show_settings() -> void:

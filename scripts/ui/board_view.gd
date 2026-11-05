@@ -8,6 +8,9 @@ const BLOCKED_COLOR := Palette.RED
 const HINT_COLOR := Palette.GOLD
 const TILE_FILL := Color(1, 1, 1, 0.05)
 const TILE_BORDER := Color(1, 1, 1, 0.08)
+## Smallest cell (in base 540x960 units) the shipped boards may draw at; about
+## 5 mm on a typical 6-inch phone. Checked by the tests against every pack.
+const MIN_CELL_SIZE := 40
 const EXIT_SECONDS := 0.25
 const EXIT_TRAVEL_CELLS := 1.5
 const BLOCKED_FLASH_SECONDS := 0.4
@@ -155,6 +158,11 @@ func _layout() -> Dictionary:
 	var cell := floorf(minf(size.x / b.width, size.y / b.height))
 	var board_size := Vector2(cell * b.width, cell * b.height)
 	return {"cell": cell, "origin": ((size - board_size) / 2.0).floor()}
+
+
+## Edge of one board cell as currently laid out.
+func cell_size() -> float:
+	return _layout()["cell"] if _controller != null else 0.0
 
 
 func _cell_at(pos: Vector2) -> Vector2i:

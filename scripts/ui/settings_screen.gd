@@ -13,6 +13,7 @@ const VERSION_SETTING := "application/config/version"
 var music_toggle: ToggleSwitch
 var sfx_toggle: ToggleSwitch
 var tips_toggle: ToggleSwitch
+var haptics_toggle: ToggleSwitch
 var music_volume_bar: VolumeBar
 var sfx_volume_bar: VolumeBar
 ## One button per tier, index = Difficulty constant.
@@ -67,6 +68,8 @@ func _build() -> void:
 	sfx_toggle = _row(rows, "speaker", Palette.MINT, "Sound effects", "Taps, hints and rewards", _progress.sound_enabled, _on_sfx_toggled)
 	rows.add_child(HSeparator.new())
 	tips_toggle = _row(rows, "bulb", Palette.GOLD, "Tutorial tips", "Short pointers on the first levels", _progress.tips_enabled, _on_tips_toggled)
+	rows.add_child(HSeparator.new())
+	haptics_toggle = _row(rows, "play", Palette.CORAL, "Vibration", "Short buzz on blocked taps, wins and losses", _progress.haptics_enabled, _on_haptics_toggled)
 
 	var volume_card := PanelContainer.new()
 	volume_card.theme_type_variation = "Card"
@@ -321,6 +324,12 @@ func _on_sfx_toggled(on: bool) -> void:
 func _on_tips_toggled(on: bool) -> void:
 	_progress.tips_enabled = on
 	_save.save_data()
+
+
+func _on_haptics_toggled(on: bool) -> void:
+	_progress.haptics_enabled = on
+	_save.save_data()
+	Haptics.buzz(_progress, Haptics.WIN_MS)  # so the player feels it is on
 
 
 func _apply_and_save() -> void:

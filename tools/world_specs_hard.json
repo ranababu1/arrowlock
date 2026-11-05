@@ -1,16 +1,19 @@
 {
-	"master_seed": 20261102,
-	"candidates": 40,
+	"master_seed": 20261106,
+	"candidates": 250,
+	"breathers": false,
+	"rising_depth": true,
+	"allow_variants": false,
 	"worlds": [
-		{"name": "World 1", "width": [5, 6], "height": [7, 8], "arrows": [16, 22], "slack": 0.0, "min_slack": 1, "bias": 0.90, "depth_ratio": 0.45, "free_weight": 3.0, "chain": 0.93},
-		{"name": "World 2", "width": [6, 6], "height": [8, 8], "arrows": [20, 26], "slack": 0.0, "min_slack": 1, "bias": 0.92, "depth_ratio": 0.50, "free_weight": 3.0, "chain": 0.93},
-		{"name": "World 3", "width": [6, 7], "height": [8, 9], "arrows": [24, 30], "slack": 0.0, "min_slack": 1, "bias": 0.93, "depth_ratio": 0.55, "free_weight": 3.0, "chain": 0.93},
-		{"name": "World 4", "width": [7, 7], "height": [9, 9], "arrows": [28, 34], "slack": 0.0, "min_slack": 1, "bias": 0.94, "depth_ratio": 0.60, "free_weight": 3.0, "chain": 0.93},
-		{"name": "World 5", "width": [7, 8], "height": [9, 10], "arrows": [32, 38], "slack": 0.0, "min_slack": 1, "bias": 0.95, "depth_ratio": 0.62, "free_weight": 3.0, "chain": 0.93},
-		{"name": "World 6", "width": [8, 8], "height": [10, 10], "arrows": [36, 42], "slack": 0.0, "min_slack": 1, "bias": 0.96, "depth_ratio": 0.65, "free_weight": 3.0, "chain": 0.93},
-		{"name": "World 7", "width": [8, 8], "height": [10, 11], "arrows": [40, 46], "slack": 0.0, "min_slack": 1, "bias": 0.97, "depth_ratio": 0.68, "free_weight": 3.0, "chain": 0.93},
-		{"name": "World 8", "width": [8, 9], "height": [11, 11], "arrows": [44, 50], "slack": 0.0, "min_slack": 1, "bias": 0.97, "depth_ratio": 0.70, "free_weight": 3.0, "chain": 0.93},
-		{"name": "World 9", "width": [9, 9], "height": [11, 12], "arrows": [48, 54], "slack": 0.0, "min_slack": 1, "bias": 0.98, "depth_ratio": 0.72, "free_weight": 3.0, "chain": 0.93},
-		{"name": "World 10", "width": [9, 9], "height": [12, 12], "arrows": [52, 58], "slack": 0.0, "min_slack": 1, "bias": 0.98, "depth_ratio": 0.75, "free_weight": 3.0, "chain": 0.93}
+		{"name": "World 1", "width": [5, 6], "height": [7, 8], "arrows": [16, 19], "slack": 0.0, "min_slack": 1, "bias": 0.90, "depth": [7, 8], "free_weight": 3.0, "chain": 0.93},
+		{"name": "World 2", "width": [6, 6], "height": [8, 8], "arrows": [20, 23], "slack": 0.0, "min_slack": 1, "bias": 0.92, "depth": [8, 9], "free_weight": 3.0, "chain": 0.93},
+		{"name": "World 3", "width": [6, 7], "height": [8, 9], "arrows": [24, 27], "slack": 0.0, "min_slack": 1, "bias": 0.93, "depth": [9, 10], "free_weight": 3.0, "chain": 0.93},
+		{"name": "World 4", "width": [7, 7], "height": [9, 9], "arrows": [28, 31], "slack": 0.0, "min_slack": 1, "bias": 0.94, "depth": [10, 11], "free_weight": 3.0, "chain": 0.93},
+		{"name": "World 5", "width": [7, 8], "height": [9, 10], "arrows": [32, 35], "slack": 0.0, "min_slack": 1, "bias": 0.95, "depth": [11, 12], "free_weight": 3.0, "chain": 0.93},
+		{"name": "World 6", "width": [8, 8], "height": [10, 10], "arrows": [36, 39], "slack": 0.0, "min_slack": 1, "bias": 0.96, "depth": [12, 13], "free_weight": 3.0, "chain": 0.93},
+		{"name": "World 7", "width": [8, 8], "height": [10, 11], "arrows": [40, 44], "slack": 0.0, "min_slack": 1, "bias": 0.97, "depth": [13, 14], "free_weight": 3.0, "chain": 0.93},
+		{"name": "World 8", "width": [8, 9], "height": [11, 11], "arrows": [45, 49], "slack": 0.0, "min_slack": 1, "bias": 0.97, "depth": [14, 15], "free_weight": 3.0, "chain": 0.93},
+		{"name": "World 9", "width": [9, 9], "height": [11, 12], "arrows": [50, 54], "slack": 0.0, "min_slack": 1, "bias": 0.98, "depth": [15, 16], "free_weight": 3.0, "chain": 0.93},
+		{"name": "World 10", "width": [9, 9], "height": [12, 12], "arrows": [55, 58], "slack": 0.0, "min_slack": 1, "bias": 0.98, "depth": [16, 18], "free_weight": 3.0, "chain": 0.93}
 	]
 }

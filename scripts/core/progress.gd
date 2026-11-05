@@ -7,6 +7,16 @@ const BADGES: Array[String] = [
 	"first_clear", "clears_10", "clears_50", "clears_100", "perfect_clear", "world_perfect",
 	"hard_clear",
 ]
+## Title and how to earn it, for every badge in BADGES.
+const BADGE_INFO := {
+	"first_clear": ["First clear", "Clear any level."],
+	"clears_10": ["10 levels cleared", "Clear 10 levels."],
+	"clears_50": ["50 levels cleared", "Clear 50 levels."],
+	"clears_100": ["All 100 levels cleared", "Clear every level of one mode."],
+	"perfect_clear": ["Perfect level", "Clear a level without a wasted tap."],
+	"world_perfect": ["Perfect world", "Get 3 stars on all 10 levels of a world."],
+	"hard_clear": ["Difficult cleared", "Clear a level in Difficult mode."],
+}
 
 var coins: int = Economy.START_COINS
 ## level id -> {"stars": int, "best_moves": int, "best_wasted": int}.
@@ -21,6 +31,11 @@ var music_volume: float = 1.0
 var sfx_volume: float = 1.0
 ## Coaching on the first levels; switches off once level 3 is cleared.
 var tips_enabled: bool = true
+## Short vibrations on blocked taps, wins and losses (phones only).
+var haptics_enabled: bool = true
+## Tier -> the star total the online leaderboard last confirmed. Kept across a
+## tier switch: the leaderboard keeps the best score anyway.
+var leaderboard_sent: Dictionary = {}
 ## The one tier the player is playing (a Difficulty constant). Changing it
 ## with switch_difficulty() wipes progress, so a save only ever holds one tier.
 var difficulty: int = Difficulty.EASY
@@ -177,6 +192,33 @@ func _award_badges(world: int, tier: int) -> Array[String]:
 	return earned
 
 
+static func badge_title(badge: String) -> String:
+	return BADGE_INFO[badge][0] if BADGE_INFO.has(badge) else badge
+
+
+static func badge_hint(badge: String) -> String:
+	return BADGE_INFO[badge][1] if BADGE_INFO.has(badge) else ""
+
+
+## Numbers for the stats screen, for one tier:
+## {"cleared", "stars", "perfect", "worlds_complete"}.
+func stats(tier: int) -> Dictionary:
+	var perfect := 0
+	for id in levels.keys():
+		if Difficulty.of_level(id) == tier and levels[id]["stars"] == Economy.MAX_STARS:
+			perfect += 1
+	var worlds := 0
+	for w in Economy.LEVELS_PER_WORLD:
+		if world_clears(w, tier) == Economy.LEVELS_PER_WORLD:
+			worlds += 1
+	return {
+		"cleared": cleared_count(tier),
+		"stars": total_stars(tier),
+		"perfect": perfect,
+		"worlds_complete": worlds,
+	}
+
+
 func _perfect_level_count() -> int:
 	var count := 0
 	for entry in levels.values():
@@ -199,7 +241,16 @@ func to_dict() -> Dictionary:
 		"music_volume": music_volume,
 		"sfx_volume": sfx_volume,
 		"difficulty": difficulty,
+		"haptics_enabled": haptics_enabled,
+		"leaderboard_sent": _sent_to_dict(),
 	}
+
+
+func _sent_to_dict() -> Dictionary:
+	var out: Dictionary = {}
+	for tier in leaderboard_sent.keys():
+		out[str(tier)] = leaderboard_sent[tier]
+	return out
 
 
 ## Builds a Progress from untrusted data. Invalid entries are dropped and
@@ -234,6 +285,13 @@ static func from_dict(data: Dictionary) -> Progress:
 	p.music_volume = clampf(float(data.get("music_volume", 1.0)), 0.0, 1.0)
 	p.sfx_volume = clampf(float(data.get("sfx_volume", 1.0)), 0.0, 1.0)
 	p.difficulty = clampi(int(data.get("difficulty", Difficulty.EASY)), 0, Difficulty.COUNT - 1)
+	p.haptics_enabled = bool(data.get("haptics_enabled", true))
+	var sent: Variant = data.get("leaderboard_sent")
+	if typeof(sent) == TYPE_DICTIONARY:
+		for key in sent.keys():
+			var tier := int(str(key)) if str(key).is_valid_int() else -1
+			if tier >= 0 and tier < Difficulty.COUNT:
+				p.leaderboard_sent[tier] = clampi(int(sent[key]), 0, Economy.MAX_STARS * 100)
 	return p
 
 

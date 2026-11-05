@@ -77,13 +77,14 @@ static func _ray_is_clear(board: BoardState, from: Vector2i, dir: String) -> boo
 
 
 ## Board size, arrow count and move limit for level `index` (0..9) of a world.
-## Every 5th level (not the 10th) is a breather; the 10th is the world's peak.
+## With "breathers" (the default) every 5th level but the 10th drops two
+## arrows; with "breathers": false the arrow count never goes down.
 static func slot_params(spec: Dictionary, index: int) -> Dictionary:
 	var t := float(index) / float(LEVELS_PER_WORLD - 1)
 	var width := roundi(lerpf(spec["width"][0], spec["width"][1], t))
 	var height := roundi(lerpf(spec["height"][0], spec["height"][1], t))
 	var count := roundi(lerpf(spec["arrows"][0], spec["arrows"][1], t))
-	if (index + 1) % 5 == 0 and index != LEVELS_PER_WORLD - 1:
+	if spec.get("breathers", true) and (index + 1) % 5 == 0 and index != LEVELS_PER_WORLD - 1:
 		count = maxi(int(spec["arrows"][0]), count - 2)
 	count = clampi(count, 1, maxi(1, floori(width * height * MAX_FILL)))
 	return {
@@ -92,6 +93,17 @@ static func slot_params(spec: Dictionary, index: int) -> Dictionary:
 		"arrows": count,
 		"moves_limit": moves_limit_for(count, float(spec["slack"]), int(spec.get("min_slack", DEFAULT_MIN_SLACK))),
 	}
+
+
+## Dependency depth the generator aims for. A spec "depth": [first, last]
+## rises evenly across the world, like "arrows"; without it the target is a
+## share of the arrow count ("depth_ratio") plus half a step per world.
+static func target_depth_for(spec: Dictionary, world: int, index: int, count: int) -> int:
+	if spec.has("depth"):
+		var t := float(index) / float(LEVELS_PER_WORLD - 1)
+		return roundi(lerpf(spec["depth"][0], spec["depth"][1], t))
+	var depth_ratio := float(spec.get("depth_ratio", DEFAULT_DEPTH_RATIO))
+	return roundi(count * depth_ratio + world * 0.5)
 
 
 static func moves_limit_for(arrow_count: int, slack: float, min_slack: int = DEFAULT_MIN_SLACK) -> int:
@@ -112,13 +124,14 @@ static func board_to_arrows(board: BoardState) -> Array[Dictionary]:
 
 
 ## Best of `candidates` seeded attempts whose layout is not in `used_canon`,
-## judged by closeness of dependency depth to the world's target. Returns
+## judged by closeness of dependency depth to the world's target. A board whose
+## depth is below `min_depth` is only used if nothing deeper turns up, so a
+## pack can be made to never get shallower from one level to the next. Returns
 ## {"level": Dictionary, "canon": String} or {} when no unique board was found.
-static func generate_level(spec: Dictionary, world: int, index: int, level_id: int, master_seed: int, candidates: int, used_canon: Dictionary) -> Dictionary:
+static func generate_level(spec: Dictionary, world: int, index: int, level_id: int, master_seed: int, candidates: int, used_canon: Dictionary, min_depth: int = 0) -> Dictionary:
 	var params := slot_params(spec, index)
 	var count: int = params["arrows"]
-	var depth_ratio := float(spec.get("depth_ratio", DEFAULT_DEPTH_RATIO))
-	var target_depth := mini(count - 1, roundi(count * depth_ratio + world * 0.5))
+	var target_depth := mini(count - 1, maxi(min_depth, target_depth_for(spec, world, index, count)))
 	## Optional pull toward boards that start with few free arrows.
 	var free_weight := float(spec.get("free_weight", 0.0))
 	var rng := RandomNumberGenerator.new()
@@ -135,6 +148,8 @@ static func generate_level(spec: Dictionary, world: int, index: int, level_id: i
 			continue
 		var metrics := LevelMetrics.compute(board)
 		var cost := absi(metrics["depth"] - target_depth) * 1000 + roundi(free_weight * metrics["free_at_start"])
+		if metrics["depth"] < min_depth:
+			cost += (min_depth - metrics["depth"]) * 1000000
 		if cost < best_cost:
 			best_cost = cost
 			best = {
@@ -185,8 +200,13 @@ static func make_variant(source: Dictionary, new_id: int) -> Dictionary:
 
 ## Generates every level in `config` ({"master_seed", "candidates", "worlds": [...]}).
 ## Returns {"levels": Array[Dictionary], "failures": Array[String], "variants": int}.
-## A level with no unique board becomes a variant of an earlier level (never in
-## the first world, at least 10 levels back); otherwise it is reported as a failure.
+## Optional config keys:
+## - "breathers" (default true): see slot_params.
+## - "rising_depth" (default false): each level's dependency depth is at least
+##   the previous level's, so the pack never gets easier on that measure.
+## - "allow_variants" (default true): a level with no unique board becomes a
+##   variant of an earlier level (never in the first world, at least 10 levels
+##   back). When false, or when no variant fits, it is reported as a failure.
 static func generate_pack(config: Dictionary) -> Dictionary:
 	var levels: Array[Dictionary] = []
 	var failures: Array[String] = []
@@ -195,16 +215,22 @@ static func generate_pack(config: Dictionary) -> Dictionary:
 	var master_seed := int(config["master_seed"])
 	var candidates := int(config["candidates"])
 	var worlds: Array = config["worlds"]
+	var rising := bool(config.get("rising_depth", false))
+	var allow_variants := bool(config.get("allow_variants", true))
+	var previous_depth := 0
 	for w in worlds.size():
+		var spec: Dictionary = worlds[w].duplicate()
+		spec["breathers"] = bool(config.get("breathers", true))
 		for i in LEVELS_PER_WORLD:
 			var level_id := w * LEVELS_PER_WORLD + i + 1
-			var made := generate_level(worlds[w], w, i, level_id, master_seed, candidates, used)
+			var made := generate_level(spec, w, i, level_id, master_seed, candidates, used, previous_depth if rising else 0)
 			if not made.is_empty():
 				used[made["canon"]] = level_id
 				levels.append(made["level"])
+				previous_depth = made["level"]["metrics"]["depth"]
 				continue
 			var variant := {}
-			if w > 0:
+			if w > 0 and allow_variants:
 				var sources: Array[Dictionary] = []
 				for earlier in levels:
 					if earlier["id"] <= level_id - LEVELS_PER_WORLD and not earlier.has("variant_of"):

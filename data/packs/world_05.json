@@ -3,49 +3,39 @@
 		{
 			"arrows": [
 				{
-					"dir": "right",
+					"dir": "left",
 					"x": 0,
-					"y": 2
+					"y": 0
 				},
 				{
 					"dir": "left",
-					"x": 5,
-					"y": 5
-				},
-				{
-					"dir": "right",
-					"x": 5,
+					"x": 3,
 					"y": 6
 				},
 				{
-					"dir": "down",
-					"x": 5,
-					"y": 3
-				},
-				{
-					"dir": "down",
-					"x": 0,
-					"y": 6
-				},
-				{
-					"dir": "right",
+					"dir": "left",
 					"x": 2,
-					"y": 3
-				},
-				{
-					"dir": "down",
-					"x": 0,
-					"y": 4
-				},
-				{
-					"dir": "right",
-					"x": 0,
-					"y": 3
-				},
-				{
-					"dir": "down",
-					"x": 0,
 					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 4
 				},
 				{
 					"dir": "up",
@@ -54,797 +44,442 @@
 				},
 				{
 					"dir": "left",
-					"x": 2,
-					"y": 0
+					"x": 5,
+					"y": 6
 				},
 				{
-					"dir": "right",
+					"dir": "left",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "left",
 					"x": 5,
-					"y": 1
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 0
 				}
 			],
 			"generator_version": 1,
 			"height": 7,
 			"id": 41,
 			"metrics": {
-				"arrows": 12,
-				"bait": 1,
-				"blocked_at_start": 6,
-				"depth": 5,
-				"free_at_start": 6,
+				"arrows": 16,
+				"bait": 2,
+				"blocked_at_start": 11,
+				"depth": 6,
+				"free_at_start": 5,
 				"height": 7,
 				"width": 6
 			},
-			"moves_limit": 17,
+			"moves_limit": 21,
 			"name": "Narrow Ember",
-			"seed": 20261161824691,
+			"seed": 20261165824695,
 			"width": 6
 		},
 		{
 			"arrows": [
 				{
-					"dir": "up",
-					"x": 3,
-					"y": 2
-				},
-				{
-					"dir": "right",
-					"x": 4,
-					"y": 2
-				},
-				{
-					"dir": "right",
-					"x": 0,
-					"y": 2
-				},
-				{
 					"dir": "left",
 					"x": 0,
 					"y": 6
 				},
 				{
-					"dir": "up",
-					"x": 0,
-					"y": 1
-				},
-				{
 					"dir": "left",
-					"x": 0,
-					"y": 5
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 1,
-					"y": 4
-				},
-				{
-					"dir": "up",
-					"x": 1,
-					"y": 6
-				},
-				{
-					"dir": "left",
-					"x": 4,
+					"x": 2,
 					"y": 6
 				},
 				{
 					"dir": "down",
-					"x": 4,
+					"x": 0,
 					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 4
 				},
 				{
 					"dir": "right",
 					"x": 5,
-					"y": 5
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 0
 				},
 				{
 					"dir": "right",
 					"x": 3,
-					"y": 5
+					"y": 0
 				}
 			],
 			"generator_version": 1,
 			"height": 7,
 			"id": 42,
 			"metrics": {
-				"arrows": 13,
+				"arrows": 16,
 				"bait": 3,
-				"blocked_at_start": 7,
+				"blocked_at_start": 12,
 				"depth": 6,
-				"free_at_start": 6,
+				"free_at_start": 4,
 				"height": 7,
 				"width": 6
 			},
-			"moves_limit": 19,
+			"moves_limit": 21,
 			"name": "Iron Glacier",
-			"seed": 20261161825716,
+			"seed": 20261165825781,
 			"width": 6
 		},
 		{
 			"arrows": [
 				{
 					"dir": "right",
-					"x": 5,
+					"x": 4,
 					"y": 6
 				},
 				{
 					"dir": "down",
-					"x": 5,
-					"y": 4
-				},
-				{
-					"dir": "right",
 					"x": 4,
-					"y": 4
+					"y": 5
 				},
 				{
 					"dir": "right",
+					"x": 5,
+					"y": 3
+				},
+				{
+					"dir": "left",
 					"x": 2,
-					"y": 4
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 5
 				},
 				{
 					"dir": "up",
-					"x": 1,
-					"y": 0
-				},
-				{
-					"dir": "down",
-					"x": 2,
-					"y": 6
-				},
-				{
-					"dir": "down",
-					"x": 2,
-					"y": 3
-				},
-				{
-					"dir": "right",
 					"x": 3,
-					"y": 3
-				},
-				{
-					"dir": "right",
-					"x": 1,
-					"y": 3
-				},
-				{
-					"dir": "right",
-					"x": 0,
-					"y": 3
-				},
-				{
-					"dir": "right",
-					"x": 5,
 					"y": 0
 				},
 				{
-					"dir": "right",
-					"x": 5,
+					"dir": "down",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 4,
 					"y": 2
 				},
 				{
 					"dir": "right",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "down",
 					"x": 4,
-					"y": 0
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 5
 				}
 			],
 			"generator_version": 1,
 			"height": 7,
 			"id": 43,
 			"metrics": {
-				"arrows": 13,
-				"bait": 0,
-				"blocked_at_start": 7,
+				"arrows": 17,
+				"bait": 5,
+				"blocked_at_start": 12,
 				"depth": 6,
-				"free_at_start": 6,
+				"free_at_start": 5,
 				"height": 7,
 				"width": 6
 			},
-			"moves_limit": 19,
+			"moves_limit": 23,
 			"name": "Crimson Drift",
-			"seed": 20261161826701,
+			"seed": 20261165826708,
 			"width": 6
 		},
 		{
 			"arrows": [
 				{
-					"dir": "down",
-					"x": 1,
-					"y": 5
-				},
-				{
 					"dir": "left",
-					"x": 1,
-					"y": 2
-				},
-				{
-					"dir": "up",
-					"x": 5,
-					"y": 2
-				},
-				{
-					"dir": "left",
-					"x": 1,
+					"x": 2,
 					"y": 1
 				},
 				{
-					"dir": "up",
-					"x": 1,
-					"y": 0
+					"dir": "down",
+					"x": 3,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 5
 				},
 				{
 					"dir": "right",
 					"x": 4,
-					"y": 2
+					"y": 5
 				},
 				{
-					"dir": "up",
-					"x": 1,
-					"y": 3
+					"dir": "down",
+					"x": 4,
+					"y": 4
 				},
 				{
-					"dir": "left",
+					"dir": "right",
 					"x": 0,
-					"y": 5
+					"y": 4
 				},
 				{
-					"dir": "left",
-					"x": 2,
-					"y": 5
+					"dir": "down",
+					"x": 1,
+					"y": 6
 				},
 				{
 					"dir": "right",
 					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 1,
 					"y": 2
 				},
 				{
 					"dir": "down",
 					"x": 2,
-					"y": 1
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 2
 				},
 				{
 					"dir": "left",
 					"x": 3,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 3,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 3,
-					"y": 4
+					"y": 2
 				}
 			],
 			"generator_version": 1,
 			"height": 7,
 			"id": 44,
 			"metrics": {
-				"arrows": 14,
+				"arrows": 17,
 				"bait": 1,
-				"blocked_at_start": 7,
-				"depth": 5,
-				"free_at_start": 7,
-				"height": 7,
-				"width": 6
-			},
-			"moves_limit": 20,
-			"name": "Bright Gate",
-			"seed": 20261161827700,
-			"width": 6
-		},
-		{
-			"arrows": [
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 0
-				},
-				{
-					"dir": "right",
-					"x": 5,
-					"y": 6
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 3
-				},
-				{
-					"dir": "right",
-					"x": 0,
-					"y": 2
-				},
-				{
-					"dir": "up",
-					"x": 3,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 2,
-					"y": 1
-				},
-				{
-					"dir": "right",
-					"x": 1,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 1,
-					"y": 5
-				},
-				{
-					"dir": "down",
-					"x": 3,
-					"y": 6
-				},
-				{
-					"dir": "up",
-					"x": 1,
-					"y": 6
-				},
-				{
-					"dir": "right",
-					"x": 0,
-					"y": 6
-				},
-				{
-					"dir": "down",
-					"x": 0,
-					"y": 4
-				},
-				{
-					"dir": "down",
-					"x": 0,
-					"y": 1
-				}
-			],
-			"generator_version": 1,
-			"height": 7,
-			"id": 45,
-			"metrics": {
-				"arrows": 13,
-				"bait": 0,
-				"blocked_at_start": 6,
-				"depth": 6,
-				"free_at_start": 7,
-				"height": 7,
-				"width": 6
-			},
-			"moves_limit": 19,
-			"name": "Winding Maze",
-			"seed": 20261161828720,
-			"width": 6
-		},
-		{
-			"arrows": [
-				{
-					"dir": "left",
-					"x": 2,
-					"y": 0
-				},
-				{
-					"dir": "down",
-					"x": 2,
-					"y": 4
-				},
-				{
-					"dir": "up",
-					"x": 1,
-					"y": 3
-				},
-				{
-					"dir": "right",
-					"x": 5,
-					"y": 1
-				},
-				{
-					"dir": "right",
-					"x": 4,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 2,
-					"y": 1
-				},
-				{
-					"dir": "left",
-					"x": 0,
-					"y": 2
-				},
-				{
-					"dir": "right",
-					"x": 0,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 0,
-					"y": 4
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 4
-				},
-				{
-					"dir": "left",
-					"x": 3,
-					"y": 4
-				},
-				{
-					"dir": "left",
-					"x": 5,
-					"y": 4
-				},
-				{
-					"dir": "down",
-					"x": 5,
-					"y": 3
-				},
-				{
-					"dir": "down",
-					"x": 0,
-					"y": 6
-				},
-				{
-					"dir": "down",
-					"x": 0,
-					"y": 5
-				}
-			],
-			"generator_version": 1,
-			"height": 7,
-			"id": 46,
-			"metrics": {
-				"arrows": 15,
-				"bait": 0,
-				"blocked_at_start": 9,
-				"depth": 7,
-				"free_at_start": 6,
-				"height": 7,
-				"width": 6
-			},
-			"moves_limit": 21,
-			"name": "Tidy Path",
-			"seed": 20261161829744,
-			"width": 6
-		},
-		{
-			"arrows": [
-				{
-					"dir": "up",
-					"x": 5,
-					"y": 1
-				},
-				{
-					"dir": "up",
-					"x": 5,
-					"y": 2
-				},
-				{
-					"dir": "up",
-					"x": 2,
-					"y": 0
-				},
-				{
-					"dir": "right",
-					"x": 5,
-					"y": 6
-				},
-				{
-					"dir": "down",
-					"x": 5,
-					"y": 4
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 0
-				},
-				{
-					"dir": "down",
-					"x": 4,
-					"y": 5
-				},
-				{
-					"dir": "down",
-					"x": 5,
-					"y": 3
-				},
-				{
-					"dir": "right",
-					"x": 2,
-					"y": 3
-				},
-				{
-					"dir": "left",
-					"x": 4,
-					"y": 0
-				},
-				{
-					"dir": "right",
-					"x": 1,
-					"y": 3
-				},
-				{
-					"dir": "right",
-					"x": 1,
-					"y": 5
-				},
-				{
-					"dir": "up",
-					"x": 1,
-					"y": 2
-				},
-				{
-					"dir": "up",
-					"x": 1,
-					"y": 6
-				},
-				{
-					"dir": "left",
-					"x": 2,
-					"y": 6
-				},
-				{
-					"dir": "left",
-					"x": 3,
-					"y": 6
-				}
-			],
-			"generator_version": 1,
-			"height": 7,
-			"id": 47,
-			"metrics": {
-				"arrows": 16,
-				"bait": 2,
-				"blocked_at_start": 11,
+				"blocked_at_start": 12,
 				"depth": 7,
 				"free_at_start": 5,
 				"height": 7,
 				"width": 6
 			},
 			"moves_limit": 23,
-			"name": "Pale Ridge",
-			"seed": 20261161830762,
-			"width": 6
-		},
-		{
-			"arrows": [
-				{
-					"dir": "down",
-					"x": 3,
-					"y": 6
-				},
-				{
-					"dir": "down",
-					"x": 0,
-					"y": 1
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 3
-				},
-				{
-					"dir": "right",
-					"x": 3,
-					"y": 3
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 1
-				},
-				{
-					"dir": "right",
-					"x": 5,
-					"y": 4
-				},
-				{
-					"dir": "right",
-					"x": 3,
-					"y": 4
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 6
-				},
-				{
-					"dir": "up",
-					"x": 3,
-					"y": 5
-				},
-				{
-					"dir": "right",
-					"x": 5,
-					"y": 1
-				},
-				{
-					"dir": "right",
-					"x": 2,
-					"y": 5
-				},
-				{
-					"dir": "right",
-					"x": 1,
-					"y": 5
-				},
-				{
-					"dir": "down",
-					"x": 1,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 0,
-					"y": 0
-				},
-				{
-					"dir": "right",
-					"x": 4,
-					"y": 1
-				},
-				{
-					"dir": "left",
-					"x": 4,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 4,
-					"y": 2
-				}
-			],
-			"generator_version": 1,
-			"height": 7,
-			"id": 48,
-			"metrics": {
-				"arrows": 17,
-				"bait": 1,
-				"blocked_at_start": 9,
-				"depth": 7,
-				"free_at_start": 8,
-				"height": 7,
-				"width": 6
-			},
-			"moves_limit": 24,
-			"name": "Misty Tower",
-			"seed": 20261161831772,
+			"name": "Bright Gate",
+			"seed": 20261165827864,
 			"width": 6
 		},
 		{
 			"arrows": [
 				{
 					"dir": "left",
-					"x": 1,
-					"y": 6
+					"x": 2,
+					"y": 2
 				},
 				{
-					"dir": "right",
-					"x": 5,
+					"dir": "left",
+					"x": 3,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 0,
 					"y": 0
 				},
 				{
-					"dir": "left",
-					"x": 2,
-					"y": 6
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 1
-				},
-				{
-					"dir": "down",
-					"x": 2,
-					"y": 3
-				},
-				{
-					"dir": "right",
-					"x": 1,
+					"dir": "up",
+					"x": 0,
 					"y": 5
 				},
 				{
-					"dir": "left",
-					"x": 3,
-					"y": 3
-				},
-				{
-					"dir": "down",
-					"x": 5,
-					"y": 6
-				},
-				{
-					"dir": "left",
-					"x": 3,
-					"y": 6
-				},
-				{
-					"dir": "left",
+					"dir": "up",
 					"x": 0,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 5,
 					"y": 2
 				},
 				{
-					"dir": "down",
+					"dir": "right",
 					"x": 5,
-					"y": 3
+					"y": 0
 				},
 				{
 					"dir": "right",
-					"x": 3,
+					"x": 5,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 2,
 					"y": 4
 				},
 				{
-					"dir": "down",
-					"x": 5,
-					"y": 2
-				},
-				{
-					"dir": "down",
-					"x": 5,
-					"y": 1
-				},
-				{
-					"dir": "down",
-					"x": 3,
-					"y": 1
-				},
-				{
-					"dir": "down",
-					"x": 3,
-					"y": 0
-				},
-				{
-					"dir": "right",
-					"x": 1,
-					"y": 0
-				}
-			],
-			"generator_version": 1,
-			"height": 7,
-			"id": 49,
-			"metrics": {
-				"arrows": 17,
-				"bait": 2,
-				"blocked_at_start": 10,
-				"depth": 6,
-				"free_at_start": 7,
-				"height": 7,
-				"width": 6
-			},
-			"moves_limit": 24,
-			"name": "Hidden Window",
-			"seed": 20261161832744,
-			"width": 6
-		},
-		{
-			"arrows": [
-				{
 					"dir": "up",
 					"x": 5,
-					"y": 0
-				},
-				{
-					"dir": "down",
-					"x": 3,
-					"y": 2
-				},
-				{
-					"dir": "left",
-					"x": 0,
 					"y": 3
 				},
 				{
@@ -854,90 +489,615 @@
 				},
 				{
 					"dir": "right",
-					"x": 5,
-					"y": 2
-				},
-				{
-					"dir": "right",
-					"x": 4,
-					"y": 2
-				},
-				{
-					"dir": "right",
-					"x": 2,
-					"y": 2
-				},
-				{
-					"dir": "right",
 					"x": 2,
 					"y": 3
 				},
 				{
-					"dir": "right",
-					"x": 5,
-					"y": 6
-				},
-				{
 					"dir": "down",
-					"x": 0,
-					"y": 6
-				},
-				{
-					"dir": "right",
-					"x": 5,
+					"x": 2,
 					"y": 1
 				},
 				{
-					"dir": "up",
+					"dir": "down",
 					"x": 2,
 					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 2,
-					"y": 4
-				},
-				{
-					"dir": "up",
-					"x": 5,
-					"y": 4
-				},
-				{
-					"dir": "right",
-					"x": 1,
-					"y": 4
-				},
-				{
-					"dir": "right",
-					"x": 0,
-					"y": 4
-				},
-				{
-					"dir": "down",
-					"x": 0,
-					"y": 1
-				},
-				{
-					"dir": "left",
-					"x": 3,
-					"y": 1
 				}
 			],
 			"generator_version": 1,
 			"height": 7,
-			"id": 50,
+			"id": 45,
 			"metrics": {
 				"arrows": 18,
 				"bait": 1,
-				"blocked_at_start": 9,
+				"blocked_at_start": 14,
 				"depth": 7,
-				"free_at_start": 9,
+				"free_at_start": 4,
 				"height": 7,
+				"width": 6
+			},
+			"moves_limit": 24,
+			"name": "Winding Maze",
+			"seed": 20261165828728,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 7
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 7
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 7
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 1
+				}
+			],
+			"generator_version": 1,
+			"height": 8,
+			"id": 46,
+			"metrics": {
+				"arrows": 18,
+				"bait": 1,
+				"blocked_at_start": 14,
+				"depth": 7,
+				"free_at_start": 4,
+				"height": 8,
+				"width": 6
+			},
+			"moves_limit": 24,
+			"name": "Tidy Path",
+			"seed": 20261165829955,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 7
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 7
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 7
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 3
+				}
+			],
+			"generator_version": 1,
+			"height": 8,
+			"id": 47,
+			"metrics": {
+				"arrows": 19,
+				"bait": 7,
+				"blocked_at_start": 14,
+				"depth": 7,
+				"free_at_start": 5,
+				"height": 8,
+				"width": 6
+			},
+			"moves_limit": 25,
+			"name": "Pale Ridge",
+			"seed": 20261165830825,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 3
+				}
+			],
+			"generator_version": 1,
+			"height": 8,
+			"id": 48,
+			"metrics": {
+				"arrows": 19,
+				"bait": 0,
+				"blocked_at_start": 12,
+				"depth": 8,
+				"free_at_start": 7,
+				"height": 8,
+				"width": 6
+			},
+			"moves_limit": 25,
+			"name": "Misty Tower",
+			"seed": 20261165831783,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 7
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 7
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 7
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 0
+				}
+			],
+			"generator_version": 1,
+			"height": 8,
+			"id": 49,
+			"metrics": {
+				"arrows": 20,
+				"bait": 2,
+				"blocked_at_start": 13,
+				"depth": 8,
+				"free_at_start": 7,
+				"height": 8,
+				"width": 6
+			},
+			"moves_limit": 26,
+			"name": "Hidden Window",
+			"seed": 20261165832786,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 5,
+					"y": 7
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 7
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 5
+				}
+			],
+			"generator_version": 1,
+			"height": 8,
+			"id": 50,
+			"metrics": {
+				"arrows": 20,
+				"bait": 3,
+				"blocked_at_start": 16,
+				"depth": 8,
+				"free_at_start": 4,
+				"height": 8,
 				"width": 6
 			},
 			"moves_limit": 26,
 			"name": "Quiet Bridge",
-			"seed": 20261161833758,
+			"seed": 20261165833802,
 			"width": 6
 		}
 	],

@@ -50,6 +50,15 @@ func _initialize() -> void:
 	_test_difficulty_progress()
 	await _test_difficulty_ui()
 	_test_countdown_screen()
+	_test_pack_ramp()
+	_test_levels_frozen()
+	await _test_board_fits_small_phone()
+	_test_badges_and_stats()
+	_test_haptics()
+	_test_leaderboard_sync()
+	_test_play_games_service()
+	_test_trophies_screen()
+	_test_economy_balance()
 	print("Tests: %d passed, %d failed" % [_passed, _failed])
 	quit(1 if _failed > 0 else 0)
 
@@ -184,6 +193,8 @@ func _test_save_roundtrip_and_corruption() -> void:
 	s.progress.sound_enabled = false
 	s.progress.music_enabled = false
 	s.progress.coins = 77
+	s.progress.haptics_enabled = false
+	s.progress.leaderboard_sent[Difficulty.EASY] = 3
 	_check(s.save_data(), "save succeeds")
 	var loaded := SaveService.new(path)
 	loaded.load_data()
@@ -191,6 +202,10 @@ func _test_save_roundtrip_and_corruption() -> void:
 	_check(loaded.progress.coins == 77 and not loaded.progress.sound_enabled and not loaded.progress.music_enabled and loaded.load_error == "", "coins and audio settings round-trip")
 	_check(Progress.from_dict({}).music_enabled and Progress.from_dict({}).sound_enabled, "audio settings default to on")
 	_check(loaded.progress.badges.has("first_clear"), "badges round-trip")
+	_check(not loaded.progress.haptics_enabled and loaded.progress.leaderboard_sent.get(Difficulty.EASY, 0) == 3, "vibration setting and leaderboard state round-trip")
+	_check(Progress.from_dict({}).haptics_enabled and Progress.from_dict({}).leaderboard_sent.is_empty(), "a save from the previous build gets vibration on and nothing sent")
+	var odd := Progress.from_dict({"leaderboard_sent": {"0": -5, "1": 99999, "7": 3, "x": 1}})
+	_check(odd.leaderboard_sent.get(0) == 0 and odd.leaderboard_sent.get(1) == 300 and not odd.leaderboard_sent.has(7), "leaderboard state is clamped and unknown tiers dropped")
 	_write_text(path, "{{ not json")
 	var corrupt := SaveService.new(path)
 	corrupt.load_data()
@@ -228,7 +243,7 @@ func _test_rewards() -> void:
 	var p := Progress.new()
 	_check(p.coins == Economy.START_COINS, "starting coins")
 	var r := p.record_result(1, 3, 6, 3, 0)
-	_check(r["stars"] == 3 and r["first_clear"] and r["coins_earned"] == 10 + 5 * 3, "first clear pays base + stars")
+	_check(r["stars"] == 3 and r["first_clear"] and r["coins_earned"] == Economy.CLEAR_BASE_COINS + Economy.COINS_PER_STAR * 3, "first clear pays base + stars")
 	_check(r["new_badges"].has("first_clear") and r["new_badges"].has("perfect_clear"), "first clear and perfect badges awarded")
 	var again := p.record_result(1, 3, 6, 3, 0)
 	_check(again["coins_earned"] == 0 and not again["first_clear"], "replay with no improvement pays nothing")
@@ -413,8 +428,17 @@ func _test_generator() -> void:
 	var p1 := LevelGenerator.slot_params(worlds[0], 0)
 	_check(p1["width"] == 3 and p1["height"] == 3 and p1["arrows"] == 3 and p1["moves_limit"] == 6, "world 1 first level parameters")
 	var p10 := LevelGenerator.slot_params(worlds[9], 9)
-	_check(p10["width"] == 8 and p10["height"] == 10 and p10["arrows"] == 34 and p10["moves_limit"] == 40, "world 10 last level parameters")
-	_check(LevelGenerator.slot_params(worlds[2], 4)["arrows"] < LevelGenerator.slot_params(worlds[2], 3)["arrows"] + 1, "5th level of a world is a breather")
+	_check(p10["width"] == 8 and p10["height"] == 11 and p10["arrows"] == 40 and p10["moves_limit"] == 44, "world 10 last level parameters")
+	var with_breather: Dictionary = worlds[2].duplicate()
+	with_breather["breathers"] = true
+	_check(LevelGenerator.slot_params(with_breather, 4)["arrows"] < LevelGenerator.slot_params(with_breather, 3)["arrows"], "with breathers on, the 5th level of a world drops arrows")
+	var without: Dictionary = worlds[2].duplicate()
+	without["breathers"] = false
+	var never_drops := true
+	for i in range(1, 10):
+		never_drops = never_drops and LevelGenerator.slot_params(without, i)["arrows"] >= LevelGenerator.slot_params(without, i - 1)["arrows"]
+	_check(never_drops, "with breathers off, the arrow count never drops inside a world")
+	_check(LevelGenerator.target_depth_for({"depth": [4, 6]}, 3, 0, 12) == 4 and LevelGenerator.target_depth_for({"depth": [4, 6]}, 3, 9, 16) == 6, "a depth range sets the target from first to last level")
 	_check(LevelGenerator.moves_limit_for(4, 0.1) == 6, "move limit is at least arrow count + 2")
 	var names: Dictionary = {}
 	for id in range(1, 101):
@@ -681,7 +705,7 @@ func _test_game_screen_ui() -> void:
 	for id in PuzzleSolver.solve(board):
 		screen.tap_cell(board.arrow_position(id))
 	_check(screen.overlay_kind() == "won" and progress.is_cleared(1), "winning shows the win panel and records progress")
-	_check(progress.stars_of(1) == 3 and progress.coins == Economy.START_COINS + 25, "a clean win pays 3 stars and 25 coins")
+	_check(progress.stars_of(1) == 3 and progress.coins == Economy.START_COINS + Economy.CLEAR_BASE_COINS + 3 * Economy.COINS_PER_STAR, "a clean win pays 3 stars and the clear reward")
 	var used := ctl.moves_used
 	screen.tap_cell(board.arrow_position(0))
 	_check(ctl.moves_used == used, "taps are ignored while the win panel is up")
@@ -914,14 +938,14 @@ func _test_arrow_shape() -> void:
 
 func _test_tutorial_steps() -> void:
 	var repo := _pack_repo()
-	# Level 1: arrow 0 (down) blocks arrow 1 (left); arrow 2 (up) is free and blocks nothing.
+	# Level 1: arrow 0 (left) blocks arrow 2 (down); arrow 1 (left) is free and blocks nothing.
 	var board: BoardState = repo.levels[0]["board"].duplicate_state()
 	var first := Tutorial.step_for(1, board, 0, true)
-	_check(first["text"] == Tutorial.TEXT_TAP and first["kind"] == Tutorial.KIND_CLEAR and first["target"] == 2, "level 1 starts by pointing at a free arrow that blocks nothing")
-	_check(MoveValidator.can_remove(board, 2) and not MoveValidator.can_remove(board, 1), "level 1 layout is as the tutorial expects")
-	board.remove_arrow(2)
+	_check(first["text"] == Tutorial.TEXT_TAP and first["kind"] == Tutorial.KIND_CLEAR and first["target"] == 1, "level 1 starts by pointing at a free arrow that blocks nothing")
+	_check(MoveValidator.can_remove(board, 1) and not MoveValidator.can_remove(board, 2), "level 1 layout is as the tutorial expects")
+	board.remove_arrow(1)
 	var second := Tutorial.step_for(1, board, 1, true)
-	_check(second["text"] == Tutorial.TEXT_BLOCKED and second["kind"] == Tutorial.KIND_BLOCKED and second["target"] == 1 and second["blocker"] == 0, "after one tap it points at the blocked arrow and at what blocks it")
+	_check(second["text"] == Tutorial.TEXT_BLOCKED and second["kind"] == Tutorial.KIND_BLOCKED and second["target"] == 2 and second["blocker"] == 0, "after one tap it points at the blocked arrow and at what blocks it")
 	board.remove_arrow(0)
 	var third := Tutorial.step_for(1, board, 2, true)
 	_check(third["text"] == Tutorial.TEXT_REST and third["target"] == -1, "once nothing is blocked it just encourages")
@@ -958,12 +982,12 @@ func _test_coach_ui() -> void:
 	root.add_child(screen)
 	screen.setup(repo.levels, 0, progress, save)
 	var board: BoardState = repo.levels[0]["board"]
-	_check(screen.coach_text() == Tutorial.TEXT_TAP and screen.board_view.coach_id() == 2, "level 1 opens with a tip and a pointer on the free arrow")
-	screen.tap_cell(board.arrow_position(2))
-	_check(screen.coach_text() == Tutorial.TEXT_BLOCKED and screen.board_view.coach_id() == 1 and screen.board_view.coach_blocker() == 0, "after the first tap it outlines the blocked arrow and its blocker")
+	_check(screen.coach_text() == Tutorial.TEXT_TAP and screen.board_view.coach_id() == 1, "level 1 opens with a tip and a pointer on the free arrow")
+	screen.tap_cell(board.arrow_position(1))
+	_check(screen.coach_text() == Tutorial.TEXT_BLOCKED and screen.board_view.coach_id() == 2 and screen.board_view.coach_blocker() == 0, "after the first tap it outlines the blocked arrow and its blocker")
 	screen.tap_cell(board.arrow_position(0))
 	_check(screen.coach_text() == Tutorial.TEXT_REST and screen.board_view.coach_id() == -1, "once the blocker is gone it encourages")
-	screen.tap_cell(board.arrow_position(1))
+	screen.tap_cell(board.arrow_position(2))
 	_check(screen.overlay_kind() == "won" and screen.coach_text() == "" and screen.board_view.coach_id() == -1, "the tip disappears when the level is won")
 	screen.queue_free()
 
@@ -1366,3 +1390,289 @@ func _test_countdown_screen() -> void:
 	_check(later.controller.countdown == 0.0 and later.time_text() == "", "Easy level 100 has no clock either")
 	later.queue_free()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_clock_save.json"))
+
+
+
+func _pack_levels(dir: String) -> Array[Dictionary]:
+	var repo := PuzzleRepository.new()
+	repo.load_dir(dir)
+	return repo.levels
+
+
+## Both packs get harder level by level: never fewer arrows, never a shallower
+## dependency chain, never more spare moves per arrow. Level 100 is the peak.
+func _test_pack_ramp() -> void:
+	for dir in ["res://data/packs", "res://data/packs_hard"]:
+		var levels := _pack_levels(dir)
+		var arrows_ok := true
+		var depth_ok := true
+		var spare_ok := true
+		var max_arrows := 0
+		var max_depth := 0
+		var dips: Array[int] = []
+		for i in levels.size():
+			var board: BoardState = levels[i]["board"]
+			var depth: int = LevelMetrics.compute(board)["depth"]
+			var spare := float(levels[i]["moves_limit"] - board.remaining_count()) / board.remaining_count()
+			max_arrows = maxi(max_arrows, board.remaining_count())
+			max_depth = maxi(max_depth, depth)
+			if i == 0:
+				continue
+			var prev: BoardState = levels[i - 1]["board"]
+			var prev_spare := float(levels[i - 1]["moves_limit"] - prev.remaining_count()) / prev.remaining_count()
+			arrows_ok = arrows_ok and board.remaining_count() >= prev.remaining_count()
+			if depth < LevelMetrics.compute(prev)["depth"]:
+				depth_ok = false
+				dips.append(i + 1)
+			# One move of leeway: limits are whole moves, rounded up.
+			spare_ok = spare_ok and spare <= prev_spare + 1.0 / board.remaining_count() + 0.0001
+		var last: BoardState = levels[99]["board"]
+		_check(arrows_ok, "%s: the arrow count never drops from one level to the next" % dir)
+		_check(depth_ok, "%s: the dependency chain never gets shallower (dips at %s)" % [dir, dips])
+		_check(spare_ok, "%s: spare moves per arrow never grow (beyond one move of rounding)" % dir)
+		_check(last.remaining_count() == max_arrows and LevelMetrics.compute(last)["depth"] == max_depth, "%s: level 100 has the most arrows and the deepest chain" % dir)
+		_check(Array(levels).all(func(l: Dictionary) -> bool: return l["variant_of"] == -1), "%s: every level is a unique layout (no reuse)" % dir)
+
+
+## Released levels must never change: a save's stars belong to a layout.
+## data/levels.lock.json holds a fingerprint per level; new levels may be
+## added after the last one, existing ones may not change.
+func _test_levels_frozen() -> void:
+	var lock: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/levels.lock.json"))
+	_check(typeof(lock) == TYPE_DICTIONARY, "the level lock file exists")
+	if typeof(lock) != TYPE_DICTIONARY:
+		return
+	for key in ["packs", "packs_hard"]:
+		var levels := _pack_levels("res://data/" + key)
+		var frozen: Array = lock[key]
+		var changed: Array[int] = []
+		for i in frozen.size():
+			if i >= levels.size() or LevelFingerprint.of(levels[i]) != frozen[i]:
+				changed.append(i + 1)
+		_check(frozen.size() == 100 and changed.is_empty(), "%s: all %d locked levels are unchanged (changed: %s)" % [key, frozen.size(), changed])
+	var level: Dictionary = _pack_levels("res://data/packs")[0]
+	var moved := level.duplicate()
+	moved["moves_limit"] = int(level["moves_limit"]) + 1
+	_check(LevelFingerprint.of(moved) != LevelFingerprint.of(level), "a different move limit changes the fingerprint")
+
+
+## The largest board must keep cells big enough to tap on a narrow 9:16
+## phone (the project's 540x960 base size, the tightest layout we support).
+func _test_board_fits_small_phone() -> void:
+	var save := SaveService.new("user://test_fit_save.json")
+	for dir in ["res://data/packs", "res://data/packs_hard"]:
+		var levels := _pack_levels(dir)
+		var biggest := 0
+		for i in levels.size():
+			var b: BoardState = levels[i]["board"]
+			var cur: BoardState = levels[biggest]["board"]
+			if b.width * 100 + b.height > cur.width * 100 + cur.height:
+				biggest = i
+		var host := Control.new()
+		host.size = Vector2(540 - 32, 960 - 32)
+		root.add_child(host)
+		var screen := GameScreen.new()
+		host.add_child(screen)
+		screen.set_anchors_preset(Control.PRESET_FULL_RECT)
+		screen.size = host.size
+		screen.setup(levels, biggest, Progress.new(), save)
+		await process_frame
+		await process_frame
+		var cell := screen.board_view.cell_size()
+		_check(cell >= BoardView.MIN_CELL_SIZE, "%s: the biggest board (%dx%d) keeps cells of at least %d px at 540x960 (got %.0f)" % [
+			dir, levels[biggest]["board"].width, levels[biggest]["board"].height, BoardView.MIN_CELL_SIZE, cell])
+		host.queue_free()
+
+
+func _test_badges_and_stats() -> void:
+	var all_described := true
+	for b in Progress.BADGES:
+		all_described = all_described and Progress.BADGE_INFO.has(b) and Progress.badge_hint(b) != ""
+	_check(all_described, "every badge has a title and a how-to-earn line")
+	var p := Progress.new()
+	for id in range(1, 11):
+		p.record_result(id, 5, 8, 5, 0)
+	p.record_result(11, 5, 8, 7, 2)
+	p.record_result(1001, 5, 6, 5, 0)
+	var s := p.stats(Difficulty.EASY)
+	_check(s["cleared"] == 11 and s["stars"] == 31 and s["perfect"] == 10 and s["worlds_complete"] == 1, "stats count clears, stars, perfect levels and full worlds")
+	_check(p.stats(Difficulty.DIFFICULT)["cleared"] == 1, "stats are per mode")
+
+
+func _test_haptics() -> void:
+	var save := SaveService.new("user://test_haptics_save.json")
+	Haptics.log.clear()
+	var repo := _pack_repo()
+	var screen := GameScreen.new()
+	root.add_child(screen)
+	screen.setup(repo.levels, 0, save.progress, save)
+	var blocked := _blocked_cell(screen.controller)
+	screen.tap_cell(blocked)
+	_check(Haptics.log == [Haptics.BLOCKED_MS], "a blocked tap gives a short buzz")
+	save.progress.haptics_enabled = false
+	screen.tap_cell(blocked)
+	_check(Haptics.log.size() == 1, "no buzz when vibration is off")
+	screen.queue_free()
+	_check(not Haptics.buzz(null, 10) and not Haptics.buzz(Progress.new(), 0), "nothing to buzz without progress or duration")
+
+	var settings := SettingsScreen.new()
+	root.add_child(settings)
+	var audio := AudioManager.new()
+	root.add_child(audio)
+	var fresh := SaveService.new("user://test_haptics_save.json")
+	settings.setup(fresh.progress, fresh, audio)
+	_check(settings.haptics_toggle.on, "vibration starts on")
+	_click(settings.haptics_toggle)
+	var reloaded := SaveService.new("user://test_haptics_save.json")
+	reloaded.load_data()
+	_check(not reloaded.progress.haptics_enabled, "switching vibration off is saved")
+	settings.queue_free()
+	audio.queue_free()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_haptics_save.json"))
+
+
+func _test_leaderboard_sync() -> void:
+	var p := Progress.new()
+	_check(LeaderboardSync.score_to_submit(p, Difficulty.EASY) == -1, "nothing to send without stars")
+	p.record_result(1, 3, 6, 3, 0)
+	_check(LeaderboardSync.score_to_submit(p, Difficulty.EASY) == 3, "a new star total is sent")
+	LeaderboardSync.mark_submitted(p, Difficulty.EASY, 3)
+	_check(LeaderboardSync.score_to_submit(p, Difficulty.EASY) == -1, "a confirmed total is not sent again")
+	LeaderboardSync.mark_submitted(p, Difficulty.EASY, 1)
+	_check(p.leaderboard_sent[Difficulty.EASY] == 3, "a confirmation never lowers what was sent")
+	_check(LeaderboardSync.score_to_submit(p, Difficulty.DIFFICULT) == -1, "each mode has its own board")
+
+
+class FakePlayGamesPlugin:
+	extends RefCounted
+	signal userAuthenticated(is_authenticated: bool)
+	signal scoreSubmitted(is_submitted: bool, leaderboard_id: String)
+	var calls: Array[String] = []
+
+	func initialize() -> void:
+		calls.append("initialize")
+
+	func isAuthenticated() -> void:
+		calls.append("isAuthenticated")
+
+	func signIn() -> void:
+		calls.append("signIn")
+
+	func showLeaderboard(id: String) -> void:
+		calls.append("show:" + id)
+
+	func submitScore(id: String, score: int) -> void:
+		calls.append("submit:%s:%d" % [id, score])
+
+
+func _play_games_with(plugin: Object, save: SaveService, ids: Array) -> PlayGames:
+	var config := "user://test_play_games.json"
+	_write_text(config, JSON.stringify({"leaderboards": {"stars_easy": ids[0], "stars_difficult": ids[1]}}))
+	var pg := PlayGames.new()
+	root.add_child(pg)
+	pg.start(save.progress, save, plugin, config)
+	return pg
+
+
+func _test_play_games_service() -> void:
+	var save := SaveService.new("user://test_pg_save.json")
+	save.progress.record_result(1, 3, 6, 3, 0)
+	var offline := PlayGames.new()
+	root.add_child(offline)
+	offline.start(save.progress, save, null, "user://no_such_config.json")
+	_check(not offline.available(Difficulty.EASY) and not offline.sync(Difficulty.EASY) and not offline.show_leaderboard(Difficulty.EASY), "without the plugin everything is a safe no-op")
+	offline.queue_free()
+	_check(FileAccess.file_exists(PlayGames.CONFIG_PATH), "the shipped Play Games config exists")
+
+	var plugin := FakePlayGamesPlugin.new()
+	var pg := _play_games_with(plugin, save, ["CgkI_easy", ""])
+	_check(plugin.calls == ["initialize", "isAuthenticated"], "start initialises the plugin and asks for the silent sign-in result")
+	_check(pg.available(Difficulty.EASY) and not pg.available(Difficulty.DIFFICULT), "a mode without a leaderboard id is unavailable")
+	_check(not pg.sync(Difficulty.EASY), "nothing is sent while signed out")
+	plugin.userAuthenticated.emit(true)
+	_check(pg.signed_in and plugin.calls.has("submit:CgkI_easy:3"), "signing in sends the star total")
+	_check(not pg.sync(Difficulty.EASY), "no second submit while one is waiting")
+	plugin.scoreSubmitted.emit(false, "CgkI_easy")
+	_check(save.progress.leaderboard_sent.get(Difficulty.EASY, 0) == 0, "a failed submit is not recorded")
+	_check(pg.sync(Difficulty.EASY), "a failed submit is retried")
+	plugin.scoreSubmitted.emit(true, "CgkI_easy")
+	var reloaded := SaveService.new("user://test_pg_save.json")
+	reloaded.load_data()
+	_check(reloaded.progress.leaderboard_sent.get(Difficulty.EASY, 0) == 3, "an accepted submit is recorded and saved")
+	_check(not pg.sync(Difficulty.EASY), "an accepted total is not sent again")
+	_check(pg.show_leaderboard(Difficulty.EASY) and plugin.calls.has("show:CgkI_easy"), "the leaderboard opens when signed in")
+	pg.sign_in()
+	_check(plugin.calls.has("signIn"), "sign_in asks the plugin")
+	pg.queue_free()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_pg_save.json"))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_play_games.json"))
+
+
+func _test_trophies_screen() -> void:
+	var save := SaveService.new("user://test_trophies_save.json")
+	save.progress.record_result(1, 3, 6, 3, 0)
+	var screen := TrophiesScreen.new()
+	root.add_child(screen)
+	screen.setup(save.progress, null, 100)
+	_check(screen.stat_labels["cleared"].text == "1 / 100" and screen.stat_labels["stars"].text == "3 / 300", "the stats show clears and stars for the mode")
+	_check(screen.badge_rows.size() == Progress.BADGES.size(), "every badge is listed")
+	_check(screen.leaderboard_button.disabled, "the leaderboard button is off without Play Games")
+	screen.queue_free()
+
+	var plugin := FakePlayGamesPlugin.new()
+	var pg := _play_games_with(plugin, save, ["CgkI_easy", "CgkI_hard"])
+	var online := TrophiesScreen.new()
+	root.add_child(online)
+	online.setup(save.progress, pg, 100)
+	_check(not online.leaderboard_button.disabled and online.leaderboard_button.text.contains("Sign in"), "signed out, the button offers sign-in")
+	online.leaderboard_button.pressed.emit()
+	_check(plugin.calls.has("signIn"), "pressing it starts the sign-in")
+	plugin.userAuthenticated.emit(true)
+	_check(online.leaderboard_button.text == "Show leaderboard", "after sign-in the button shows the leaderboard")
+	online.leaderboard_button.pressed.emit()
+	_check(plugin.calls.has("show:CgkI_easy"), "pressing it opens this mode's leaderboard")
+	online.queue_free()
+	pg.queue_free()
+
+	var select := LevelSelect.new()
+	root.add_child(select)
+	select.setup(_pack_repo(), Progress.new(), 0)
+	var asked := [false]
+	select.trophies_requested.connect(func() -> void: asked[0] = true)
+	var found := _find_icon_button(select, "star")
+	_check(found != null, "the menu has a trophies button")
+	if found != null:
+		found.pressed.emit()
+	_check(asked[0], "the trophies button opens the trophies screen")
+	select.queue_free()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_play_games.json"))
+
+
+func _find_icon_button(node: Node, glyph: String) -> IconButton:
+	for child in node.get_children():
+		if child is IconButton and child.glyph == glyph:
+			return child
+		var deeper := _find_icon_button(child, glyph)
+		if deeper != null:
+			return deeper
+	return null
+
+
+## A player who clears every level with the fewest stars can still afford
+## helpers along the way, and a perfect player never gets an absurd hoard.
+func _test_economy_balance() -> void:
+	for tier in [Difficulty.EASY, Difficulty.DIFFICULT]:
+		var levels := _pack_levels("res://data/packs" if tier == Difficulty.EASY else "res://data/packs_hard")
+		var careless := Progress.new()
+		var perfect := Progress.new()
+		var careless_ok := true
+		for level in levels:
+			var id := Difficulty.make_id(tier, level["id"])
+			var arrows: int = level["board"].remaining_count()
+			var limit: int = level["moves_limit"]
+			# Careless: one star, and one Hint bought on every level.
+			careless_ok = careless_ok and careless.spend(Economy.PRICE_HINT)
+			careless.record_result(id, arrows, limit, limit, limit - arrows)
+			perfect.record_result(id, arrows, limit, arrows, 0)
+		_check(careless_ok, "%s: a one-star player can buy a Hint on every level" % Difficulty.name_of(tier))
+		_check(perfect.coins <= Economy.START_COINS + 100 * 60 * Economy.HARD_REWARD_MULTIPLIER, "%s: a perfect run earns a bounded number of coins (%d)" % [Difficulty.name_of(tier), perfect.coins])

@@ -3,14 +3,9 @@
 		{
 			"arrows": [
 				{
-					"dir": "left",
-					"x": 0,
+					"dir": "right",
+					"x": 4,
 					"y": 1
-				},
-				{
-					"dir": "left",
-					"x": 1,
-					"y": 2
 				},
 				{
 					"dir": "up",
@@ -18,88 +13,103 @@
 					"y": 3
 				},
 				{
-					"dir": "down",
+					"dir": "up",
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "right",
 					"x": 1,
-					"y": 1
-				},
-				{
-					"dir": "left",
-					"x": 2,
-					"y": 1
-				},
-				{
-					"dir": "right",
-					"x": 4,
-					"y": 0
-				},
-				{
-					"dir": "right",
-					"x": 2,
 					"y": 0
 				},
 				{
 					"dir": "up",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "right",
 					"x": 2,
 					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 2
 				}
 			],
 			"generator_version": 1,
 			"height": 5,
 			"id": 21,
 			"metrics": {
-				"arrows": 8,
+				"arrows": 9,
 				"bait": 1,
-				"blocked_at_start": 5,
+				"blocked_at_start": 4,
 				"depth": 3,
-				"free_at_start": 3,
+				"free_at_start": 5,
 				"height": 5,
 				"width": 5
 			},
-			"moves_limit": 13,
+			"moves_limit": 14,
 			"name": "Narrow Island",
-			"seed": 20261161804492,
+			"seed": 20261165804504,
 			"width": 5
 		},
 		{
 			"arrows": [
 				{
-					"dir": "left",
-					"x": 1,
-					"y": 3
-				},
-				{
-					"dir": "left",
-					"x": 0,
-					"y": 1
-				},
-				{
-					"dir": "down",
-					"x": 0,
-					"y": 4
+					"dir": "right",
+					"x": 3,
+					"y": 0
 				},
 				{
 					"dir": "up",
+					"x": 3,
+					"y": 2
+				},
+				{
+					"dir": "right",
 					"x": 1,
 					"y": 1
 				},
 				{
-					"dir": "down",
+					"dir": "left",
 					"x": 0,
 					"y": 0
 				},
 				{
 					"dir": "up",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "right",
 					"x": 1,
 					"y": 2
 				},
 				{
-					"dir": "up",
-					"x": 1,
-					"y": 4
-				},
-				{
-					"dir": "left",
-					"x": 2,
+					"dir": "right",
+					"x": 3,
 					"y": 4
 				}
 			],
@@ -107,25 +117,35 @@
 			"height": 5,
 			"id": 22,
 			"metrics": {
-				"arrows": 8,
-				"bait": 0,
+				"arrows": 9,
+				"bait": 1,
 				"blocked_at_start": 4,
 				"depth": 3,
-				"free_at_start": 4,
+				"free_at_start": 5,
 				"height": 5,
 				"width": 5
 			},
-			"moves_limit": 13,
+			"moves_limit": 14,
 			"name": "Iron Gate",
-			"seed": 20261161805504,
+			"seed": 20261165805517,
 			"width": 5
 		},
 		{
 			"arrows": [
 				{
+					"dir": "right",
+					"x": 1,
+					"y": 4
+				},
+				{
 					"dir": "up",
-					"x": 4,
-					"y": 2
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 1
 				},
 				{
 					"dir": "left",
@@ -134,101 +154,101 @@
 				},
 				{
 					"dir": "down",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "up",
 					"x": 3,
 					"y": 1
 				},
 				{
-					"dir": "right",
-					"x": 2,
-					"y": 2
-				},
-				{
 					"dir": "left",
-					"x": 1,
+					"x": 4,
 					"y": 1
 				},
 				{
-					"dir": "left",
-					"x": 1,
+					"dir": "right",
+					"x": 4,
 					"y": 2
 				},
 				{
 					"dir": "up",
-					"x": 2,
+					"x": 4,
 					"y": 3
-				},
-				{
-					"dir": "right",
-					"x": 1,
-					"y": 3
-				},
-				{
-					"dir": "down",
-					"x": 1,
-					"y": 0
 				}
 			],
 			"generator_version": 1,
 			"height": 5,
 			"id": 23,
 			"metrics": {
-				"arrows": 9,
-				"bait": 0,
-				"blocked_at_start": 5,
-				"depth": 4,
-				"free_at_start": 4,
+				"arrows": 10,
+				"bait": 1,
+				"blocked_at_start": 4,
+				"depth": 3,
+				"free_at_start": 6,
 				"height": 5,
 				"width": 5
 			},
 			"moves_limit": 15,
 			"name": "Crimson Maze",
-			"seed": 20261161806515,
+			"seed": 20261165806524,
 			"width": 5
 		},
 		{
 			"arrows": [
 				{
 					"dir": "right",
-					"x": 4,
-					"y": 2
-				},
-				{
-					"dir": "down",
-					"x": 2,
-					"y": 4
-				},
-				{
-					"dir": "right",
-					"x": 0,
-					"y": 4
-				},
-				{
-					"dir": "down",
-					"x": 2,
-					"y": 2
-				},
-				{
-					"dir": "right",
-					"x": 0,
-					"y": 2
-				},
-				{
-					"dir": "up",
 					"x": 0,
 					"y": 0
 				},
 				{
-					"dir": "up",
-					"x": 0,
+					"dir": "left",
+					"x": 1,
 					"y": 1
 				},
 				{
-					"dir": "up",
+					"dir": "left",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "left",
 					"x": 0,
 					"y": 3
 				},
 				{
 					"dir": "left",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "right",
 					"x": 1,
 					"y": 3
 				}
@@ -237,205 +257,220 @@
 			"height": 5,
 			"id": 24,
 			"metrics": {
-				"arrows": 9,
+				"arrows": 10,
 				"bait": 0,
-				"blocked_at_start": 6,
-				"depth": 4,
-				"free_at_start": 3,
+				"blocked_at_start": 4,
+				"depth": 3,
+				"free_at_start": 6,
 				"height": 5,
 				"width": 5
 			},
 			"moves_limit": 15,
 			"name": "Bright Orbit",
-			"seed": 20261161807522,
+			"seed": 20261165807531,
 			"width": 5
 		},
 		{
 			"arrows": [
 				{
-					"dir": "right",
-					"x": 1,
+					"dir": "up",
+					"x": 2,
 					"y": 3
 				},
 				{
 					"dir": "down",
-					"x": 2,
-					"y": 2
-				},
-				{
-					"dir": "up",
-					"x": 2,
-					"y": 1
-				},
-				{
-					"dir": "right",
-					"x": 0,
-					"y": 1
+					"x": 3,
+					"y": 4
 				},
 				{
 					"dir": "down",
 					"x": 1,
-					"y": 2
+					"y": 4
 				},
 				{
-					"dir": "up",
-					"x": 0,
-					"y": 0
+					"dir": "left",
+					"x": 4,
+					"y": 4
 				},
 				{
-					"dir": "up",
+					"dir": "right",
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "down",
 					"x": 0,
 					"y": 2
 				},
 				{
 					"dir": "left",
-					"x": 3,
+					"x": 1,
 					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 1
 				}
 			],
 			"generator_version": 1,
 			"height": 5,
 			"id": 25,
 			"metrics": {
-				"arrows": 8,
+				"arrows": 10,
 				"bait": 0,
 				"blocked_at_start": 4,
 				"depth": 3,
-				"free_at_start": 4,
+				"free_at_start": 6,
 				"height": 5,
 				"width": 5
 			},
-			"moves_limit": 13,
+			"moves_limit": 15,
 			"name": "Winding Quarry",
-			"seed": 20261161808530,
+			"seed": 20261165808542,
 			"width": 5
 		},
 		{
 			"arrows": [
 				{
-					"dir": "right",
-					"x": 4,
-					"y": 4
-				},
-				{
 					"dir": "up",
-					"x": 3,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 2,
+					"x": 0,
 					"y": 1
 				},
 				{
 					"dir": "up",
-					"x": 2,
-					"y": 2
+					"x": 0,
+					"y": 5
 				},
 				{
-					"dir": "up",
-					"x": 2,
+					"dir": "left",
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 1,
 					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 3
 				},
 				{
 					"dir": "up",
 					"x": 3,
-					"y": 4
+					"y": 1
 				},
 				{
-					"dir": "right",
-					"x": 0,
-					"y": 4
+					"dir": "up",
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 1
 				},
 				{
 					"dir": "down",
-					"x": 0,
-					"y": 3
+					"x": 4,
+					"y": 5
 				},
 				{
 					"dir": "down",
-					"x": 2,
+					"x": 3,
 					"y": 5
 				},
 				{
 					"dir": "right",
-					"x": 4,
-					"y": 2
+					"x": 2,
+					"y": 1
 				}
 			],
 			"generator_version": 1,
 			"height": 6,
 			"id": 26,
 			"metrics": {
-				"arrows": 10,
+				"arrows": 11,
 				"bait": 1,
-				"blocked_at_start": 5,
+				"blocked_at_start": 6,
 				"depth": 4,
 				"free_at_start": 5,
 				"height": 6,
 				"width": 5
 			},
-			"moves_limit": 16,
+			"moves_limit": 17,
 			"name": "Tidy Signal",
-			"seed": 20261161809545,
+			"seed": 20261165809554,
 			"width": 5
 		},
 		{
 			"arrows": [
 				{
 					"dir": "down",
-					"x": 1,
-					"y": 4
+					"x": 2,
+					"y": 3
 				},
 				{
-					"dir": "down",
+					"dir": "left",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "right",
 					"x": 1,
 					"y": 2
 				},
 				{
-					"dir": "right",
-					"x": 4,
-					"y": 4
-				},
-				{
-					"dir": "down",
+					"dir": "left",
 					"x": 0,
 					"y": 2
 				},
 				{
-					"dir": "up",
-					"x": 1,
-					"y": 0
-				},
-				{
-					"dir": "up",
-					"x": 2,
-					"y": 0
-				},
-				{
-					"dir": "down",
-					"x": 4,
+					"dir": "left",
+					"x": 0,
 					"y": 5
 				},
 				{
 					"dir": "left",
-					"x": 4,
-					"y": 2
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 5
 				},
 				{
 					"dir": "down",
-					"x": 4,
-					"y": 1
+					"x": 3,
+					"y": 4
 				},
 				{
-					"dir": "right",
+					"dir": "down",
 					"x": 3,
 					"y": 1
-				},
-				{
-					"dir": "right",
-					"x": 2,
-					"y": 3
 				}
 			],
 			"generator_version": 1,
@@ -444,72 +479,72 @@
 			"metrics": {
 				"arrows": 11,
 				"bait": 1,
-				"blocked_at_start": 4,
+				"blocked_at_start": 5,
 				"depth": 4,
-				"free_at_start": 7,
+				"free_at_start": 6,
 				"height": 6,
 				"width": 5
 			},
-			"moves_limit": 18,
+			"moves_limit": 17,
 			"name": "Pale Valley",
-			"seed": 20261161810547,
+			"seed": 20261165810560,
 			"width": 5
 		},
 		{
 			"arrows": [
 				{
 					"dir": "down",
-					"x": 2,
+					"x": 1,
 					"y": 5
 				},
 				{
+					"dir": "up",
+					"x": 1,
+					"y": 1
+				},
+				{
 					"dir": "left",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "down",
 					"x": 1,
 					"y": 3
 				},
 				{
 					"dir": "up",
-					"x": 4,
+					"x": 3,
 					"y": 0
 				},
 				{
-					"dir": "left",
-					"x": 0,
-					"y": 5
-				},
-				{
-					"dir": "left",
-					"x": 3,
-					"y": 5
-				},
-				{
-					"dir": "right",
-					"x": 4,
-					"y": 1
-				},
-				{
 					"dir": "up",
-					"x": 4,
+					"x": 3,
 					"y": 2
 				},
 				{
-					"dir": "down",
+					"dir": "up",
 					"x": 3,
-					"y": 4
-				},
-				{
-					"dir": "down",
-					"x": 3,
-					"y": 3
-				},
-				{
-					"dir": "right",
-					"x": 4,
-					"y": 3
-				},
-				{
-					"dir": "right",
-					"x": 2,
 					"y": 3
 				}
 			],
@@ -518,58 +553,68 @@
 			"id": 28,
 			"metrics": {
 				"arrows": 11,
-				"bait": 0,
-				"blocked_at_start": 5,
+				"bait": 1,
+				"blocked_at_start": 6,
 				"depth": 4,
-				"free_at_start": 6,
+				"free_at_start": 5,
 				"height": 6,
 				"width": 5
 			},
-			"moves_limit": 18,
+			"moves_limit": 17,
 			"name": "Misty Anchor",
-			"seed": 20261161811557,
+			"seed": 20261165811567,
 			"width": 5
 		},
 		{
 			"arrows": [
 				{
-					"dir": "up",
-					"x": 4,
+					"dir": "down",
+					"x": 0,
 					"y": 3
 				},
 				{
-					"dir": "right",
-					"x": 3,
-					"y": 3
-				},
-				{
-					"dir": "right",
-					"x": 3,
+					"dir": "left",
+					"x": 0,
 					"y": 2
 				},
 				{
-					"dir": "down",
-					"x": 2,
+					"dir": "left",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 3,
 					"y": 5
 				},
 				{
 					"dir": "down",
-					"x": 4,
-					"y": 5
-				},
-				{
-					"dir": "down",
-					"x": 4,
+					"x": 3,
 					"y": 4
 				},
 				{
-					"dir": "down",
-					"x": 2,
-					"y": 4
+					"dir": "left",
+					"x": 1,
+					"y": 3
 				},
 				{
 					"dir": "right",
-					"x": 3,
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 2,
 					"y": 4
 				},
 				{
@@ -578,19 +623,9 @@
 					"y": 4
 				},
 				{
-					"dir": "right",
-					"x": 0,
-					"y": 4
-				},
-				{
-					"dir": "left",
-					"x": 0,
-					"y": 5
-				},
-				{
 					"dir": "down",
-					"x": 0,
-					"y": 3
+					"x": 1,
+					"y": 2
 				}
 			],
 			"generator_version": 1,
@@ -599,78 +634,78 @@
 			"metrics": {
 				"arrows": 12,
 				"bait": 0,
-				"blocked_at_start": 7,
-				"depth": 5,
-				"free_at_start": 5,
+				"blocked_at_start": 6,
+				"depth": 4,
+				"free_at_start": 6,
 				"height": 6,
 				"width": 5
 			},
-			"moves_limit": 20,
+			"moves_limit": 18,
 			"name": "Hidden Canyon",
-			"seed": 20261161812602,
+			"seed": 20261165812578,
 			"width": 5
 		},
 		{
 			"arrows": [
 				{
-					"dir": "right",
-					"x": 3,
-					"y": 3
+					"dir": "up",
+					"x": 2,
+					"y": 0
 				},
 				{
-					"dir": "right",
-					"x": 4,
-					"y": 4
+					"dir": "left",
+					"x": 1,
+					"y": 2
 				},
 				{
 					"dir": "left",
 					"x": 3,
-					"y": 0
+					"y": 2
 				},
 				{
-					"dir": "right",
-					"x": 4,
+					"dir": "down",
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 3,
 					"y": 0
 				},
 				{
 					"dir": "up",
 					"x": 3,
-					"y": 4
+					"y": 1
 				},
 				{
 					"dir": "right",
-					"x": 0,
-					"y": 4
+					"x": 1,
+					"y": 1
 				},
 				{
-					"dir": "right",
-					"x": 3,
-					"y": 5
+					"dir": "up",
+					"x": 1,
+					"y": 3
 				},
 				{
-					"dir": "right",
-					"x": 2,
-					"y": 5
-				},
-				{
-					"dir": "right",
-					"x": 0,
-					"y": 5
-				},
-				{
-					"dir": "down",
+					"dir": "left",
 					"x": 0,
 					"y": 3
 				},
 				{
-					"dir": "down",
-					"x": 0,
-					"y": 1
+					"dir": "left",
+					"x": 2,
+					"y": 3
 				},
 				{
-					"dir": "left",
-					"x": 1,
-					"y": 1
+					"dir": "right",
+					"x": 4,
+					"y": 0
 				}
 			],
 			"generator_version": 1,
@@ -678,16 +713,16 @@
 			"id": 30,
 			"metrics": {
 				"arrows": 12,
-				"bait": 1,
-				"blocked_at_start": 7,
-				"depth": 5,
-				"free_at_start": 5,
+				"bait": 0,
+				"blocked_at_start": 6,
+				"depth": 4,
+				"free_at_start": 6,
 				"height": 6,
 				"width": 5
 			},
-			"moves_limit": 20,
+			"moves_limit": 18,
 			"name": "Quiet Ember",
-			"seed": 20261161813587,
+			"seed": 20261165813586,
 			"width": 5
 		}
 	],

@@ -6,15 +6,6 @@ extends Control
 signal menu_requested
 signal next_requested(index: int)
 
-const BADGE_NAMES := {
-	"first_clear": "First clear",
-	"clears_10": "10 levels cleared",
-	"clears_50": "50 levels cleared",
-	"clears_100": "All 100 levels cleared",
-	"perfect_clear": "Perfect level",
-	"world_perfect": "Perfect world",
-	"hard_clear": "Difficult cleared",
-}
 const LOW_MOVES_RATIO := 0.25
 const MID_MOVES_RATIO := 0.5
 const OVERLAY_FADE_SECONDS := 0.2
@@ -366,7 +357,9 @@ func _load_level() -> void:
 	controller.completed.connect(_on_completed)
 	controller.lost.connect(_on_lost)
 	controller.arrow_removed.connect(func(_id: int, _info: Dictionary) -> void: _sfx("tap_clear"))
-	controller.move_blocked.connect(func(_id: int, _blocker: int) -> void: _sfx("tap_blocked"))
+	controller.move_blocked.connect(func(_id: int, _blocker: int) -> void:
+		_sfx("tap_blocked")
+		Haptics.buzz(_progress, Haptics.BLOCKED_MS))
 	if not controller.start(level["board"], level["moves_limit"], Difficulty.countdown_for(level["id"])):
 		_note.text = "This level is misconfigured."
 		return
@@ -461,7 +454,7 @@ func _on_completed(moves: int) -> void:
 		if result["world_bonus"] > 0:
 			detail += "  (includes world bonus)"
 		for badge in result["new_badges"]:
-			detail += "\nNew badge: %s" % BADGE_NAMES.get(badge, badge)
+			detail += "\nNew badge: %s" % Progress.badge_title(badge)
 	if not _save.save_data():
 		detail += "\nProgress could not be saved"
 	_overlay_title.text = "Level cleared!"
@@ -473,6 +466,7 @@ func _on_completed(moves: int) -> void:
 	_set_button(_overlay_secondary, "Menu", func() -> void: menu_requested.emit())
 	_show_overlay("won")
 	_confetti.burst()
+	Haptics.buzz(_progress, Haptics.WIN_MS)
 	_play_win_sounds(stars, coins_earned)
 	_refresh()
 
@@ -493,6 +487,7 @@ func _on_lost(wasted: int) -> void:
 	_set_button(_overlay_secondary, "Menu", func() -> void: menu_requested.emit())
 	_show_overlay("lost")
 	_sfx("lose")
+	Haptics.buzz(_progress, Haptics.LOSE_MS)
 	_refresh()
 
 
