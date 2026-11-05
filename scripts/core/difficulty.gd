@@ -10,10 +10,8 @@ const COUNT := 2
 ## Difficult level n is saved as HARD_ID_BASE + n.
 const HARD_ID_BASE := 1000
 
-## Seconds a player has after each tap before the level is lost. Easy has no
-## clock for the first levels, then a relaxed one; Difficult is always tight.
-const EASY_COUNTDOWN_FROM_LEVEL := 31
-const EASY_COUNTDOWN := 20.0
+## Seconds a player has after each tap before the level is lost. Only
+## Difficult has a clock; Easy lets players take as long as they like.
 const HARD_COUNTDOWN := 10.0
 
 const NAMES: Array[String] = ["Easy", "Difficult"]
@@ -34,9 +32,7 @@ static func make_id(difficulty: int, local: int) -> int:
 
 ## Seconds allowed between taps, or 0.0 when the level has no clock.
 static func countdown_for(level_id: int) -> float:
-	if of_level(level_id) == DIFFICULT:
-		return HARD_COUNTDOWN
-	return EASY_COUNTDOWN if level_id >= EASY_COUNTDOWN_FROM_LEVEL else 0.0
+	return HARD_COUNTDOWN if of_level(level_id) == DIFFICULT else 0.0
 
 
 static func name_of(difficulty: int) -> String:
@@ -47,4 +43,4 @@ static func name_of(difficulty: int) -> String:
 static func rule_text(difficulty: int) -> String:
 	if difficulty == DIFFICULT:
 		return "Huge boards, almost no spare moves, and %d seconds per tap." % int(HARD_COUNTDOWN)
-	return "Relaxed. No clock until level %d, then %d seconds per tap." % [EASY_COUNTDOWN_FROM_LEVEL, int(EASY_COUNTDOWN)]
+	return "Relaxed. No clock: take as long as you like."

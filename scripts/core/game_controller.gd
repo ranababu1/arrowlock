@@ -34,7 +34,8 @@ var lost_by_time := false
 var _clock_running := false
 var _initial: BoardState
 var _original_limit: int = 0
-## Stack of {"id": int, "info": Dictionary}; removals only.
+## One entry per move, oldest first: {"id": int, "info": Dictionary} for a
+## removal, {"id": int, "blocked": true} for a wasted tap.
 var _history: Array[Dictionary] = []
 
 
@@ -113,6 +114,7 @@ func tap(pos: Vector2i) -> bool:
 	var blocker := MoveValidator.first_blocker(board, id)
 	if blocker != -1:
 		wasted_taps += 1
+		_history.append({"id": id, "blocked": true})
 		move_blocked.emit(id, blocker)
 		_check_loss()
 		return false
@@ -153,14 +155,19 @@ func can_undo() -> bool:
 	return state == State.PLAYING and not _history.is_empty()
 
 
-## Restores the last removed arrow and refunds the move that removed it.
-## Wasted taps are not refunded. Disabled once the level is over.
+## Takes back the last move and refunds it. A removal puts the arrow back; a
+## wasted tap is simply forgotten (and no longer counts as wasted). Disabled
+## once the level is over.
 func undo() -> bool:
 	if not can_undo():
 		return false
 	var entry: Dictionary = _history.pop_back()
-	board.restore_arrow(entry["id"], entry["info"])
 	moves_used -= 1
+	if entry.get("blocked", false):
+		wasted_taps -= 1
+		refill_clock()
+		return true
+	board.restore_arrow(entry["id"], entry["info"])
 	refill_clock()
 	arrow_restored.emit(entry["id"])
 	return true

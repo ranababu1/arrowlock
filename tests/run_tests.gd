@@ -1130,13 +1130,17 @@ func _test_move_limit() -> void:
 	w.tap(Vector2i(0, 0))
 	_check(w.state == GameController.State.WON and won[0] == 1 and w.moves_left() == 0, "win on last allowed move")
 
-	# Undo refunds the removal but not earlier wasted taps.
+	# Undo takes back exactly one tap, wasted or not.
 	var u := _controller_for(_board(3, 1, rows), 4)
 	u.tap(Vector2i(0, 0))
 	u.tap(Vector2i(1, 0))
 	_check(u.moves_used == 2, "two moves used before undo")
 	u.undo()
-	_check(u.moves_used == 1 and u.wasted_taps == 1, "undo refunds removal only")
+	_check(u.moves_used == 1 and u.wasted_taps == 1 and u.board.remaining_count() == 2, "undo takes back the last removal only")
+	_check(u.undo() and u.moves_used == 0 and u.wasted_taps == 0 and u.board.remaining_count() == 2, "a second undo takes back the wasted tap and refunds it")
+	_check(not u.undo(), "nothing left to undo")
+	u.tap(Vector2i(2, 0))
+	_check(not u.can_undo(), "a tap on an empty cell is not a move and cannot be undone")
 
 	# A limit below the arrow count can never be won and is rejected.
 	var bad := GameController.new()
@@ -1147,8 +1151,7 @@ func _test_difficulty_ids() -> void:
 	_check(Difficulty.of_level(100) == Difficulty.EASY and Difficulty.of_level(1001) == Difficulty.DIFFICULT, "ids above 1000 are Difficult")
 	_check(Difficulty.local_id(1007) == 7 and Difficulty.local_id(7) == 7, "local id strips the Difficult offset")
 	_check(Difficulty.make_id(Difficulty.DIFFICULT, 12) == 1012 and Difficulty.make_id(Difficulty.EASY, 12) == 12, "make_id round-trips")
-	_check(Difficulty.countdown_for(1) == 0.0 and Difficulty.countdown_for(30) == 0.0, "Easy has no clock through level 30")
-	_check(Difficulty.countdown_for(31) == 20.0 and Difficulty.countdown_for(100) == 20.0, "Easy uses 20 s from level 31")
+	_check(Difficulty.countdown_for(1) == 0.0 and Difficulty.countdown_for(100) == 0.0, "Easy never has a clock")
 	_check(Difficulty.countdown_for(1001) == 10.0 and Difficulty.countdown_for(1100) == 10.0, "Difficult uses 10 s on every level")
 	_check(Progress.world_of(1011) == 1 and Progress.world_of(11) == 1 and Progress.world_of(1010) == 0, "worlds are counted within a tier")
 
@@ -1359,7 +1362,7 @@ func _test_countdown_screen() -> void:
 	early.queue_free()
 	var later := GameScreen.new()
 	root.add_child(later)
-	later.setup(easy.levels, 30, Progress.new(), save)
-	_check(later.controller.countdown == 20.0 and later.time_text().contains("20 s per tap"), "Easy level 31 has a 20 s clock")
+	later.setup(easy.levels, 99, Progress.new(), save)
+	_check(later.controller.countdown == 0.0 and later.time_text() == "", "Easy level 100 has no clock either")
 	later.queue_free()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_clock_save.json"))
