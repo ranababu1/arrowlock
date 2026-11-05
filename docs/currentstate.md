@@ -1,60 +1,63 @@
 # Current State
 
-**Phase:** Release 1 plan (`docs/level-plan-100.md`), milestones R1 (move limits), R2 (save v2, rewards logic), R3 (generator, validator, draft pack) and R4 (interface) done; the game now plays the draft 100-level pack. Next: owner playthrough and review (R5/R6), then release candidate (R7). **Last updated:** 2026-11-01.
-**Branch/commit:** `main`, remote `origin` = https://github.com/ranababu1/arrowlock.git
+**Phase:** Release 1 (`docs/level-plan-100.md`). R1 to R4 done; both 100-level packs are final for release 1 and frozen; badges/stats screen, vibration and the Play Games leaderboard code are in. Next: the owner-only steps of the Android release candidate (R7, `docs/release.md`). **Last updated:** 2026-11-05.
+**Branch/commit:** `main`, remote `origin` = https://github.com/ranababu1/arrowlock.git. Version name 0.2.0 (`project.godot`), version code 2 (set in the export preset).
 
 ## Feature status
 | Area | Status |
 |---|---|
 | Godot project scaffold | Implemented; loads and starts headless |
-| Rules engine (M1) | Implemented; automated tests pass |
-| Solver + independent cross-check | Implemented; automated tests pass |
-| Level select, game screen, win/game-over panels, hint/undo/extra moves (R4) | Implemented; 205 tests pass; verified on the emulator (see changelog for what is not) |
-| Level loading + validation (M3) | Implemented; automated tests pass |
-| Content | The game loads the draft 100-level pack from `data/packs/` (generated, validated, NOT owner-reviewed). `data/levels.json` (4 levels) is used by tests only |
-| Level tooling (R3) | Implemented and tested: generator, metrics, validator, reuse detection, `tools/generate_levels.gd` |
-| Save v2 + rewards (R2) | Implemented and tested: stars, coins, world unlock, badges, v1 migration. UI only shows coins and a result line; no level select, no badge screen |
-| Helpers | Undo (20), Hint (30), +3 moves (50, once per attempt) wired to coins |
-| Audio | Implemented: music loop and 10 effects, original and synthesised (`tools/make_audio.py`); tested for wiring, not auditioned by ear |
-| Settings screen | Implemented: music, sound and tutorial-tips toggles, music and effects volume sliders, all saved; no haptics |
-| Difficulty tiers | Implemented: Easy (default) and Difficult, each with 100 levels. The player picks one in Settings and plays only that mode; switching shows a warning and erases progress (coins back to 100). Per-tap countdown (Difficult 10 s always; Easy none through level 30, then 20 s); Difficult pays 2x. Difficult pack is a generated draft, not owner-reviewed |
-| Tutorial | Implemented for levels 1 to 3 (tip card, pointers, blocked-arrow lesson); ends after level 3, re-enable in Settings; not user-tested |
-| Visual design | Redesigned: Poppins font, palette, glass theme, animated backdrop, cards, vector icons, flat rounded arrows |
-| Safe-area insets | Implemented via `DisplayServer.get_display_safe_area()` with a 16px minimum; not tested on a device with a cutout |
-| Android export (M0) | Debug APK exports and runs on the emulator; physical device not tested |
+| Rules engine, solvers, move limits | Implemented; tests pass. Undo takes back exactly one tap (wasted or not) and refunds it; empty-cell taps are free; a level is lost only at 0 moves (owner decision, even if already unwinnable) |
+| Level select, game screen, win/game-over panels, hint/undo/extra moves | Implemented; verified on the emulator on 2026-11-01 (before today's changes) |
+| Content | Easy and Difficult packs, 100 levels each, regenerated 2026-11-05 to get harder level by level (no breathers, no reused layouts) and **frozen** in `data/levels.lock.json`. Not reviewed by the owner (owner chose not to review now) |
+| Level tooling | Generator with depth ranges per world, rising-depth floor and a switch to forbid reuse; validator; `tools/generate_levels.gd`, `tools/freeze_levels.gd` |
+| Save v2 + rewards | Implemented and tested: stars, coins, world unlock, badges, v1 migration, vibration setting, leaderboard state. Older 0.1.0 saves load unchanged (defaults fill the new fields) |
+| Economy | Retuned: clear 20 + 5 per star, world bonus 50; Undo 20, Hint 30, +3 moves 50. Tests check that a one-star player can still buy a Hint on every level. Not tested with players |
+| Difficulty tiers | Easy (no clock) and Difficult (10 s per tap, 2x coins). Chosen in Settings; switching erases progress after a warning |
+| Trophies screen | Implemented: stats for the current mode, all 7 badges (earned, or how to earn), leaderboard button. Opened from the star button on the menu |
+| Vibration | Implemented: short buzz on a blocked tap, win and loss; Settings toggle. Needs the Vibrate permission in the export preset. Not felt on a device yet |
+| Online leaderboard (Play Games) | Code implemented and tested with a fake plugin: optional sign-in, two boards (stars per mode), scores sent only from the saved state and retried after failures. Plugin `addons/GodotPlayGameServices` v3.4.0 (MIT) added. **Not working yet**: needs the owner's Play Console setup, leaderboard ids in `data/play_games.json`, the Game ID and a Gradle build (see `docs/release.md`). Never run on a device |
+| Audio | Implemented; not yet listened to by the owner (deferred by the owner; nothing waits on it) |
+| Settings | Difficulty, music, effects, tutorial tips, vibration, two volume sliders |
+| Tutorial | Levels 1 to 3; still matches the new level 1 (tests check it); not user-tested |
+| Safe-area insets | Implemented; not tested on a cutout device |
+| Board size | Tests check that the biggest board of each pack keeps cells of at least 40 px at the 540x960 base layout |
+| Android export (M0) | Debug APK ran on the emulator (2026-11-01). Release candidate not built yet. Physical device not tested (deferred by the owner) |
 
 ## Architecture
-- `scripts/core/` — pure logic, no Node dependencies: `board_state.gd`, `move_validator.gd`, `puzzle_solver.gd`, `game_controller.gd`, `economy.gd`, `progress.gd`, `board_canon.gd`, `level_metrics.gd`, `level_generator.gd`, `level_validator.gd`.
-- `scripts/services/` — `puzzle_repository.gd`, `save_service.gd`.
-- `scripts/ui/` — `main.gd` (router, safe area, Android back, fades), `level_select.gd`, `settings_screen.gd`, `game_screen.gd`, `board_view.gd` (drawing/input only); design system: `palette.gd`, `app_theme.gd`, `glyphs.gd`, `backdrop.gd`, `icon_button.gd`, `action_button.gd`, `toggle_switch.gd`, `level_tile.gd`, `star_row.gd`, `progress_pill.gd`, `glyph_view.gd`, `confetti.gd`.
-- `scripts/services/audio_manager.gd`; `assets/audio/`, `assets/fonts/`; `tools/make_audio.py`.
-- `data/levels.json` — versioned level data (schema version 2, `moves_limit` required). `tests/run_tests.gd` — test runner.
-
-## Identity
-Android package ID: `dev.imrn.arrowlock` (owner's domain imrn.dev); version name 0.1.0, version code 1. Set in the local `export_presets.cfg`, which is gitignored.
+- `scripts/core/` — pure logic: `board_state.gd`, `move_validator.gd`, `puzzle_solver.gd`, `game_controller.gd`, `economy.gd`, `progress.gd`, `difficulty.gd`, `tutorial.gd`, `board_canon.gd`, `level_metrics.gd`, `level_generator.gd`, `level_validator.gd`, `level_fingerprint.gd`, `leaderboard_sync.gd`.
+- `scripts/services/` — `puzzle_repository.gd`, `save_service.gd`, `audio_manager.gd`, `haptics.gd`, `play_games.gd` (talks to the plugin's Android singleton; a no-op elsewhere).
+- `scripts/ui/` — `main.gd` (router), `level_select.gd`, `settings_screen.gd`, `trophies_screen.gd`, `game_screen.gd`, `board_view.gd` and the design-system widgets.
+- `data/packs/`, `data/packs_hard/` (levels), `data/levels.lock.json` (frozen fingerprints), `data/play_games.json` (leaderboard ids, empty for now), `data/levels.json` (4 levels, tests only).
+- `addons/GodotPlayGameServices/` — third-party plugin, enabled in `project.godot`. Its autoload is not used by this game's code.
+- `tools/` — `generate_levels.gd`, `freeze_levels.gd`, `world_specs.json`, `world_specs_hard.json`, `make_audio.py`. `tests/run_tests.gd` — test runner.
+- Docs: `plan.md` (baseline), `level-plan-100.md` (release 1 + owner decisions in §11), `release.md` (release steps and Play checklist), `instructions.md`, `changelog.md`.
 
 ## Toolchain
-Godot 4.7.2 stable (winget). `config/features` says 4.3; project runs on 4.7.2.
+Godot 4.7.2 stable. `config/features` says 4.3; the project runs on 4.7.2.
 
 ## Build/test status
-Verified 2026-11-01: `godot_console --headless --path . -s tests/run_tests.gd` -> 408 passed, 0 failed. `godot_console --headless --path . -s tools/generate_levels.gd` (and `-- --hard`) -> 100 levels each, 0 failures. Headless startup of the main scene: no errors. Android debug export + install + launch, tap-through of level 1 incl. move limit and game over, verified on the Pixel_10a emulator (2026-11-01). Not verified: physical device, pause/resume, save persistence across restarts.
+Verified 2026-11-05 in a Linux container with the official Godot 4.7.2 build:
+- `godot --headless --path . -s tests/run_tests.gd` → **472 passed, 0 failed**.
+- `godot --headless --path . -s tools/generate_levels.gd` (and `-- --hard`) → 100 levels each, 0 variants, 0 failures.
+- `godot --headless --path . --quit-after 120` → starts with no script errors.
+- Not done here: Android export, emulator or device runs (no Android SDK in that container). The plugin's editor code was not run there either.
 
 ## Known issues / risks
-- No haptics or badge screen yet. Audio has not been listened to by the owner, so it is unreviewed.
-- Emulator `adb` is flaky (goes offline); device runs often need a retry.
-- A level is lost only at 0 moves even if it is already unwinnable.
-- Economy numbers and the generator's difficulty targets are untested guesses; tune after playtesting.
-- Regenerating the pack changes levels (and therefore saved progress meaning); once players have saves, level ids and layouts must stay frozen.
-- Coins can reach 0 and Undo then refuses, but a stuck player can always Restart.
-- `DirAccess.rename_absolute` overwrite behaviour on Windows is unconfirmed; save atomicity is unverified.
-- Board view has no minimum cell size check for large boards.
+- The Play Games plugin v3.4.0 is documented for Godot 4.5; it has not been built with 4.7.2 yet. The first Gradle export may need a plugin update.
+- No player has played the new packs; the difficulty is measured by the generator (arrows, chain depth, spare moves), not by people.
+- Difficult boards go up to 9x12; cells are about 50 px at the 540x960 base layout, which is small on narrow phones.
+- Economy numbers are untested with players.
+- A level is lost only at 0 moves even if already unwinnable (by design).
+- Emulator `adb` is flaky; `DirAccess.rename_absolute` overwrite on Windows and save atomicity are unverified.
+- Levels are frozen: changing a released level breaks the tests on purpose. Add new levels only after level 100.
 
 ## Next steps
-0. Owner: play Difficult and say whether 10 s per tap and the board sizes are right (tune `tools/world_specs_hard.json`).
-1. Owner: answer the open questions in `docs/level-plan-100.md` section 11.
-2. Owner: play through the 100 levels; note too-easy / too-hard / boring ones; adjust `tools/world_specs.json` and regenerate (R5/R6). Level 100 looks easy for a finale.
-3. Owner: listen to the music and effects and say what to change (edit `tools/make_audio.py`, rerun). Then play the tutorial and say whether it is clear, and add a badge/stats screen.
-4. Android check on a physical device (M0); test pause/resume and save persistence.
+1. Owner: Play Console app, Play Games project, two leaderboards, OAuth client; put the leaderboard ids in `data/play_games.json` (`docs/release.md` §1).
+2. Owner: export preset with Gradle build, Vibrate permission, Game ID and signing; export the 0.2.0 release candidate (`docs/release.md` §2–3).
+3. Owner: device checks and the upgrade test on a physical phone, then the internal test track (`docs/release.md` §4–5).
+4. Owner, later: listen to the audio, try the tutorial, play the packs and report anything too hard or too easy.
+5. Play listing, privacy policy and Data safety (`docs/release.md` §6) before any wider release.
 
 ## Decisions needing owner approval
-- Release 1 scope is `docs/level-plan-100.md` (100 levels, move limits, rewards, leaderboard). Open questions are in its section 11; the online leaderboard needs explicit approval. `docs/level-plan-500.md` is deferred. Nothing from these plans is implemented; the running build has unlimited moves and 4 levels.
+- None open. All decisions of 2026-11-05 are recorded in `docs/level-plan-100.md` §11. A production release still needs explicit approval (`instructions.md` §7).

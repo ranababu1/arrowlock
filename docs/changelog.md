@@ -2,6 +2,42 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-05 — Owner decisions applied: rising difficulty, frozen packs, trophies, vibration, Play Games leaderboard, release guide
+
+Owner answers to the open questions (recorded in `level-plan-100.md` §11) were applied without waiting for a playtest, as asked.
+
+### Changed
+- **Undo** now takes back exactly one tap, wasted or not, and refunds that move; an undone wasted tap no longer counts as wasted (so it no longer costs a star). Still 20 coins. (Before: only removals could be undone.)
+- **Clock only in Difficult** (10 s per tap). Easy has no clock at all; it used to start a 20 s clock at level 31.
+- **Both packs regenerated to get harder level by level** (owner: "make them incrementally difficult", no review for now). Spec changes in `tools/world_specs*.json`:
+  - no breather levels (`breathers: false`); arrow ranges of neighbouring worlds no longer overlap;
+  - each world has an explicit, reachable chain-depth range (`depth: [first, last]`) and the generator never picks a shallower board than the previous level (`rising_depth: true`); 250 attempts per level;
+  - no reused layouts (`allow_variants: false`). Reuse question (left to the agent): none. Every level is unique, and the old limits stay in the validator only as a safety net.
+  - Easy now runs 3 arrows on 3x3 (depth 1, 3 spare moves) up to 40 arrows on 8x11 (depth 16, 4 spare); spare moves fall from 100% to 10% of the arrows. Difficult runs 16 arrows on 5x7 (depth 7) up to 58 arrows on 9x12 (depth 18), always one spare move.
+- **Coins retuned** (owner left it to the agent): clear reward 10 → 20, world bonus 25 → 50, 5 per star unchanged. Reason: at the old values a one-star player who bought a Hint (30) on each level was broke within 8 levels. Now that player stays at about break-even.
+- Version name 0.1.0 → 0.2.0 for the release candidate.
+
+### Added
+- **Level freeze:** `scripts/core/level_fingerprint.gd`, `tools/freeze_levels.gd` and `data/levels.lock.json` (one fingerprint per level of both packs). A test fails if a locked level's layout, size or move limit changes, because saved stars belong to that layout. New levels may only be added after level 100.
+- **Trophies screen** (`scripts/ui/trophies_screen.gd`, star button on the menu): stats for the current mode (levels, stars, perfect levels, finished worlds, coins, badges), all 7 badges with how to earn them, and the leaderboard button. Badge names moved to `Progress.BADGE_INFO`.
+- **Vibration** (`scripts/services/haptics.gd`): 35 ms on a blocked tap, 60 ms on a win, 160 ms on a loss; a Vibration toggle in Settings (saved as `haptics_enabled`, default on). Uses `Input.vibrate_handheld` on phones only; needs the Vibrate permission in the export preset.
+- **Google Play Games leaderboard** (owner approved, "build it now"):
+  - Dependency: `addons/GodotPlayGameServices` v3.4.0 (commit e38b618, MIT, about 376 KB including the debug and release AARs) from github.com/godot-sdk-integrations/godot-play-game-services. Picked because it is the maintained Godot 4 plugin hosted by the Godot Foundation. Enabled as an editor plugin; its autoload is not registered, because our code uses the Android singleton directly. Adds the Internet permission to the Android build.
+  - `scripts/services/play_games.gd`: optional sign-in (silent check on launch), two leaderboards (star total per mode), submits on sign-in and on each return to the menu. `scripts/core/leaderboard_sync.gd` decides what still needs sending from the saved stars (saved as `leaderboard_sent`); failed submits are retried. Without the plugin or without ids everything is a no-op, so the game works offline and signed out.
+  - `data/play_games.json` holds the two leaderboard ids, empty until the Play Console project exists.
+- **`docs/release.md`:** Play Console and Play Games setup, export preset, build checks, a device and upgrade checklist, internal test track steps and the Play listing / Data safety checklist (R7).
+- Tests: rising difficulty for both packs (arrows, depth, spare moves; level 100 is the peak), no reuse, frozen levels, biggest board at least 40 px per cell at 540x960 (Difficult level 100 measures 50 px), badge texts and stats, vibration and its setting, leaderboard sync, the Play Games service against a fake plugin (sign-in, submit, failure and retry, saved state, opening the board), the Trophies screen, economy balance, and save fields from 0.1.0 saves.
+
+### Docs
+- `level-plan-100.md`: status updated (no longer a proposal); §11 now records the owner's decisions.
+- `instructions.md`: owner rules: no `Co-Authored-By` lines, no AI-named branches, work on `main`, commit as the owner.
+- `currentstate.md` rewritten to match the code (the old "nothing from these plans is implemented" line was stale).
+
+### Verification
+- Linux container, official Godot 4.7.2 build: `godot --headless --path . -s tests/run_tests.gd` → 472 passed, 0 failed. Generators: 100 levels each, 0 variants, 0 failures. `--quit-after 120` main-scene start: no script errors.
+- Not verified: no Android export, emulator or device run today (no Android SDK in that container); the plugin has not been built with Godot 4.7.2 or run on a device; vibration not felt; leaderboard not connected to a real Play Games project; no human has played the new packs.
+- Commit `cc4acfb` (Undo/clock change) was authored as "Claude" by mistake; later commits use the owner's identity. History was not rewritten.
+
 ## 2026-11-02 — Difficulty is chosen in Settings; switching resets progress
 
 ### Changed

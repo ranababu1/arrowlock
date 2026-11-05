@@ -1,6 +1,6 @@
-# Release 1 Plan: 100 Levels, Move Limits, Rewards, Leaderboard (proposal)
+# Release 1 Plan: 100 Levels, Move Limits, Rewards, Leaderboard
 
-**Status:** Proposal. Supersedes the scope of `level-plan-500.md` for the first release (that document is deferred, not deleted). `plan.md` is unchanged.
+**Status:** Approved and implemented through R4, plus the online leaderboard code (R8); owner decisions of 2026-11-05 are in section 11. Supersedes the scope of `level-plan-500.md` for the first release (that document is deferred, not deleted). `plan.md` is unchanged. Where this plan and the decisions in section 11 differ, section 11 wins.
 
 ## 1. Owner decisions captured from chat (2026-11-01)
 
@@ -137,10 +137,17 @@ This conflicts with the `plan.md` exclusions, so it is held for explicit owner a
 - **Coins create an economy to maintain.** Kept deliberately small, earn-only, no purchases in release 1.
 - **Online leaderboard adds a dependency, console setup and privacy work.** Held back from release 1 by design.
 
-## 11. Decisions still needed
+## 11. Decisions (owner, 2026-11-05)
 
-1. Confirm: taps on empty cells are free.
-2. Confirm: undo costs a coin and refunds only the removed arrow's move.
-3. Confirm the reuse limits (15 of 100, not in World 1, at least 10 levels apart).
-4. Approve or defer the Play Games leaderboard (R8).
-5. Confirm star rule (3 stars = zero wasted taps) and the 8-of-10 world unlock.
+1. **Taps on empty cells stay free.** Confirmed.
+2. **Undo takes back exactly one tap**, a wasted tap or a removal, and refunds that move; a wasted tap that is undone no longer counts as wasted. Still costs coins. (Replaces "refunds only the removed arrow's move".)
+3. **Reuse: none.** The owner left this to the agent. Decision: every shipped level is a unique layout; the generator no longer falls back to rotated copies (`allow_variants: false`) and the tests fail if a pack contains one. The validator keeps the old limits (15 of 100, not in World 1, 10 apart) only as a safety net for future packs.
+4. **Play Games leaderboard approved; build it now.** Two boards (Easy stars, Difficult stars). Code is in; the Play Console setup is an owner step (`docs/release.md`).
+5. **Stars (3 = no wasted taps) and the 8-of-10 world unlock:** confirmed.
+
+Further owner direction the same day:
+- **No owner level review for now.** Both packs must get harder level by level instead of in steps with breathers: the arrow count never drops, the dependency chain never gets shallower, spare moves per arrow never grow, and level 100 is the hardest. Enforced by tests. Replaces the "every 5th level is a breather" rule in section 3.
+- **Losing only at 0 moves** stays, even when the board is already unwinnable, so players spend more time on a level.
+- **The per-tap clock is Difficult-only** (10 s). Easy has no clock at all (it had 20 s from level 31).
+- Coin balance and the level freeze were left to the agent: see the changelog of 2026-11-05.
+- Audio and tutorial review: later; nothing waits for it.
