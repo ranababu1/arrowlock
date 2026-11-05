@@ -46,8 +46,8 @@ Before committing:
 - After each push, verify success using the Git command output and, where available, the remote branch status. Report the commit hash and verification result accurately.
 - Review diffs before committing. Use focused, descriptive commit messages such as `feat: add seeded puzzle generator` or `fix: prevent duplicate score submission`.
 - Do not use AI co-author trailers in commit messages. Never add `Co-Authored-By` lines of any kind (owner rule, 2026-11-05).
-- Never create branches whose name contains "claude" (or any AI tool name). Work and push on `main` unless the owner names another branch (owner rule, 2026-11-05).
-- Commit with the owner's git identity (`I m r a a n <imrn.dev@gmail.com>`), not an AI identity.
+- Work and push on `main`. Do not create other branches unless the owner names one (owner rule, 2026-11-05).
+- Commit only with the owner's git identity (`I m r a a n <imrn.dev@gmail.com>`).
 - Never run destructive operations such as `git reset --hard`, `git clean -fd`, force-push, history rewriting, or branch deletion without explicit authorization.
 - Do not amend or rewrite shared commits unless explicitly authorized.
 - Push only to the configured remote and intended branch. If no remote is configured, credentials are unavailable, or the push is rejected, do not invent success; explain the blocker and the exact next step.

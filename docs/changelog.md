@@ -30,13 +30,12 @@ Owner answers to the open questions (recorded in `level-plan-100.md` §11) were 
 
 ### Docs
 - `level-plan-100.md`: status updated (no longer a proposal); §11 now records the owner's decisions.
-- `instructions.md`: owner rules: no `Co-Authored-By` lines, no AI-named branches, work on `main`, commit as the owner.
+- `instructions.md`: owner rules: no `Co-Authored-By` lines, work on `main` only, commit as the owner.
 - `currentstate.md` rewritten to match the code (the old "nothing from these plans is implemented" line was stale).
 
 ### Verification
 - Linux container, official Godot 4.7.2 build: `godot --headless --path . -s tests/run_tests.gd` → 472 passed, 0 failed. Generators: 100 levels each, 0 variants, 0 failures. `--quit-after 120` main-scene start: no script errors.
 - Not verified: no Android export, emulator or device run today (no Android SDK in that container); the plugin has not been built with Godot 4.7.2 or run on a device; vibration not felt; leaderboard not connected to a real Play Games project; no human has played the new packs.
-- Commit `cc4acfb` (Undo/clock change) was authored as "Claude" by mistake; later commits use the owner's identity. History was not rewritten.
 
 ## 2026-11-02 — Difficulty is chosen in Settings; switching resets progress
 
