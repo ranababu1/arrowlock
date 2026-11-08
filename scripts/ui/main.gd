@@ -45,6 +45,7 @@ func _ready() -> void:
 		if not repo.load_dir(PACK_DIRS[tier], Difficulty.HARD_ID_BASE if tier == Difficulty.DIFFICULT else 0):
 			push_error("Level load failed (%s): %s" % [Difficulty.name_of(tier), "; ".join(repo.errors)])
 		_repos.append(repo)
+		_save.progress.cap_leaderboard_sent(tier, repo.levels.size())
 	if _repos[Difficulty.EASY].levels.is_empty():
 		_repo = _repos[Difficulty.EASY]
 	else:

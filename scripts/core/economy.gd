@@ -36,6 +36,8 @@ const SPEED_BONUS_MAX := 200
 const PAR_SECONDS_PER_ARROW := 1.5
 ## Highest possible score of one level (3 stars and a perfect speed bonus).
 const MAX_LEVEL_POINTS := POINTS_PER_STAR * MAX_STARS + SPEED_BONUS_MAX
+## Upper limit of both Play Console score leaderboards (set to 0..1,000,000).
+const LEADERBOARD_MAX := 1_000_000
 
 
 ## 3 stars: no wasted taps. 2 stars: wasted taps used at most half the slack

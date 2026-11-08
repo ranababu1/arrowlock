@@ -1,7 +1,7 @@
 {
 	"_comment": "Leaderboard ids from Play Console > Play Games Services > Leaderboards. Empty = online leaderboard switched off. Not secret.",
 	"leaderboards": {
-		"score_easy": "",
-		"score_difficult": ""
+		"score_easy": "CgkI49CE1KgPEAIQAA",
+		"score_difficult": "CgkI49CE1KgPEAIQAQ"
 	}
 }

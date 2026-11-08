@@ -22,3 +22,6 @@ build/
 .DS_Store
 Thumbs.db
 *.tmp
+
+# Stamped by tools/build_android.sh
+data/build_info.json

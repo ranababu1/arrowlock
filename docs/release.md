@@ -13,8 +13,8 @@ Current candidate: version name **0.3.0** (`project.godot` → `application/conf
    - Leaderboards → create two:
      | Name | Score format | Order | Limits |
      |---|---|---|---|
-     | Score (Easy) | Numeric, 0 decimals | Larger is better | 0 to 50000 |
-     | Score (Difficult) | Numeric, 0 decimals | Larger is better | 0 to 50000 |
+     | Score (Easy) | Numeric, 0 decimals | Larger is better | 0 to 1000000 (done 2026-11-08, id `CgkI49CE1KgPEAIQAA`) |
+     | Score (Difficult) | Numeric, 0 decimals | Larger is better | 0 to 1000000 (done 2026-11-08, id `CgkI49CE1KgPEAIQAQ`) |
    - Copy the **Game ID** (a number) and both **leaderboard IDs** (strings starting `CgkI`).
    - Publish the game services configuration (testers only is enough for the internal track; add your test accounts as testers).
 4. Put the two leaderboard IDs in `data/play_games.json` (`score_easy`, `score_difficult`), commit and push. They are not secrets. While they are empty the leaderboard button stays off and nothing is sent.
@@ -30,7 +30,7 @@ Current candidate: version name **0.3.0** (`project.godot` → `application/conf
 | Package → Unique Name | `dev.imrn.arrowlock` |
 | Version → Code / Name | `32` / empty (empty = use `project.godot`; `tools/build_android.sh --bump` raises the code) |
 | Permissions | **Vibrate** on (for the Vibration setting). Internet is added by the Play Games plugin. Nothing else. |
-| GodotPlayGameServices → game_id | the Game ID from step 1.3 |
+| GodotPlayGameServices → game_id | `526309730403` (the plugin writes it to `game_services_project_id` in strings.xml) |
 | Keystore → Release | path, alias and password of the upload key (stored in `export_credentials.cfg`, which is gitignored) |
 | Export format | AAB for Play, APK for local testing |
 | Resources → filters | keep `*.json` included (levels, lock file, Play Games config, ads config) |

@@ -328,7 +328,9 @@ static func from_dict(data: Dictionary) -> Progress:
 		for key in sent.keys():
 			var tier := int(str(key)) if str(key).is_valid_int() else -1
 			if tier >= 0 and tier < Difficulty.COUNT:
-				p.leaderboard_sent[tier] = clampi(int(sent[key]), 0, Economy.MAX_LEVEL_POINTS * 100)
+				# Tightened to the mode's real level count by cap_leaderboard_sent()
+				# once the packs are loaded; here only the board's own limit is known.
+				p.leaderboard_sent[tier] = clampi(int(sent[key]), 0, Economy.LEADERBOARD_MAX)
 	p.profile_name = clean_name(str(data.get("profile_name", "")))
 	p.profile_avatar = clampi(int(data.get("profile_avatar", 0)), 0, AVATAR_COUNT - 1)
 	return p
@@ -355,6 +357,20 @@ static func clean_name(text: String) -> String:
 			out += ch
 			last_space = false
 	return out.strip_edges().left(NAME_MAX_LENGTH).strip_edges()
+
+
+## Highest score a mode with `level_count` levels can reach (every level at
+## 3 stars and a perfect speed bonus), never above the leaderboard's limit.
+static func max_total_points(level_count: int) -> int:
+	return mini(Economy.MAX_LEVEL_POINTS * maxi(0, level_count), Economy.LEADERBOARD_MAX)
+
+
+## Caps what the leaderboard is recorded to have for `tier` at what that mode's
+## `level_count` levels can score, so a damaged save cannot block future
+## submits. Call once the level packs are loaded. Does nothing for an empty pack.
+func cap_leaderboard_sent(tier: int, level_count: int) -> void:
+	if level_count > 0 and leaderboard_sent.has(tier):
+		leaderboard_sent[tier] = mini(int(leaderboard_sent[tier]), max_total_points(level_count))
 
 
 ## Name to show for the local profile.

@@ -58,6 +58,7 @@ func _initialize() -> void:
 	_test_leaderboard_sync()
 	_test_play_games_service()
 	_test_profile_screen()
+	_test_version_text()
 	_test_economy_balance()
 	_test_speed_score()
 	_test_ad_policy()
@@ -209,7 +210,15 @@ func _test_save_roundtrip_and_corruption() -> void:
 	_check(not loaded.progress.haptics_enabled and loaded.progress.leaderboard_sent.get(Difficulty.EASY, 0) == 3, "vibration setting and leaderboard state round-trip")
 	_check(Progress.from_dict({}).haptics_enabled and Progress.from_dict({}).leaderboard_sent.is_empty(), "a save from the previous build gets vibration on and nothing sent")
 	var odd := Progress.from_dict({"leaderboard_sent": {"0": -5, "1": 99999, "7": 3, "x": 1}})
-	_check(odd.leaderboard_sent.get(0) == 0 and odd.leaderboard_sent.get(1) == Economy.MAX_LEVEL_POINTS * 100 and not odd.leaderboard_sent.has(7), "leaderboard state is clamped and unknown tiers dropped")
+	_check(odd.leaderboard_sent.get(0) == 0 and odd.leaderboard_sent.get(1) == 99999 and not odd.leaderboard_sent.has(7), "leaderboard state keeps real values and drops unknown tiers")
+	_check(Progress.from_dict({"leaderboard_sent": {"0": 5000000}}).leaderboard_sent.get(0) == Economy.LEADERBOARD_MAX, "a value above the board's limit is cut to 1,000,000")
+	odd.cap_leaderboard_sent(1, 100)
+	_check(odd.leaderboard_sent.get(1) == Economy.MAX_LEVEL_POINTS * 100, "a 100-level mode caps at 100 perfect levels")
+	var big := Progress.from_dict({"leaderboard_sent": {"0": 150000}})
+	big.cap_leaderboard_sent(0, 400)
+	_check(big.leaderboard_sent.get(0) == 150000, "a 400-level mode keeps scores above the old 100-level cap")
+	big.cap_leaderboard_sent(0, 0)
+	_check(big.leaderboard_sent.get(0) == 150000 and Progress.max_total_points(5000) == Economy.LEADERBOARD_MAX, "an empty pack changes nothing; the cap never passes the board limit")
 	_write_text(path, "{{ not json")
 	var corrupt := SaveService.new(path)
 	corrupt.load_data()
@@ -1609,6 +1618,16 @@ func _test_play_games_service() -> void:
 	pg.queue_free()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_pg_save.json"))
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_play_games.json"))
+
+
+func _test_version_text() -> void:
+	var version := str(ProjectSettings.get_setting("application/config/version"))
+	_check(SettingsScreen.version_text("user://no_build_info.json") == "Arrowlock " + version, "About shows the version from project.godot")
+	_write_text("user://test_build_info.json", '{"build": 38, "commit": "abc1234"}')
+	_check(SettingsScreen.version_text("user://test_build_info.json") == "Arrowlock %s (build 38)" % version, "About adds the build number when the build stamped it")
+	_write_text("user://test_build_info.json", "nonsense")
+	_check(SettingsScreen.version_text("user://test_build_info.json") == "Arrowlock " + version, "a broken build stamp is ignored")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_build_info.json"))
 
 
 func _test_profile_screen() -> void:

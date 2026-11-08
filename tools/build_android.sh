@@ -30,6 +30,9 @@ echo "Testing..."
 godot --headless --path . -s tests/run_tests.gd 2>&1 | tail -1 | tee /dev/stderr | grep -q " 0 failed" \
 	|| { echo "Tests failed; not building." >&2; exit 1; }
 
+# The About line in Settings shows this build number (data/build_info.json is gitignored).
+printf '{"build": %s, "commit": "%s"}\n' "$code" "$(git rev-parse --short HEAD)" > data/build_info.json
+
 # shellcheck disable=SC1090
 source "$SIGNING"
 export GODOT_ANDROID_KEYSTORE_RELEASE_PATH GODOT_ANDROID_KEYSTORE_RELEASE_USER GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD

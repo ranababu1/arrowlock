@@ -2,6 +2,18 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-08 — Play Games ids, score cap from level count, build number in About (build 38)
+
+### Changed
+- `data/play_games.json`: `score_easy` = `CgkI49CE1KgPEAIQAA`, `score_difficult` = `CgkI49CE1KgPEAIQAQ`. The online leaderboard is now switched on in builds.
+- Play Games Game ID `526309730403` set in the export preset (`godot_play_game_services/game_id`; the plugin writes it to the `game_services_project_id` string resource). The preset is gitignored; `docs/release.md` §2 records the value.
+- Leaderboards in Play Console now accept 0 to 1,000,000 (owner). `Economy.LEADERBOARD_MAX = 1_000_000`. The saved "already sent" score is bounded by that on load, then capped at `MAX_LEVEL_POINTS × the mode's real level count` once the packs are loaded (`Progress.cap_leaderboard_sent`, called from `main.gd`). It used to be a fixed `MAX_LEVEL_POINTS × 100`, which would have wrongly capped scores after a 400-level expansion.
+- About in Settings: the version already came from `project.godot` (0.3.0 since build 32; "0.2.0" was an older install). It now also shows the build number, e.g. "Arrowlock 0.3.0 (build 38)", stamped by `tools/build_android.sh` into the gitignored `data/build_info.json` on every build.
+- Tests: score cap (board limit, 100- and 400-level modes, empty pack), version text with and without a build stamp. 566 passed, 0 failed.
+
+### Not done
+- Release AAB and upload-key SHA-1: dropped by the owner for now.
+
 ## 2026-11-08 — Profile screen with Play Games name and picture (build 37)
 
 Owner: players should see a profile with their badges, leaderboard name and picture; take what Google allows from the Play account, otherwise let players enter their own details.
