@@ -1944,6 +1944,38 @@ func _test_ads_service() -> void:
 	_check(not cut.calls.has("initialize"), "no consent answer, no ads")
 	cut_ads.queue_free()
 
+	# A test-ads build (device-testing APK) never uses the real unit, whatever ads.json says.
+	var stamp := "user://test_ads_build_info.json"
+	var real_config := {"use_real_ads": true, "interstitial_unit_id": "ca-app-pub-1/2"}
+	_write_text(stamp, '{"build": 38, "test_ads": true}')
+	var cfg_path := "user://test_ads.json"
+	_write_text(cfg_path, JSON.stringify(real_config))
+	var apk_ads := Ads.new()
+	root.add_child(apk_ads)
+	var apk_fake := FakeAdmob.new()
+	apk_ads.add_child(apk_fake)
+	apk_ads.start(apk_fake, cfg_path, stamp)
+	_check(not apk_ads.use_real_ads, "a test-ads build stamp forces Google's test ads")
+	apk_ads.queue_free()
+	_write_text(stamp, '{"build": 38, "test_ads": false}')
+	var aab_ads := Ads.new()
+	root.add_child(aab_ads)
+	var aab_fake := FakeAdmob.new()
+	aab_ads.add_child(aab_fake)
+	aab_ads.start(aab_fake, cfg_path, stamp)
+	_check(aab_ads.use_real_ads, "a release build stamp keeps the real ads from ads.json")
+	aab_ads.queue_free()
+	var bare_ads := Ads.new()
+	root.add_child(bare_ads)
+	var bare_fake := FakeAdmob.new()
+	bare_ads.add_child(bare_fake)
+	bare_ads.start(bare_fake, cfg_path, "user://no_build_info.json")
+	_check(bare_ads.use_real_ads, "without a stamp ads.json decides")
+	bare_ads.queue_free()
+	_write_text(stamp, "garbage")
+	_check(not BuildInfo.forces_test_ads(stamp) and BuildInfo.build_number(stamp) == -1, "a broken stamp forces nothing")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(stamp))
+
 	# enabled=false: the plugin is never touched.
 	var off := FakeAdmob.new()
 	var off_ads := _ads_with(off, {"enabled": false})

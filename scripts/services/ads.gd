@@ -36,11 +36,13 @@ var _pending := Callable()
 
 
 ## `backend` is for tests; normally an Admob node is made when the Android
-## plugin is present.
-func start(backend: Node = null, config_path: String = CONFIG_PATH) -> void:
+## plugin is present. A build stamped "test_ads" by the build script (the
+## device-testing APK) always uses Google's test ad unit, whatever ads.json says,
+## so the owner's own phones never load real ads.
+func start(backend: Node = null, config_path: String = CONFIG_PATH, build_info_path: String = BuildInfo.PATH) -> void:
 	var config := load_config(config_path)
 	policy = AdPolicy.from_config(config)
-	use_real_ads = bool(config.get("use_real_ads", false))
+	use_real_ads = bool(config.get("use_real_ads", false)) and not BuildInfo.forces_test_ads(build_info_path)
 	interstitial_unit_id = str(config.get("interstitial_unit_id", "")).strip_edges()
 	if not policy.enabled:
 		return

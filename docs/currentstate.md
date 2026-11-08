@@ -1,7 +1,7 @@
 # Current State
 
 **Phase:** Release 1 (`docs/level-plan-100.md`). R1 to R4 done; both 100-level packs are final for release 1 and frozen; badges/stats screen, vibration and the Play Games leaderboard code are in. Next: the owner-only steps of the Android release candidate (R7, `docs/release.md`). **Last updated:** 2026-11-05.
-**Branch/commit:** `main`, remote `origin` = https://github.com/ranababu1/arrowlock.git. Version name 0.3.0 (`project.godot`), build number 32 (version code, in the gitignored export preset). Build with `tools/build_android.sh --bump`.
+**Branch/commit:** `main`, remote `origin` = https://github.com/ranababu1/arrowlock.git. Version name 0.3.0 (`project.godot`), version code 38 (export preset, gitignored), the Play release candidate, subject to Play Console. Device APK: `tools/build_android.sh`; Play release (signed AAB + upload-key APK, verified): `tools/build_android.sh --release <key folder>` (`docs/release.md` §3).
 
 ## Feature status
 | Area | Status |
@@ -24,6 +24,7 @@
 | Tutorial | Levels 1 to 3; still matches the new level 1 (tests check it); not user-tested |
 | Safe-area insets | Implemented; not tested on a cutout device |
 | Board size | Tests check that the biggest board of each pack keeps cells of at least 40 px at the 540x960 base layout |
+| Release AAB workflow | Implemented 2026-11-08: `--release` builds a signed AAB (real ads) and an upload-key APK (test ads) and verifies package, version, arm64, Play Games and AdMob ids, signatures and the upload SHA-1 `57:AC:89:…:08:75`, then prints SHA-256. AAB format confirmed with an unsigned probe export; **signed release build not yet run** (needs the owner's key credentials at build time). No Play Console upload |
 | Android export (M0) | Debug APK ran on the emulator (2026-11-01). Release candidate not built yet. Physical device not tested (deferred by the owner) |
 
 ## Architecture

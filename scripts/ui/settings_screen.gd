@@ -8,8 +8,6 @@ signal back_requested
 signal difficulty_switched(tier: int)
 
 const VERSION_SETTING := "application/config/version"
-## Written by tools/build_android.sh for each build (gitignored); absent in the editor.
-const BUILD_INFO_PATH := "res://data/build_info.json"
 
 var music_toggle: ToggleSwitch
 var sfx_toggle: ToggleSwitch
@@ -104,12 +102,11 @@ func _build() -> void:
 
 ## "Arrowlock 0.3.0 (build 38)": the version name from project.godot and, in
 ## exported builds, the build number stamped by the build script.
-static func version_text(build_info_path: String = BUILD_INFO_PATH) -> String:
+static func version_text(build_info_path: String = BuildInfo.PATH) -> String:
 	var text := "Arrowlock %s" % ProjectSettings.get_setting(VERSION_SETTING, "dev")
-	if FileAccess.file_exists(build_info_path):
-		var info: Variant = JSON.parse_string(FileAccess.get_file_as_string(build_info_path))
-		if typeof(info) == TYPE_DICTIONARY and typeof(info.get("build")) in [TYPE_INT, TYPE_FLOAT]:
-			text += " (build %d)" % int(info["build"])
+	var build := BuildInfo.build_number(build_info_path)
+	if build >= 0:
+		text += " (build %d)" % build
 	return text
 
 

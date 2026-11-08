@@ -2,6 +2,30 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-08 — Play release workflow: signed AAB, verification, test ads on APKs
+
+Owner asked for Play Store AAB readiness (audit first, then approved): one release command makes an AAB and an APK, the upload key folder is given at build time, APKs use test ads and only the AAB uses real ads.
+
+### Audit findings (before changes)
+- Gradle build, package `dev.imrn.arrowlock`, arm64-v8a, `*.json` filter, launcher icons, Vibrate, Game ID `526309730403` and both leaderboard ids were already correct. Internet / network state come from the plugins; no extra permissions.
+- Gaps: export format was APK only; signing used the internal keystore; no AAB build or verification; `release.md` still named version code 32; every build, including sideloaded APKs, served real ads.
+- `aapt2` cannot read an AAB's (protobuf) manifest; downloading Google's bundletool was not permitted in this environment, so a small reader was written instead.
+
+### Added
+- `tools/build_android.sh --release <key folder or env file> [--bump] [--overwrite]`: runs tests, validates the export and data configuration, exports `build/arrowlock-<v>-b<code>.aab` (real ads) and `build/arrowlock-<v>-b<code>-arm64-v8a-upload.apk` (test ads), both with the upload key, then verifies bundle structure, package, version name and code, arm64-v8a, Play Games `APP_ID` and Game ID, the real AdMob app id, the build stamp, `jarsigner -verify`, the AAB and APK certificate SHA-1 against `57:AC:89:CF:26:6A:D1:8D:16:07:ED:4E:EA:C4:34:9C:41:50:08:75`, and prints size and SHA-256. Refuses to replace existing artifacts without `--overwrite`. Credentials come from `<folder>/upload.env` or a hidden prompt; export logs have the password masked; nothing is stored in Git or CI. The preset's export format is switched to AAB (`1`) only for that export and restored on exit, even after a failure.
+- `tools/aab_manifest.py`: dependency-free reader for the AAB's protobuf manifest (package, versions, permissions, meta-data, ABIs).
+- `scripts/services/build_info.gd`: reads the build stamp. The plain APK workflow is unchanged except that it now stamps `test_ads: true`.
+- `Ads` obeys the stamp: a test-ads build always uses Google's test interstitial unit, whatever `data/ads.json` says.
+- Godot 4.7.2 export format values checked by exporting a probe: `gradle_build/export_format=1` produced a real bundle (`BundleConfig.pb`, `base/manifest/`, `base/lib/arm64-v8a/`).
+- Tests: test-ads stamp forces test ads, release stamp keeps real ads, no stamp defers to `ads.json`, a broken stamp forces nothing. 570 passed, 0 failed.
+
+### Docs
+- `release.md`: version code 38 as the candidate (subject to Play Console), both workflows, signing without passwords, the verification list, and the upload-key vs Play App Signing SHA-1 distinction (two Android OAuth credentials). AdMob notes updated for the stamp.
+
+### Not done (owner)
+- Signed release build not run yet: it needs the upload key credentials at build time.
+- Play Console: upload, Play App Signing enrolment and its SHA-1, both OAuth credentials, Data safety, ads and Advertising ID declarations. No upload or publish was attempted.
+
 ## 2026-11-08 — Play Games ids, score cap from level count, build number in About (build 38)
 
 ### Changed

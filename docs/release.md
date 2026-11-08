@@ -2,14 +2,16 @@
 
 How to turn `main` into a build on the Play Console internal test track. Steps marked **Owner** need your Google account, signing key or a physical phone, so an agent cannot do them. Everything else is already in the repository.
 
-Current candidate: version name **0.3.0** (`project.godot` → `application/config/version`), build number (version code) **32**. Build with `tools/build_android.sh --bump`, which raises the build number, runs the tests and writes `build/arrowlock-<version>-b<code>-arm64-v8a.apk`. Version codes only go up: internal builds already used 31 and 32.
+Current candidate: version name **0.3.0** (`project.godot` → `application/config/version`), version code **38**, subject to Play Console: Play has received no upload yet, so 38 is free there. Local sideload APKs have used codes up to 38; Play only rejects codes it has itself received. Release build: `tools/build_android.sh --release <key folder>` (§3).
 
 ## 1. One-time Play Console setup (Owner)
 
 1. Create the app in Play Console: name "Arrowlock", default language English, Game, Free.
 2. Package name must be **`dev.imrn.arrowlock`** (cannot be changed later).
 3. Play Games Services → create a project for this game.
-   - Credentials → add an **Android** OAuth client with the package name and the **SHA-1 of the signing key** (both the upload key and Play App Signing key, see step 5).
+   - Credentials → add **two Android** OAuth clients, both with package `dev.imrn.arrowlock`, one per certificate (they are different keys and are not interchangeable):
+     - **Upload key** SHA-1 `57:AC:89:CF:26:6A:D1:8D:16:07:ED:4E:EA:C4:34:9C:41:50:08:75` (`D:\Keys\Arrowlock\arrowlock-upload.jks`, alias `arrowlock-upload`): covers APKs you sign and sideload yourself.
+     - **Play App Signing key** SHA-1: Play Console → Test and release → App integrity → App signing, after enrolling in Play App Signing with the first upload. Covers every install from Play (Google re-signs those). Without it, sign-in fails for Play installs.
    - Leaderboards → create two:
      | Name | Score format | Order | Limits |
      |---|---|---|---|
@@ -28,11 +30,11 @@ Current candidate: version name **0.3.0** (`project.godot` → `application/conf
 |---|---|
 | Use Gradle Build | **On** (the Play Games plugin needs it). First run Project → Install Android Build Template. |
 | Package → Unique Name | `dev.imrn.arrowlock` |
-| Version → Code / Name | `32` / empty (empty = use `project.godot`; `tools/build_android.sh --bump` raises the code) |
+| Version → Code / Name | `38` / empty (empty = use `project.godot`; `--bump` on the build script raises the code) |
 | Permissions | **Vibrate** on (for the Vibration setting). Internet is added by the Play Games plugin. Nothing else. |
 | GodotPlayGameServices → game_id | `526309730403` (the plugin writes it to `game_services_project_id` in strings.xml) |
-| Keystore → Release | path, alias and password of the upload key (stored in `export_credentials.cfg`, which is gitignored) |
-| Export format | AAB for Play, APK for local testing |
+| Keystore → Release | leave empty: the build script passes the key through `GODOT_ANDROID_KEYSTORE_RELEASE_*` environment variables (§3) |
+| Gradle Build → Export Format | leave **APK** (`0`). The release script switches it to AAB (`1`, checked against Godot 4.7.2 by inspecting the exported bundle) for the AAB export and puts it back |
 | Resources → filters | keep `*.json` included (levels, lock file, Play Games config, ads config) |
 | Launcher Icons → Main 192x192 | `res://assets/icon/icon_512.png` |
 | Launcher Icons → Adaptive Foreground / Background / Monochrome 432x432 | `res://assets/icon/adaptive_foreground_432.png`, `adaptive_background_432.png`, `adaptive_monochrome_432.png` (regenerate with `python -I tools/make_icon.py` from `tools/icon_source.png`) |
@@ -41,13 +43,38 @@ Check that Project → Project Settings → Plugins shows **GodotPlayGameService
 
 ## 3. Build and check before upload
 
-1. On the build machine:
+Two workflows, both in `tools/build_android.sh` (Git Bash on Windows):
+
+| Command | Output | Signed with | Ads |
+|---|---|---|---|
+| `tools/build_android.sh [--bump]` | `build/arrowlock-<v>-b<code>-arm64-v8a.apk` | internal key (`~/.arrowlock/signing.env`) | Google **test** ads |
+| `tools/build_android.sh --release <key folder or env file> [--bump] [--overwrite]` | `build/arrowlock-<v>-b<code>.aab` **and** `build/arrowlock-<v>-b<code>-arm64-v8a-upload.apk` | Play **upload key** | AAB: **real** ads. APK: **test** ads |
+
+Every build is stamped with `data/build_info.json` (gitignored): its build number (shown in Settings → About) and whether it must use test ads. The ads service obeys the stamp, so APKs on your own phones never load real ads, whatever `data/ads.json` says.
+
+**Signing (release).** Keystore `D:\Keys\Arrowlock\arrowlock-upload.jks`, alias `arrowlock-upload`. Pass the folder at build time. The script reads, in order:
+1. `<folder>/upload.env` (or an env file passed directly) with three lines:
    ```
-   godot --headless --path . -s tests/run_tests.gd
+   GODOT_ANDROID_KEYSTORE_RELEASE_PATH="D:/Keys/Arrowlock/arrowlock-upload.jks"
+   GODOT_ANDROID_KEYSTORE_RELEASE_USER="arrowlock-upload"
+   GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD="..."
    ```
-   Must end with `0 failed`.
-2. Export a **release** AAB (and an APK of the same commit for sideloading).
-3. Record the artifact filename, version name, version code and commit hash in `docs/changelog.md`.
+2. otherwise the single `*.jks` in the folder plus a hidden password prompt (needs a terminal).
+
+The password never goes on a command line, into the repository, or into logs: export logs in `build/logs/` have it replaced with `<hidden>`. Nothing about the key is stored in Git or CI.
+
+**What `--release` checks before it reports success** (any failure stops it):
+1. All automated tests pass.
+2. Export configuration: package `dev.imrn.arrowlock`, Gradle build, arm64-v8a, Vibrate, Play Games Game ID set, launcher icons set, both leaderboard ids, AdMob real app id and unit id.
+3. Existing artifacts are not replaced unless `--overwrite` is given.
+4. AAB manifest (read by `tools/aab_manifest.py`, no third-party tool): it is an app bundle, package, versionName and versionCode match, arm64-v8a native libs present, Play Games `APP_ID` and the real AdMob app id present, Game ID in the resources, build stamp says real ads.
+5. AAB signature: `jarsigner -verify` passes and `keytool -printcert -jarfile` shows the upload key SHA-1 (`$UPLOAD_SHA1`, default above).
+6. APK signature: `apksigner verify` passes with the same SHA-1, and the APK is stamped for test ads.
+7. Prints each artifact's path, size and SHA-256.
+
+Record the artifact names, version, commit and SHA-256 in `docs/changelog.md`.
+
+**Installing on your phone.** An app signed with one key cannot be updated in place by one signed with another. Uninstall internal-key builds before installing the `-upload.apk`, and uninstall sideloaded builds before installing from Play (Play installs carry the Play App Signing key).
 
 ## 4. Device checks (Owner, physical phone)
 
@@ -86,7 +113,7 @@ Do these on a real phone with the release APK. Write the result of each line in 
 
 The game shows an interstitial when the player leaves the win or game-over panel (Next, Retry, Replay or Menu) on level 11 or higher in either tier, at most once every 60 seconds. "+3 moves" never shows an ad. Settings are in `data/ads.json` (`first_level`, `min_seconds_between`, `enabled`). Plugin: `addons/AdmobPlugin` v7.0 (MIT, Google Mobile Ads 24.9.0).
 
-Builds use **Google's test ads** until you switch them over. Never tap your own real ads; AdMob bans accounts for it.
+The real ids are set (2026-11-08). Only the Play AAB serves real ads; every APK from `tools/build_android.sh` is stamped to use Google's test ad unit (§3). Never tap your own real ads; AdMob bans accounts for it.
 
 1. https://admob.google.com → Apps → Add app → Android → "Is the app listed on a store?" No for now (link it after the Play listing exists). Name: Arrowlock.
 2. Copy the **App ID** (`ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY`).
@@ -98,7 +125,7 @@ Builds use **Google's test ads** until you switch them over. Never tap your own 
 6. Build, install, play to level 11 and finish a game. New ad units can take a few hours to serve; until then nothing shows (the game just carries on).
 7. app-ads.txt: AdMob asks for one on the developer website listed on Play. Optional, but it improves fill.
 
-For your own phones, keep internal builds on test ads (`use_real_ads=false` and `is_real=false`) and switch to real ids only for the Play upload. Alternatively, register your phones as test devices in AdMob → Settings → Test devices.
+Your own phones: sideloaded APKs already use test ads. A copy installed from Play serves real ads, so also register your phones in AdMob → Settings → Test devices before installing from the internal track.
 
 ## 7. After release: levels are frozen
 
