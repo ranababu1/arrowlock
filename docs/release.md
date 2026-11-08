@@ -72,6 +72,10 @@ The password never goes on a command line, into the repository, or into logs: ex
 6. APK signature: `apksigner verify` passes with the same SHA-1, and the APK is stamped for test ads.
 7. Prints each artifact's path, size and SHA-256.
 
+To re-run only the checks on artifacts that already exist (no rebuild, no key): `tools/build_android.sh --verify`.
+
+Godot 4.7 puts the game files (`res://`) of an AAB in an install-time asset pack, `assetPackInstallTime/assets/`, not in `base/assets/`; the checks look there.
+
 Record the artifact names, version, commit and SHA-256 in `docs/changelog.md`.
 
 **Installing on your phone.** An app signed with one key cannot be updated in place by one signed with another. Uninstall internal-key builds before installing the `-upload.apk`, and uninstall sideloaded builds before installing from Play (Play installs carry the Play App Signing key).

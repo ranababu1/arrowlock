@@ -2,6 +2,15 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-08 — Release check fix: AAB asset pack path; build 38 verified
+
+- The owner ran `tools/build_android.sh --release` and both artifacts were exported and signed, but the check stopped with `KeyError: base/assets/data/build_info.json`. Godot 4.7 puts the game files of an AAB in an install-time asset pack (`assetPackInstallTime/assets/`), not `base/assets/` (diagnosed by the owner's review agent; confirmed by listing the bundle). The check now looks in the asset pack, then `base/assets/`, and says clearly if the stamp is missing. The APK check already used the right path (`assets/`).
+- New `tools/build_android.sh --verify`: re-runs the configuration and artifact checks on existing release files without rebuilding or a key.
+- Build 38 verified with `--verify`, all checks passed:
+  - `build/arrowlock-0.3.0-b38.aab`: 33,551,529 bytes, SHA-256 `7df81ba30540c99a075a1526298b193f777add5c0b278517b247ccaceed441c5`; package `dev.imrn.arrowlock`, 0.3.0 (38), arm64-v8a; real ads stamp; signature verified, upload key SHA-1 `57:AC:89:CF:26:6A:D1:8D:16:07:ED:4E:EA:C4:34:9C:41:50:08:75`.
+  - `build/arrowlock-0.3.0-b38-arm64-v8a-upload.apk`: 91,436,002 bytes, SHA-256 `69223f6488c0dfde2d4e6612a68afe2ed0f30f123e436354a234800023e785af`; same key; test ads stamp.
+  - Built from commit `6440245`. Not uploaded; not run on a device.
+
 ## 2026-11-08 — Play release workflow: signed AAB, verification, test ads on APKs
 
 Owner asked for Play Store AAB readiness (audit first, then approved): one release command makes an AAB and an APK, the upload key folder is given at build time, APKs use test ads and only the AAB uses real ads.

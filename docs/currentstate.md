@@ -24,7 +24,7 @@
 | Tutorial | Levels 1 to 3; still matches the new level 1 (tests check it); not user-tested |
 | Safe-area insets | Implemented; not tested on a cutout device |
 | Board size | Tests check that the biggest board of each pack keeps cells of at least 40 px at the 540x960 base layout |
-| Release AAB workflow | Implemented 2026-11-08: `--release` builds a signed AAB (real ads) and an upload-key APK (test ads) and verifies package, version, arm64, Play Games and AdMob ids, signatures and the upload SHA-1 `57:AC:89:…:08:75`, then prints SHA-256. AAB format confirmed with an unsigned probe export; **signed release build not yet run** (needs the owner's key credentials at build time). No Play Console upload |
+| Release AAB workflow | Implemented 2026-11-08: `--release` builds a signed AAB (real ads) and an upload-key APK (test ads) and verifies package, version, arm64, Play Games and AdMob ids, signatures and the upload SHA-1 `57:AC:89:…:08:75`, then prints SHA-256. **Build 38 built by the owner and verified 2026-11-08** (`--verify`, all checks passed): `build/arrowlock-0.3.0-b38.aab` 33,551,529 bytes, SHA-256 `7df81ba30540c99a075a1526298b193f777add5c0b278517b247ccaceed441c5`; `build/arrowlock-0.3.0-b38-arm64-v8a-upload.apk` 91,436,002 bytes, SHA-256 `69223f6488c0dfde2d4e6612a68afe2ed0f30f123e436354a234800023e785af`; both signed with the upload key `57:AC:89:…:08:75`; built from commit `6440245`. Not uploaded; not run on a device |
 | Android export (M0) | Debug APK ran on the emulator (2026-11-01). Release candidate not built yet. Physical device not tested (deferred by the owner) |
 
 ## Architecture

@@ -22,6 +22,9 @@
 #   --bump       raise the version code by 1 first (Play rejects a reused code).
 #   --overwrite  allow replacing existing release artifacts (refused otherwise).
 #
+# Re-check existing release artifacts without rebuilding (no key needed):
+#   tools/build_android.sh --verify
+#
 # Version name: project.godot (application/config/version).
 # Version code: export_presets.cfg (version/code; gitignored, docs/release.md §2).
 # Expected upload certificate SHA-1: $UPLOAD_SHA1 (default below).
@@ -37,10 +40,12 @@ BUILD_TOOLS="${ANDROID_BUILD_TOOLS:-$(ls -d "${LOCALAPPDATA:-$HOME}"/Android/Sdk
 release=""
 bump=0
 overwrite=0
+verify=0
 while [ $# -gt 0 ]; do
 	case "$1" in
 		--bump) bump=1 ;;
 		--overwrite) overwrite=1 ;;
+		--verify) verify=1 ;;
 		--release) shift; release="${1:-}"; [ -n "$release" ] || { echo "--release needs the key folder or env file" >&2; exit 2; } ;;
 		*) echo "Unknown option: $1" >&2; exit 2 ;;
 	esac
@@ -56,7 +61,9 @@ preset() { sed -n "s/^$1=\(.*\)$/\1/p" "$PRESETS" | head -1 | tr -d '"'; }
 [ -f "$PRESETS" ] || fail "missing $PRESETS (see docs/release.md §2)"
 
 # --- credentials -------------------------------------------------------------
-if [ -z "$release" ]; then
+if [ $verify -eq 1 ]; then
+	[ -z "$release" ] && [ $bump -eq 0 ] || fail "--verify takes no other options"
+elif [ -z "$release" ]; then
 	SIGNING="$HOME/.arrowlock/signing.env"
 	[ -f "$SIGNING" ] || fail "missing $SIGNING"
 	# shellcheck disable=SC1090
@@ -77,9 +84,11 @@ else
 		read -rsp "Password for $UPLOAD_ALIAS in ${jks[0]}: " GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD; echo
 	fi
 fi
-export GODOT_ANDROID_KEYSTORE_RELEASE_PATH GODOT_ANDROID_KEYSTORE_RELEASE_USER GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD
-[ -f "${GODOT_ANDROID_KEYSTORE_RELEASE_PATH:-}" ] || fail "keystore not found: ${GODOT_ANDROID_KEYSTORE_RELEASE_PATH:-<unset>}"
-[ -n "${GODOT_ANDROID_KEYSTORE_RELEASE_USER:-}" ] && [ -n "${GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD:-}" ] || fail "keystore alias or password not set"
+if [ $verify -eq 0 ]; then
+	export GODOT_ANDROID_KEYSTORE_RELEASE_PATH GODOT_ANDROID_KEYSTORE_RELEASE_USER GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD
+	[ -f "${GODOT_ANDROID_KEYSTORE_RELEASE_PATH:-}" ] || fail "keystore not found: ${GODOT_ANDROID_KEYSTORE_RELEASE_PATH:-<unset>}"
+	[ -n "${GODOT_ANDROID_KEYSTORE_RELEASE_USER:-}" ] && [ -n "${GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD:-}" ] || fail "keystore alias or password not set"
+fi
 
 # --- version -----------------------------------------------------------------
 code=$(preset "version\/code")
@@ -91,9 +100,11 @@ version=$(sed -n 's/^config\/version="\(.*\)"$/\1/p' project.godot)
 commit="$(git rev-parse --short HEAD)$(git diff --quiet HEAD -- . ':!data/build_info.json' || echo '+uncommitted')"
 
 # --- tests -------------------------------------------------------------------
-echo "Testing..."
-godot --headless --path . -s tests/run_tests.gd 2>&1 | tail -1 | tee /dev/stderr | grep -q " 0 failed" \
-	|| fail "tests failed; not building"
+if [ $verify -eq 0 ]; then
+	echo "Testing..."
+	godot --headless --path . -s tests/run_tests.gd 2>&1 | tail -1 | tee /dev/stderr | grep -q " 0 failed" \
+		|| fail "tests failed; not building"
+fi
 
 # Writes data/build_info.json (gitignored): build number for About, ads mode.
 stamp() { printf '{"build": %s, "commit": "%s", "test_ads": %s}\n' "$code" "$(git rev-parse --short HEAD)" "$1" > data/build_info.json; }
@@ -112,7 +123,7 @@ export_as() {
 	[ -f "$out" ] || fail "export produced no file: $out"
 }
 
-if [ -z "$release" ]; then
+if [ -z "$release" ] && [ $verify -eq 0 ]; then
 	out="build/arrowlock-$version-b$code-arm64-v8a.apk"
 	stamp true
 	echo "Building $out (test ads) ..."
@@ -144,16 +155,21 @@ PY
 
 aab="build/arrowlock-$version-b$code.aab"
 apk="build/arrowlock-$version-b$code-arm64-v8a-upload.apk"
-if [ $overwrite -eq 0 ]; then
-	for f in "$aab" "$apk"; do [ ! -e "$f" ] || fail "$f already exists (check it, then rerun with --overwrite)"; done
+if [ $verify -eq 1 ]; then
+	for f in "$aab" "$apk"; do [ -f "$f" ] || fail "nothing to verify: $f does not exist"; done
+	commit="not rebuilt; stamped from commit $(unzip -p "$apk" assets/data/build_info.json | sed -n 's/.*"commit": "\([^"]*\)".*/\1/p')"
+else
+	if [ $overwrite -eq 0 ]; then
+		for f in "$aab" "$apk"; do [ ! -e "$f" ] || fail "$f already exists (check it, then rerun with --overwrite)"; done
+	fi
+	echo "Building $aab (real ads) ..."
+	stamp false
+	export_as 1 "$aab" build/logs/export-aab.log
+	echo "Building $apk (test ads) ..."
+	stamp true
+	export_as 0 "$apk" build/logs/export-apk-upload.log
 fi
-
-echo "Building $aab (real ads) ..."
-stamp false
-export_as 1 "$aab" build/logs/export-aab.log
-echo "Building $apk (test ads) ..."
-stamp true
-export_as 0 "$apk" build/logs/export-apk-upload.log
+mkdir -p build/logs
 
 # --- release: verify -----------------------------------------------------------
 echo "Verifying..."
@@ -171,7 +187,10 @@ assert "com.google.android.gms.games.APP_ID" in m["meta"], "Play Games APP_ID me
 assert m["meta"].get("com.google.android.gms.ads.APPLICATION_ID", "").startswith("ca-app-pub-1106747567696734~"), "AdMob app id is not the real one"
 with zipfile.ZipFile(aab) as z:
     assert game_id.encode() in z.read("base/resources.pb"), "game_services_project_id is not the configured Game ID"
-    info = json.loads(z.read("base/assets/data/build_info.json"))
+    # Godot 4.7 puts game files in an install-time asset pack, not in base/.
+    stamps = [n for n in ("assetPackInstallTime/assets/data/build_info.json", "base/assets/data/build_info.json") if n in z.namelist()]
+    assert stamps, "build stamp data/build_info.json not found in the bundle"
+    info = json.loads(z.read(stamps[0]))
     assert info.get("test_ads") is False and info.get("build") == int(code), f"build stamp {info}"
 print(f"  package {m['package']}, version {m['versionName']} ({m['versionCode']}), abis {', '.join(m['abis'])}")
 print(f"  permissions: {', '.join(p.split('.')[-1] for p in m['permissions'])}")
