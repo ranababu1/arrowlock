@@ -26,6 +26,17 @@ const WORLD_UNLOCK_CLEARS := 8
 
 const MAX_STARS := 3
 
+## Score (the leaderboard number). A level's score is its stars plus a speed
+## bonus; each level keeps its best score and the leaderboard posts the sum.
+const POINTS_PER_STAR := 100
+## The speed bonus approaches this for an instant solve and never reaches it.
+const SPEED_BONUS_MAX := 200
+## Par time per arrow, in seconds. Solving in exactly par time earns half of
+## SPEED_BONUS_MAX; twice as fast earns two thirds, and so on.
+const PAR_SECONDS_PER_ARROW := 1.5
+## Highest possible score of one level (3 stars and a perfect speed bonus).
+const MAX_LEVEL_POINTS := POINTS_PER_STAR * MAX_STARS + SPEED_BONUS_MAX
+
 
 ## 3 stars: no wasted taps. 2 stars: wasted taps used at most half the slack
 ## (slack = moves_limit - arrow_count). 1 star: cleared.
@@ -35,3 +46,18 @@ static func stars_for(wasted_taps: int, slack: int) -> int:
 	if wasted_taps * 2 <= slack:
 		return 2
 	return 1
+
+
+## Speed bonus for clearing `arrow_count` arrows in `seconds`. It falls
+## smoothly with time and never hits zero, so faster always scores more and two
+## players rarely tie. Unknown time (negative) earns no bonus.
+static func speed_bonus(seconds: float, arrow_count: int) -> int:
+	if seconds < 0.0 or arrow_count < 1:
+		return 0
+	var par := PAR_SECONDS_PER_ARROW * arrow_count
+	return roundi(SPEED_BONUS_MAX * par / (par + seconds))
+
+
+## Score of one clear: stars plus the speed bonus.
+static func level_points(stars: int, seconds: float, arrow_count: int) -> int:
+	return POINTS_PER_STAR * stars + speed_bonus(seconds, arrow_count)

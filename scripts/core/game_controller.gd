@@ -30,6 +30,9 @@ var extra_moves_granted: int = 0
 var countdown: float = 0.0
 var time_left: float = 0.0
 var lost_by_time := false
+## Seconds spent on this attempt so far, counted from the start (not the
+## first tap, so studying the board counts too). Drives the speed bonus.
+var elapsed: float = 0.0
 
 var _clock_running := false
 var _initial: BoardState
@@ -62,6 +65,7 @@ func restart() -> void:
 	moves_limit = _original_limit
 	time_left = countdown
 	lost_by_time = false
+	elapsed = 0.0
 	_clock_running = false
 
 
@@ -82,10 +86,14 @@ func clock_running() -> bool:
 	return _clock_running and state == State.PLAYING
 
 
-## Advances the clock by `delta` seconds. Does nothing before the first tap,
-## without a countdown, or once the level is over.
+## Advances time by `delta` seconds: the attempt's elapsed time always, and the
+## countdown once the first arrow is tapped (when the level has one). Does
+## nothing once the level is over.
 func tick(delta: float) -> void:
-	if state != State.PLAYING or countdown <= 0.0 or not _clock_running:
+	if state != State.PLAYING or delta <= 0.0:
+		return
+	elapsed += delta
+	if countdown <= 0.0 or not _clock_running:
 		return
 	time_left = maxf(0.0, time_left - delta)
 	if time_left <= 0.0:

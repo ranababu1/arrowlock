@@ -1,7 +1,7 @@
 # Current State
 
 **Phase:** Release 1 (`docs/level-plan-100.md`). R1 to R4 done; both 100-level packs are final for release 1 and frozen; badges/stats screen, vibration and the Play Games leaderboard code are in. Next: the owner-only steps of the Android release candidate (R7, `docs/release.md`). **Last updated:** 2026-11-05.
-**Branch/commit:** `main`, remote `origin` = https://github.com/ranababu1/arrowlock.git. Version name 0.2.0 (`project.godot`), version code 2 (set in the export preset).
+**Branch/commit:** `main`, remote `origin` = https://github.com/ranababu1/arrowlock.git. Version name 0.3.0 (`project.godot`), build number 32 (version code, in the gitignored export preset). Build with `tools/build_android.sh --bump`.
 
 ## Feature status
 | Area | Status |
@@ -12,11 +12,12 @@
 | Content | Easy and Difficult packs, 100 levels each, regenerated 2026-11-05 to get harder level by level (no breathers, no reused layouts) and **frozen** in `data/levels.lock.json`. Not reviewed by the owner (owner chose not to review now) |
 | Level tooling | Generator with depth ranges per world, rising-depth floor and a switch to forbid reuse; validator; `tools/generate_levels.gd`, `tools/freeze_levels.gd` |
 | Save v2 + rewards | Implemented and tested: stars, coins, world unlock, badges, v1 migration, vibration setting, leaderboard state. Older 0.1.0 saves load unchanged (defaults fill the new fields) |
+| Score (leaderboard) | Implemented and tested: each clear scores 100 per star plus a speed bonus of up to 200 (half at par = 1.5 s per arrow, falling smoothly so ties are rare). Time counts from when the level opens, pauses while a panel is shown, and resets on Retry. Each level keeps its best score; the leaderboard posts the sum per mode (max 50,000). Shown on the win panel and the Trophies screen. Speed pays no coins. Older saves get 100 per star until a level is replayed. Not tuned with players |
 | Economy | Retuned: clear 20 + 5 per star, world bonus 50; Undo 20, Hint 30, +3 moves 50. Tests check that a one-star player can still buy a Hint on every level. Not tested with players |
 | Difficulty tiers | Easy (no clock) and Difficult (10 s per tap, 2x coins). Chosen in Settings; switching erases progress after a warning |
 | Trophies screen | Implemented: stats for the current mode, all 7 badges (earned, or how to earn), leaderboard button. Opened from the star button on the menu |
 | Vibration | Implemented: short buzz on a blocked tap, win and loss; Settings toggle. Needs the Vibrate permission in the export preset. Not felt on a device yet |
-| Online leaderboard (Play Games) | Code implemented and tested with a fake plugin: optional sign-in, two boards (stars per mode), scores sent only from the saved state and retried after failures. Plugin `addons/GodotPlayGameServices` v3.4.0 (MIT) added. **Not working yet**: needs the owner's Play Console setup, leaderboard ids in `data/play_games.json`, the Game ID and a Gradle build (see `docs/release.md`). Never run on a device |
+| Online leaderboard (Play Games) | Code implemented and tested with a fake plugin: optional sign-in, two boards (score per mode: each level's best clear, 100 per star plus a speed bonus, summed), scores sent only from the saved state and retried after failures. Plugin `addons/GodotPlayGameServices` v3.4.0 (MIT) added. **Not working yet**: needs the owner's Play Console setup, leaderboard ids in `data/play_games.json`, the Game ID and a Gradle build (see `docs/release.md`). Never run on a device |
 | Audio | Implemented; not yet listened to by the owner (deferred by the owner; nothing waits on it) |
 | Settings | Difficulty, music, effects, tutorial tips, vibration, two volume sliders |
 | Tutorial | Levels 1 to 3; still matches the new level 1 (tests check it); not user-tested |
@@ -38,7 +39,7 @@ Godot 4.7.2 stable. `config/features` says 4.3; the project runs on 4.7.2.
 
 ## Build/test status
 Verified 2026-11-05 in a Linux container with the official Godot 4.7.2 build:
-- `godot --headless --path . -s tests/run_tests.gd` → **472 passed, 0 failed**.
+- `godot --headless --path . -s tests/run_tests.gd` → **503 passed, 0 failed (2026-11-07, Windows, Godot 4.7.2)**.
 - `godot --headless --path . -s tools/generate_levels.gd` (and `-- --hard`) → 100 levels each, 0 variants, 0 failures.
 - `godot --headless --path . --quit-after 120` → starts with no script errors.
 - Not done here: Android export, emulator or device runs (no Android SDK in that container). The plugin's editor code was not run there either.
@@ -54,7 +55,7 @@ Verified 2026-11-05 in a Linux container with the official Godot 4.7.2 build:
 
 ## Next steps
 1. Owner: Play Console app, Play Games project, two leaderboards, OAuth client; put the leaderboard ids in `data/play_games.json` (`docs/release.md` §1).
-2. Owner: export preset with Gradle build, Vibrate permission, Game ID and signing; export the 0.2.0 release candidate (`docs/release.md` §2–3).
+2. Owner: export preset with Gradle build, Vibrate permission, Game ID and signing; export the release candidate (`docs/release.md` §2–3).
 3. Owner: device checks and the upgrade test on a physical phone, then the internal test track (`docs/release.md` §4–5).
 4. Owner, later: listen to the audio, try the tutorial, play the packs and report anything too hard or too easy.
 5. Play listing, privacy policy and Data safety (`docs/release.md` §6) before any wider release.

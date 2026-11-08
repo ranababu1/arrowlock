@@ -2,6 +2,27 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-07 — 0.3.0 (build 32): speed score for the leaderboard, logo splash screen
+
+Owner: the game is fairly easy, so a star leaderboard (max 300) would fill up with ties; give more points for faster solves.
+
+### Changed
+- **Leaderboard posts a score instead of the star total.** A clear scores `100 × stars + speed bonus`. Speed bonus = `round(200 × par / (par + seconds))`, par = 1.5 s per arrow: 200 for an instant solve, 100 at par, 67 at twice par, never zero. Each level keeps its best score (stars and fastest time are tracked separately, so they can come from different runs); the leaderboard gets the sum per mode, at most 50,000. Constants in `Economy` (`POINTS_PER_STAR`, `SPEED_BONUS_MAX`, `PAR_SECONDS_PER_ARROW`).
+- Time is counted from the moment the level opens (not the first tap, so studying the board counts), pauses while the win or game-over panel is shown, keeps running after buying +3 moves, and resets on Retry. Time while the app is in the background is not counted.
+- Coins are unchanged; speed pays no coins.
+- `data/play_games.json` keys renamed `stars_easy`/`stars_difficult` → `score_easy`/`score_difficult` (no ids had been set yet). Play Console leaderboards should be named "Score (Easy/Difficult)" with limits 0 to 50000 (`docs/release.md` §1).
+- Save format stays v2: levels gain `best_points` and `best_seconds`. Older saves get 100 per star and no time until a level is replayed.
+- Version 0.2.0 → **0.3.0**, build number (version code) 2 → **32**: internal builds had already used 31, and Android will not install a lower code over a higher one. New `tools/build_android.sh` (`--bump` raises the build number, runs the tests, names the APK `arrowlock-<version>-b<code>-arm64-v8a.apk`).
+- Boot splash is now the owner's logo (`assets/splash.png`, rounded corners, dark background) instead of the Godot logo.
+
+### Added
+- Win panel shows the time, the points of the run and the best score; Trophies shows Score.
+- Tests: speed bonus shape, best-score keeping, sums per mode, old-save fallback and clamping, controller timing, time formatting (503 passed, 0 failed).
+
+### Known
+- Not tested with players: par time and the bonus size are guesses.
+- Scores are computed on the phone, so a modified app could post anything; acceptable for a free game without prizes.
+
 ## 2026-11-05 — Owner decisions applied: rising difficulty, frozen packs, trophies, vibration, Play Games leaderboard, release guide
 
 Owner answers to the open questions (recorded in `level-plan-100.md` §11) were applied without waiting for a playtest, as asked.

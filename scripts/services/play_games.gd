@@ -1,6 +1,6 @@
 class_name PlayGames
 extends Node
-## Google Play Games sign-in and the online star leaderboards.
+## Google Play Games sign-in and the online score leaderboards.
 ##
 ## Talks to the Android singleton of the GodotPlayGameServices plugin
 ## (addons/GodotPlayGameServices, MIT, v3.4.0). On desktop, in tests, or when a
@@ -15,7 +15,7 @@ signal auth_changed(signed_in: bool)
 const SINGLETON := "GodotPlayGameServices"
 const CONFIG_PATH := "res://data/play_games.json"
 ## Config key per tier, indexed by Difficulty constant.
-const TIER_KEYS: Array[String] = ["stars_easy", "stars_difficult"]
+const TIER_KEYS: Array[String] = ["score_easy", "score_difficult"]
 
 var signed_in := false
 ## Leaderboard id per tier ("" = not configured).
@@ -63,7 +63,7 @@ func show_leaderboard(tier: int) -> bool:
 	return true
 
 
-## Sends the star total for `tier` if the leaderboard does not have it yet.
+## Sends the score for `tier` if the leaderboard does not have it yet.
 ## Returns true when a submit was started.
 func sync(tier: int) -> bool:
 	if not available(tier) or not signed_in or _progress == null:

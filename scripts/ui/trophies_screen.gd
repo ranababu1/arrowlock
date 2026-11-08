@@ -75,6 +75,7 @@ func _stats_card() -> Control:
 	var s := _progress.stats(_progress.difficulty)
 	var worlds := ceili(float(_level_count) / Economy.LEVELS_PER_WORLD)
 	for row in [
+		["points", "Score", str(s["points"])],
 		["cleared", "Levels cleared", "%d / %d" % [s["cleared"], _level_count]],
 		["stars", "Stars", "%d / %d" % [s["stars"], _level_count * Economy.MAX_STARS]],
 		["perfect", "Perfect levels", str(s["perfect"])],
@@ -148,11 +149,11 @@ func _refresh_leaderboard() -> void:
 		leaderboard_button.text = "Leaderboard unavailable"
 		leaderboard_button.disabled = true
 	elif not _play_games.signed_in:
-		leaderboard_caption.text = "Optional. Sign in with Google Play Games to post your star total. The game works the same without it."
+		leaderboard_caption.text = "Optional. Sign in with Google Play Games to post your score. The game works the same without it."
 		leaderboard_button.text = "Sign in with Play Games"
 		leaderboard_button.disabled = false
 	else:
-		leaderboard_caption.text = "Your %s star total is posted automatically." % Difficulty.name_of(tier)
+		leaderboard_caption.text = "Your %s score is posted automatically. Each level counts its best clear: 100 points per star plus a speed bonus." % Difficulty.name_of(tier)
 		leaderboard_button.text = "Show leaderboard"
 		leaderboard_button.disabled = false
 

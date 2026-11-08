@@ -59,6 +59,7 @@ func _initialize() -> void:
 	_test_play_games_service()
 	_test_trophies_screen()
 	_test_economy_balance()
+	_test_speed_score()
 	print("Tests: %d passed, %d failed" % [_passed, _failed])
 	quit(1 if _failed > 0 else 0)
 
@@ -205,7 +206,7 @@ func _test_save_roundtrip_and_corruption() -> void:
 	_check(not loaded.progress.haptics_enabled and loaded.progress.leaderboard_sent.get(Difficulty.EASY, 0) == 3, "vibration setting and leaderboard state round-trip")
 	_check(Progress.from_dict({}).haptics_enabled and Progress.from_dict({}).leaderboard_sent.is_empty(), "a save from the previous build gets vibration on and nothing sent")
 	var odd := Progress.from_dict({"leaderboard_sent": {"0": -5, "1": 99999, "7": 3, "x": 1}})
-	_check(odd.leaderboard_sent.get(0) == 0 and odd.leaderboard_sent.get(1) == 300 and not odd.leaderboard_sent.has(7), "leaderboard state is clamped and unknown tiers dropped")
+	_check(odd.leaderboard_sent.get(0) == 0 and odd.leaderboard_sent.get(1) == Economy.MAX_LEVEL_POINTS * 100 and not odd.leaderboard_sent.has(7), "leaderboard state is clamped and unknown tiers dropped")
 	_write_text(path, "{{ not json")
 	var corrupt := SaveService.new(path)
 	corrupt.load_data()
@@ -1535,11 +1536,11 @@ func _test_leaderboard_sync() -> void:
 	var p := Progress.new()
 	_check(LeaderboardSync.score_to_submit(p, Difficulty.EASY) == -1, "nothing to send without stars")
 	p.record_result(1, 3, 6, 3, 0)
-	_check(LeaderboardSync.score_to_submit(p, Difficulty.EASY) == 3, "a new star total is sent")
-	LeaderboardSync.mark_submitted(p, Difficulty.EASY, 3)
+	_check(LeaderboardSync.score_to_submit(p, Difficulty.EASY) == 300, "a new score is sent")
+	LeaderboardSync.mark_submitted(p, Difficulty.EASY, 300)
 	_check(LeaderboardSync.score_to_submit(p, Difficulty.EASY) == -1, "a confirmed total is not sent again")
 	LeaderboardSync.mark_submitted(p, Difficulty.EASY, 1)
-	_check(p.leaderboard_sent[Difficulty.EASY] == 3, "a confirmation never lowers what was sent")
+	_check(p.leaderboard_sent[Difficulty.EASY] == 300, "a confirmation never lowers what was sent")
 	_check(LeaderboardSync.score_to_submit(p, Difficulty.DIFFICULT) == -1, "each mode has its own board")
 
 
@@ -1567,7 +1568,7 @@ class FakePlayGamesPlugin:
 
 func _play_games_with(plugin: Object, save: SaveService, ids: Array) -> PlayGames:
 	var config := "user://test_play_games.json"
-	_write_text(config, JSON.stringify({"leaderboards": {"stars_easy": ids[0], "stars_difficult": ids[1]}}))
+	_write_text(config, JSON.stringify({"leaderboards": {"score_easy": ids[0], "score_difficult": ids[1]}}))
 	var pg := PlayGames.new()
 	root.add_child(pg)
 	pg.start(save.progress, save, plugin, config)
@@ -1590,7 +1591,7 @@ func _test_play_games_service() -> void:
 	_check(pg.available(Difficulty.EASY) and not pg.available(Difficulty.DIFFICULT), "a mode without a leaderboard id is unavailable")
 	_check(not pg.sync(Difficulty.EASY), "nothing is sent while signed out")
 	plugin.userAuthenticated.emit(true)
-	_check(pg.signed_in and plugin.calls.has("submit:CgkI_easy:3"), "signing in sends the star total")
+	_check(pg.signed_in and plugin.calls.has("submit:CgkI_easy:300"), "signing in sends the score")
 	_check(not pg.sync(Difficulty.EASY), "no second submit while one is waiting")
 	plugin.scoreSubmitted.emit(false, "CgkI_easy")
 	_check(save.progress.leaderboard_sent.get(Difficulty.EASY, 0) == 0, "a failed submit is not recorded")
@@ -1598,7 +1599,7 @@ func _test_play_games_service() -> void:
 	plugin.scoreSubmitted.emit(true, "CgkI_easy")
 	var reloaded := SaveService.new("user://test_pg_save.json")
 	reloaded.load_data()
-	_check(reloaded.progress.leaderboard_sent.get(Difficulty.EASY, 0) == 3, "an accepted submit is recorded and saved")
+	_check(reloaded.progress.leaderboard_sent.get(Difficulty.EASY, 0) == 300, "an accepted submit is recorded and saved")
 	_check(not pg.sync(Difficulty.EASY), "an accepted total is not sent again")
 	_check(pg.show_leaderboard(Difficulty.EASY) and plugin.calls.has("show:CgkI_easy"), "the leaderboard opens when signed in")
 	pg.sign_in()
@@ -1676,3 +1677,61 @@ func _test_economy_balance() -> void:
 			perfect.record_result(id, arrows, limit, arrows, 0)
 		_check(careless_ok, "%s: a one-star player can buy a Hint on every level" % Difficulty.name_of(tier))
 		_check(perfect.coins <= Economy.START_COINS + 100 * 60 * Economy.HARD_REWARD_MULTIPLIER, "%s: a perfect run earns a bounded number of coins (%d)" % [Difficulty.name_of(tier), perfect.coins])
+
+
+func _test_speed_score() -> void:
+	# The bonus: half at par, falling smoothly, never zero, none without a time.
+	var par := Economy.PAR_SECONDS_PER_ARROW * 10
+	_check(Economy.speed_bonus(par, 10) == Economy.SPEED_BONUS_MAX / 2, "par time earns half the speed bonus")
+	_check(Economy.speed_bonus(0.0, 10) == Economy.SPEED_BONUS_MAX, "an instant solve earns the whole bonus")
+	_check(Economy.speed_bonus(-1.0, 10) == 0, "an unknown time earns no bonus")
+	_check(Economy.speed_bonus(3600.0, 10) > 0, "even a very slow clear earns some bonus")
+	var last := Economy.SPEED_BONUS_MAX + 1
+	for t in [0.0, 5.0, 10.0, 15.0, 30.0, 60.0, 120.0]:
+		var bonus := Economy.speed_bonus(t, 10)
+		_check(bonus < last or t == 0.0, "the bonus falls with time (%.0f s)" % t)
+		last = bonus
+	_check(Economy.speed_bonus(30.0, 40) > Economy.speed_bonus(30.0, 10), "bigger boards get more time for the same bonus")
+	_check(Economy.level_points(3, 0.0, 5) == Economy.MAX_LEVEL_POINTS, "max level points = 3 stars + full bonus")
+
+	# Best score per level; the leaderboard number is the sum.
+	var p := Progress.new()
+	var first := p.record_result(1, 10, 14, 10, 0, 30.0)
+	var expect := 300 + Economy.speed_bonus(30.0, 10)
+	_check(first["points"] == expect and p.points_of(1) == expect and first["new_best"], "first clear scores stars + speed")
+	var slower := p.record_result(1, 10, 14, 10, 0, 60.0)
+	_check(not slower["new_best"] and slower["best_points"] == expect and p.points_of(1) == expect, "a slower replay keeps the best score")
+	var faster := p.record_result(1, 10, 14, 10, 0, 12.0)
+	_check(faster["new_best"] and p.points_of(1) == faster["points"] and p.levels[1]["best_seconds"] == 12.0, "a faster replay raises the score")
+	_check(faster["coins_earned"] == 0, "speed alone pays no coins")
+	var sloppy_fast := p.record_result(1, 10, 14, 14, 4, 1.0)
+	_check(sloppy_fast["stars"] == 1 and p.stars_of(1) == 3, "stars stay the best ever")
+	_check(p.points_of(1) == maxi(faster["points"], sloppy_fast["points"]), "the score is the best single clear")
+	p.record_result(2, 5, 8, 5, 0, 20.0)
+	p.record_result(1002, 5, 8, 5, 0, 20.0)
+	_check(p.total_points(Difficulty.EASY) == p.points_of(1) + p.points_of(2), "the score sums one mode")
+	_check(p.stats(Difficulty.EASY)["points"] == p.total_points(Difficulty.EASY), "stats show the score")
+	_check(LeaderboardSync.score_to_submit(p, Difficulty.EASY) == p.total_points(Difficulty.EASY), "the leaderboard gets the score")
+
+	# Ties: two perfect players a second apart on one level get different scores.
+	_check(Economy.level_points(3, 20.0, 20) != Economy.level_points(3, 21.0, 20), "one second apart is not a tie")
+
+	# Saves from before the score: stars-only score until replayed; bad numbers clamped.
+	var old := Progress.from_dict({"levels": {"1": {"stars": 2, "best_moves": 5, "best_wasted": 1}, 		"2": {"stars": 3, "best_moves": 5, "best_wasted": 0, "best_points": 99999, "best_seconds": -7}}})
+	_check(old.points_of(1) == 200 and old.levels[1]["best_seconds"] == -1.0, "an old save scores 100 per star")
+	_check(old.points_of(2) == Economy.MAX_LEVEL_POINTS and old.levels[2]["best_seconds"] == -1.0, "damaged score fields are clamped")
+	var round_trip := Progress.from_dict(p.to_dict())
+	_check(round_trip.total_points() == p.total_points() and round_trip.levels[1]["best_seconds"] == 1.0, "score and fastest time survive a save")
+
+	# The controller counts time from the start of the attempt, stops at the end and resets on restart.
+	var c := GameController.new()
+	c.start(_board(3, 1, [[0, 0, "left"]]), 2)
+	c.tick(2.5)
+	_check(is_equal_approx(c.elapsed, 2.5), "time counts before the first tap")
+	c.tap(Vector2i(0, 0))
+	c.tick(5.0)
+	_check(c.state == GameController.State.WON and is_equal_approx(c.elapsed, 2.5), "time stops at the win")
+	c.restart()
+	_check(c.elapsed == 0.0, "restart resets the time")
+	_check(GameScreen.format_seconds(42.25) == "42.2 s" or GameScreen.format_seconds(42.25) == "42.3 s", "seconds format")
+	_check(GameScreen.format_seconds(65.2) == "1:05.2", "minutes format")

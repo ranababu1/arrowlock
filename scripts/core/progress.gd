@@ -19,8 +19,9 @@ const BADGE_INFO := {
 }
 
 var coins: int = Economy.START_COINS
-## level id -> {"stars": int, "best_moves": int, "best_wasted": int}.
-## best_wasted is -1 when unknown (migrated from save v1).
+## level id -> {"stars": int, "best_moves": int, "best_wasted": int,
+## "best_points": int, "best_seconds": float}.
+## best_wasted and best_seconds are -1 when unknown (older saves).
 var levels: Dictionary = {}
 var badges: Array[String] = []
 ## Sound effects on/off.
@@ -33,7 +34,7 @@ var sfx_volume: float = 1.0
 var tips_enabled: bool = true
 ## Short vibrations on blocked taps, wins and losses (phones only).
 var haptics_enabled: bool = true
-## Tier -> the star total the online leaderboard last confirmed. Kept across a
+## Tier -> the score the online leaderboard last confirmed. Kept across a
 ## tier switch: the leaderboard keeps the best score anyway.
 var leaderboard_sent: Dictionary = {}
 ## The one tier the player is playing (a Difficulty constant). Changing it
@@ -87,6 +88,21 @@ func total_stars(tier: int = -1) -> int:
 	return total
 
 
+## Best score of one level (0 when not cleared).
+func points_of(level_id: int) -> int:
+	return levels[level_id]["best_points"] if levels.has(level_id) else 0
+
+
+## Score in one tier, or in both when `tier` is -1: the sum of every level's
+## best score. This is the number the leaderboard shows.
+func total_points(tier: int = -1) -> int:
+	var total := 0
+	for id in levels.keys():
+		if tier < 0 or Difficulty.of_level(id) == tier:
+			total += levels[id]["best_points"]
+	return total
+
+
 func world_clears(world: int, tier: int = Difficulty.EASY) -> int:
 	var count := 0
 	for id in levels.keys():
@@ -124,10 +140,12 @@ func spend(price: int) -> bool:
 
 
 ## Records a finished level and returns what was earned:
-## {"stars", "coins_earned", "first_clear", "improved", "world_bonus", "new_badges"}.
+## {"stars", "coins_earned", "first_clear", "improved", "world_bonus",
+## "new_badges", "points", "best_points", "new_best"}.
 ## `moves_limit` is the level's original limit (not including extra moves).
+## `seconds` is how long the attempt took (-1 when unknown: no speed bonus).
 ## Returns {} for impossible inputs and changes nothing.
-func record_result(level_id: int, arrow_count: int, moves_limit: int, moves_used: int, wasted_taps: int) -> Dictionary:
+func record_result(level_id: int, arrow_count: int, moves_limit: int, moves_used: int, wasted_taps: int, seconds: float = -1.0) -> Dictionary:
 	if level_id < 1 or arrow_count < 1 or moves_limit < arrow_count \
 			or moves_used < arrow_count or wasted_taps < 0 or wasted_taps > moves_used:
 		push_error("record_result: inconsistent result for level %d" % level_id)
@@ -139,10 +157,13 @@ func record_result(level_id: int, arrow_count: int, moves_limit: int, moves_used
 	var clears_before := world_clears(world, tier)
 	var first := not levels.has(level_id)
 	var old_stars := stars_of(level_id)
+	var old_points := points_of(level_id)
+	var points := Economy.level_points(stars, seconds, arrow_count)
 	var earned := 0
 	if first:
 		earned = (Economy.CLEAR_BASE_COINS + Economy.COINS_PER_STAR * stars) * multiplier
-		levels[level_id] = {"stars": stars, "best_moves": moves_used, "best_wasted": wasted_taps}
+		levels[level_id] = {"stars": stars, "best_moves": moves_used, "best_wasted": wasted_taps,
+			"best_points": points, "best_seconds": seconds if seconds >= 0.0 else -1.0}
 	else:
 		var entry: Dictionary = levels[level_id]
 		if stars > old_stars:
@@ -151,6 +172,9 @@ func record_result(level_id: int, arrow_count: int, moves_limit: int, moves_used
 		entry["best_moves"] = mini(entry["best_moves"], moves_used)
 		if entry["best_wasted"] < 0 or wasted_taps < entry["best_wasted"]:
 			entry["best_wasted"] = wasted_taps
+		entry["best_points"] = maxi(entry["best_points"], points)
+		if seconds >= 0.0 and (entry["best_seconds"] < 0.0 or seconds < entry["best_seconds"]):
+			entry["best_seconds"] = seconds
 	var world_bonus := 0
 	if clears_before < Economy.LEVELS_PER_WORLD and world_clears(world, tier) == Economy.LEVELS_PER_WORLD:
 		world_bonus = Economy.WORLD_COMPLETE_BONUS * multiplier
@@ -164,6 +188,9 @@ func record_result(level_id: int, arrow_count: int, moves_limit: int, moves_used
 		"improved": stars > old_stars,
 		"world_bonus": world_bonus,
 		"new_badges": _award_badges(world, tier),
+		"points": points,
+		"best_points": maxi(points, old_points),
+		"new_best": points > old_points,
 	}
 
 
@@ -201,7 +228,7 @@ static func badge_hint(badge: String) -> String:
 
 
 ## Numbers for the stats screen, for one tier:
-## {"cleared", "stars", "perfect", "worlds_complete"}.
+## {"cleared", "stars", "perfect", "worlds_complete", "points"}.
 func stats(tier: int) -> Dictionary:
 	var perfect := 0
 	for id in levels.keys():
@@ -216,6 +243,7 @@ func stats(tier: int) -> Dictionary:
 		"stars": total_stars(tier),
 		"perfect": perfect,
 		"worlds_complete": worlds,
+		"points": total_points(tier),
 	}
 
 
@@ -269,10 +297,14 @@ static func from_dict(data: Dictionary) -> Progress:
 			var stars := int(entry.get("stars", 0))
 			if id < 1 or stars < 1 or stars > Economy.MAX_STARS:
 				continue
+			# Saves from before the score existed get the stars-only score.
+			var floor_points := Economy.POINTS_PER_STAR * stars
 			p.levels[id] = {
 				"stars": stars,
 				"best_moves": maxi(0, int(entry.get("best_moves", 0))),
 				"best_wasted": maxi(-1, int(entry.get("best_wasted", -1))),
+				"best_points": clampi(int(entry.get("best_points", floor_points)), floor_points, Economy.MAX_LEVEL_POINTS),
+				"best_seconds": maxf(-1.0, float(entry.get("best_seconds", -1.0))),
 			}
 	var raw_badges: Variant = data.get("badges")
 	if typeof(raw_badges) == TYPE_ARRAY:
@@ -291,7 +323,7 @@ static func from_dict(data: Dictionary) -> Progress:
 		for key in sent.keys():
 			var tier := int(str(key)) if str(key).is_valid_int() else -1
 			if tier >= 0 and tier < Difficulty.COUNT:
-				p.leaderboard_sent[tier] = clampi(int(sent[key]), 0, Economy.MAX_STARS * 100)
+				p.leaderboard_sent[tier] = clampi(int(sent[key]), 0, Economy.MAX_LEVEL_POINTS * 100)
 	return p
 
 
@@ -304,6 +336,7 @@ static func from_v1(data: Dictionary) -> Progress:
 		for key in raw.keys():
 			var moves := int(raw[key])
 			if str(key).is_valid_int() and int(str(key)) >= 1 and moves > 0:
-				p.levels[int(str(key))] = {"stars": 1, "best_moves": moves, "best_wasted": -1}
+				p.levels[int(str(key))] = {"stars": 1, "best_moves": moves, "best_wasted": -1,
+					"best_points": Economy.POINTS_PER_STAR, "best_seconds": -1.0}
 	p.sound_enabled = bool(data.get("sound_enabled", true))
 	return p

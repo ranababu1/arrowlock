@@ -83,8 +83,7 @@ func time_text() -> String:
 
 
 func _process(delta: float) -> void:
-	if controller.has_clock():
-		advance_time(delta)
+	advance_time(delta)
 
 
 func tap_cell(cell: Vector2i) -> void:
@@ -443,13 +442,19 @@ func _show_overlay(kind: String) -> void:
 func _on_completed(moves: int) -> void:
 	var level: Dictionary = _levels[_index]
 	var result := _progress.record_result(
-		level["id"], level["board"].remaining_count(), level["moves_limit"], moves, controller.wasted_taps)
-	var detail := "%d moves  -  %d wasted" % [moves, controller.wasted_taps]
+		level["id"], level["board"].remaining_count(), level["moves_limit"], moves, controller.wasted_taps,
+		controller.elapsed)
+	var detail := "%d moves  -  %d wasted  -  %s" % [moves, controller.wasted_taps, format_seconds(controller.elapsed)]
 	var stars := 0
 	var coins_earned := 0
 	if not result.is_empty():
 		stars = result["stars"]
 		coins_earned = result["coins_earned"]
+		detail += "\n%d points" % result["points"]
+		if result["new_best"] and not result["first_clear"]:
+			detail += "  -  new best!"
+		elif not result["new_best"]:
+			detail += "  (best %d)" % result["best_points"]
 		detail += "\n+%d coins" % coins_earned
 		if result["world_bonus"] > 0:
 			detail += "  (includes world bonus)"
@@ -489,6 +494,14 @@ func _on_lost(wasted: int) -> void:
 	_sfx("lose")
 	Haptics.buzz(_progress, Haptics.LOSE_MS)
 	_refresh()
+
+
+## "42.3 s" under a minute, "1:05.2" above.
+static func format_seconds(seconds: float) -> String:
+	if seconds < 60.0:
+		return "%.1f s" % seconds
+	var minutes := floori(seconds / 60.0)
+	return "%d:%04.1f" % [minutes, seconds - minutes * 60.0]
 
 
 func _sfx(sound_name: String) -> void:

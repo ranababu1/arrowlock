@@ -113,7 +113,7 @@ func _show_select() -> void:
 	select.level_chosen.connect(_start_level)
 	select.settings_requested.connect(_show_settings)
 	select.trophies_requested.connect(_show_trophies)
-	# Back on the menu after a level: post a new star total if there is one.
+	# Back on the menu after a level: post a new score if there is one.
 	_play_games.sync(_save.progress.difficulty)
 
 
