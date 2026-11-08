@@ -2,6 +2,18 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-08 — New app icon (build 36)
+
+Owner supplied the icon art (navy rounded square, green and white chevrons) for the phone's app list.
+
+### Added
+- `tools/icon_source.png` (owner art, 1254x1254) and `tools/make_icon.py` (Pillow), which writes `assets/icon/`: `icon_512.png` (rounded square, transparent corners; project icon and legacy launcher icon), and Android adaptive icon layers `adaptive_foreground_432.png` (chevrons only, cut out by brightness, sized to stay inside the 66 dp safe circle), `adaptive_background_432.png` (navy gradient) and `adaptive_monochrome_432.png` (Android 13 themed icons). Adaptive layers are needed because launchers crop icons to circles or squircles; the plain square art would show black corners or be cut.
+- `project.godot` `config/icon` → `res://assets/icon/icon_512.png` (was the Godot placeholder `icon.svg`).
+- Export preset (gitignored, set locally and documented in `docs/release.md` §2): all four launcher icon slots point at the files above.
+
+### Checked
+- b36 APK: `mipmap/icon` is an adaptive icon with background, foreground and monochrome layers; the extracted images are the new art. Previewed under circle, rounded-square, squircle and themed masks. Tests: 542 passed, 0 failed. Not seen on a phone's launcher yet.
+
 ## 2026-11-08 — Switching difficulty keeps progress (build 35)
 
 Owner: do not reset progress when a player swaps difficulty. This replaces the 2026-11-05 decision (`level-plan-100.md` §11) that a switch wipes progress.

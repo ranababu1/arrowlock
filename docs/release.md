@@ -33,7 +33,9 @@ Current candidate: version name **0.3.0** (`project.godot` → `application/conf
 | GodotPlayGameServices → game_id | the Game ID from step 1.3 |
 | Keystore → Release | path, alias and password of the upload key (stored in `export_credentials.cfg`, which is gitignored) |
 | Export format | AAB for Play, APK for local testing |
-| Resources → filters | keep `*.json` included (levels, lock file, Play Games config) |
+| Resources → filters | keep `*.json` included (levels, lock file, Play Games config, ads config) |
+| Launcher Icons → Main 192x192 | `res://assets/icon/icon_512.png` |
+| Launcher Icons → Adaptive Foreground / Background / Monochrome 432x432 | `res://assets/icon/adaptive_foreground_432.png`, `adaptive_background_432.png`, `adaptive_monochrome_432.png` (regenerate with `python -I tools/make_icon.py` from `tools/icon_source.png`) |
 
 Check that Project → Project Settings → Plugins shows **GodotPlayGameServices** enabled (it is enabled in `project.godot`).
 
