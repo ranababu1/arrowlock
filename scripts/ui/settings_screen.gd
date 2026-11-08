@@ -1,11 +1,10 @@
 class_name SettingsScreen
 extends Control
 ## Difficulty, music and sound-effect settings, plus credits. Changes apply and
-## save at once, except a difficulty switch, which asks first because it wipes
-## progress.
+## save at once. Switching difficulty keeps progress in both modes.
 
 signal back_requested
-## Fired after progress was reset for the new tier (already saved).
+## Fired after the mode in play changed (already saved).
 signal difficulty_switched(tier: int)
 
 const VERSION_SETTING := "application/config/version"
@@ -18,16 +17,11 @@ var music_volume_bar: VolumeBar
 var sfx_volume_bar: VolumeBar
 ## One button per tier, index = Difficulty constant.
 var difficulty_buttons: Array[Button] = []
-var confirm_button: Button
-var cancel_button: Button
 
 var _progress: Progress
 var _save: SaveService
 var _audio: AudioManager
 var _mode_rules: Label
-var _confirm: Control
-var _confirm_text: Label
-var _pending_tier := -1
 
 
 func setup(progress: Progress, save: SaveService, audio: AudioManager) -> void:
@@ -104,42 +98,15 @@ func _build() -> void:
 		label.theme_type_variation = "Muted"
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		about_text.add_child(label)
-	_build_confirm()
 
 
-## What a tier switch will do, shown before anything is wiped.
-static func warning_text(tier: int) -> String:
-	return "Switching to %s mode erases all your stars, coins and badges. %s mode is locked until you switch back, and switching back erases your %s progress too. This cannot be undone." % [
-		Difficulty.name_of(tier), Difficulty.name_of(1 - tier), Difficulty.name_of(tier)]
-
-
-func confirm_visible() -> bool:
-	return _confirm.visible
-
-
-## Asks to switch to `tier` (what tapping a tier button does).
+## Switches to `tier` at once (what tapping a tier button does). Nothing is
+## lost: each mode keeps its own levels, and coins and badges are shared.
 func request_difficulty(tier: int) -> void:
-	if tier == _progress.difficulty or tier < 0 or tier >= Difficulty.COUNT:
-		return
-	_pending_tier = tier
-	_confirm_text.text = warning_text(tier)
-	_confirm.visible = true
-
-
-func confirm_switch() -> void:
-	if _pending_tier < 0:
-		return
-	var tier := _pending_tier
-	cancel_switch()
 	if _progress.switch_difficulty(tier):
 		_save.save_data()
 		_refresh_difficulty()
 		difficulty_switched.emit(tier)
-
-
-func cancel_switch() -> void:
-	_pending_tier = -1
-	_confirm.visible = false
 
 
 func _difficulty_card() -> Control:
@@ -170,7 +137,7 @@ func _difficulty_card() -> Control:
 	_mode_rules.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(_mode_rules)
 	var note := Label.new()
-	note.text = "You play one mode at a time. Switching erases your progress."
+	note.text = "Switch any time. Each mode keeps its own progress; coins and badges are shared."
 	note.theme_type_variation = "Caption"
 	note.add_theme_color_override("font_color", Palette.GOLD)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -186,58 +153,6 @@ func _refresh_difficulty() -> void:
 		button.theme_type_variation = ("DangerButton" if tier == Difficulty.DIFFICULT else "PrimaryButton") if active else ""
 		button.text = "%s  (playing)" % Difficulty.name_of(tier) if active else Difficulty.name_of(tier)
 	_mode_rules.text = Difficulty.rule_text(_progress.difficulty)
-
-
-func _build_confirm() -> void:
-	_confirm = Control.new()
-	_confirm.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_confirm.mouse_filter = Control.MOUSE_FILTER_STOP
-	_confirm.visible = false
-	add_child(_confirm)
-	var dim := ColorRect.new()
-	dim.color = Color(0.02, 0.03, 0.08, 0.8)
-	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
-	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_confirm.add_child(dim)
-	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_confirm.add_child(center)
-	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(440, 0)
-	center.add_child(panel)
-	var pad := MarginContainer.new()
-	for side in ["left", "right", "top", "bottom"]:
-		pad.add_theme_constant_override("margin_" + side, 20)
-	panel.add_child(pad)
-	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 14)
-	pad.add_child(box)
-	var heading := Label.new()
-	heading.text = "Reset your progress?"
-	heading.theme_type_variation = "Heading"
-	heading.add_theme_font_size_override("font_size", 30)
-	heading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(heading)
-	_confirm_text = Label.new()
-	_confirm_text.theme_type_variation = "Muted"
-	_confirm_text.add_theme_font_size_override("font_size", 18)
-	_confirm_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_confirm_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	box.add_child(_confirm_text)
-	confirm_button = Button.new()
-	confirm_button.text = "Erase progress and switch"
-	confirm_button.theme_type_variation = "DangerButton"
-	confirm_button.custom_minimum_size = Vector2(0, 60)
-	confirm_button.focus_mode = Control.FOCUS_NONE
-	confirm_button.pressed.connect(confirm_switch)
-	box.add_child(confirm_button)
-	cancel_button = Button.new()
-	cancel_button.text = "Keep my progress"
-	cancel_button.theme_type_variation = "PrimaryButton"
-	cancel_button.custom_minimum_size = Vector2(0, 60)
-	cancel_button.focus_mode = Control.FOCUS_NONE
-	cancel_button.pressed.connect(cancel_switch)
-	box.add_child(cancel_button)
 
 
 func _row(parent: Control, glyph: String, color: Color, title: String, caption: String, value: bool, handler: Callable) -> ToggleSwitch:

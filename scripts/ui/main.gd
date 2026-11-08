@@ -132,7 +132,7 @@ func _show_settings() -> void:
 	_swap(settings)
 	settings.setup(_save.progress, _save, _audio)
 	settings.back_requested.connect(_show_select)
-	# Settings has already reset the progress; point the menus at the new pack.
+	# Settings has already switched the mode; point the menus at its pack.
 	settings.difficulty_switched.connect(func(_tier: int) -> void:
 		_select_tier(_save.progress.difficulty)
 		_last_index = -1)

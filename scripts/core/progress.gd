@@ -37,22 +37,20 @@ var haptics_enabled: bool = true
 ## Tier -> the score the online leaderboard last confirmed. Kept across a
 ## tier switch: the leaderboard keeps the best score anyway.
 var leaderboard_sent: Dictionary = {}
-## The one tier the player is playing (a Difficulty constant). Changing it
-## with switch_difficulty() wipes progress, so a save only ever holds one tier.
+## The tier the player is playing now (a Difficulty constant). Progress of both
+## tiers lives side by side (Difficult ids are offset by HARD_ID_BASE).
 var difficulty: int = Difficulty.EASY
 
 
 ## World index (0-based) within the level's own tier.
-## Starts over in `tier`: clears levels, badges and coins (back to the starting
-## amount). Sound, volume and tips settings are kept. Returns false and changes
-## nothing when `tier` is already the current one or is not a tier.
+## Makes `tier` the mode in play. Keeps everything: each tier's levels, the
+## shared coins and badges (owner rule 2026-11-08; before that a switch wiped
+## progress). Returns false and changes nothing when `tier` is already the
+## current one or is not a tier.
 func switch_difficulty(tier: int) -> bool:
 	if tier == difficulty or tier < 0 or tier >= Difficulty.COUNT:
 		return false
 	difficulty = tier
-	levels.clear()
-	badges.clear()
-	coins = Economy.START_COINS
 	return true
 
 

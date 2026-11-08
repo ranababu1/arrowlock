@@ -149,8 +149,7 @@ func _chips() -> Control:
 	return row
 
 
-## The tier being played and its rules. It is changed in Settings, because
-## switching wipes progress.
+## The tier being played and its rules. It is changed in Settings.
 func _mode_line() -> Control:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 2)

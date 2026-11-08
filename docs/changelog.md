@@ -2,6 +2,18 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-08 — Switching difficulty keeps progress (build 35)
+
+Owner: do not reset progress when a player swaps difficulty. This replaces the 2026-11-05 decision (`level-plan-100.md` §11) that a switch wipes progress.
+
+### Changed
+- `Progress.switch_difficulty` only changes the mode in play. Easy and Difficult levels were already stored side by side (Difficult ids are offset by 1000), so nothing else had to change and no save migration is needed.
+- Coins and badges are shared between modes (as they already were within a save). Difficult still pays 2x coins, and those coins can now be spent in Easy.
+- Settings: tapping the other mode switches at once; the "Reset your progress?" dialog is gone. Caption now reads "Switch any time. Each mode keeps its own progress; coins and badges are shared."
+- Leaderboards were already per mode, so nothing changes there.
+- Players who switched on an earlier build already lost that progress; it cannot be restored.
+- Tests rewritten for the new rule: levels, stars, coins, badges and settings survive a switch and a reload, both modes keep their own clears, Difficult stays playable after switching back. 542 passed, 0 failed.
+
 ## 2026-11-08 — Real AdMob ids (build 34)
 
 - Owner created the AdMob app and the interstitial unit. `android_export.cfg`: `is_real=true`, app id `ca-app-pub-1106747567696734~9418380851`. `data/ads.json`: `use_real_ads=true`, unit `ca-app-pub-1106747567696734/1268428091`. Ids are public by design (they ship in every APK).
