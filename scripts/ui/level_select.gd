@@ -5,7 +5,7 @@ extends Control
 
 signal level_chosen(index: int)
 signal settings_requested
-signal trophies_requested
+signal profile_requested
 
 const COLUMNS := 5
 ## Pixels of vertical movement before a press becomes a scroll drag.
@@ -132,9 +132,9 @@ func _header() -> Control:
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(title)
-	var trophies := IconButton.new("star", 52)
-	trophies.pressed.connect(func() -> void: trophies_requested.emit())
-	row.add_child(trophies)
+	var profile := IconButton.new("person", 52)
+	profile.pressed.connect(func() -> void: profile_requested.emit())
+	row.add_child(profile)
 	var gear := IconButton.new("gear", 52)
 	gear.pressed.connect(func() -> void: settings_requested.emit())
 	row.add_child(gear)

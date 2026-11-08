@@ -3,7 +3,7 @@ extends RefCounted
 ## Small vector icons drawn with canvas primitives, so the game needs no icon
 ## font or image files. Call from a CanvasItem's _draw.
 
-const NAMES := ["back", "gear", "coin", "undo", "bulb", "restart", "lock", "note", "speaker", "check", "arrow", "play", "star"]
+const NAMES := ["back", "gear", "coin", "undo", "bulb", "restart", "lock", "note", "speaker", "check", "arrow", "play", "star", "person"]
 
 
 ## Draws `glyph` centred on `center`, fitting a square of edge `size`.
@@ -45,6 +45,9 @@ static func draw(canvas: CanvasItem, glyph: String, center: Vector2, size: float
 				center + Vector2(0.02, 0.34) * size, center + Vector2(-0.22, 0.14) * size]), color)
 			canvas.draw_arc(center + Vector2(0.02, 0) * size, size * 0.2, -0.9, 0.9, 12, color, w, true)
 			canvas.draw_arc(center + Vector2(0.02, 0) * size, size * 0.36, -0.9, 0.9, 14, color, w, true)
+		"person":
+			canvas.draw_circle(center + Vector2(0, -0.16) * size, size * 0.18, color)
+			canvas.draw_arc(center + Vector2(0, 0.42) * size, size * 0.32, PI, TAU, 20, color, w * 1.6, true)
 		"check":
 			canvas.draw_polyline(PackedVector2Array([
 				center + Vector2(-0.3, 0.02) * size, center + Vector2(-0.08, 0.26) * size,

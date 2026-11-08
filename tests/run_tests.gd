@@ -57,7 +57,7 @@ func _initialize() -> void:
 	_test_haptics()
 	_test_leaderboard_sync()
 	_test_play_games_service()
-	_test_trophies_screen()
+	_test_profile_screen()
 	_test_economy_balance()
 	_test_speed_score()
 	_test_ad_policy()
@@ -1545,7 +1545,12 @@ class FakePlayGamesPlugin:
 	extends RefCounted
 	signal userAuthenticated(is_authenticated: bool)
 	signal scoreSubmitted(is_submitted: bool, leaderboard_id: String)
+	signal currentPlayerLoaded(player_json: String)
+	signal imageStored(file_path: String)
 	var calls: Array[String] = []
+
+	func loadCurrentPlayer(force_reload: bool) -> void:
+		calls.append("loadCurrentPlayer:%s" % force_reload)
 
 	func initialize() -> void:
 		calls.append("initialize")
@@ -1606,29 +1611,66 @@ func _test_play_games_service() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_play_games.json"))
 
 
-func _test_trophies_screen() -> void:
-	var save := SaveService.new("user://test_trophies_save.json")
+func _test_profile_screen() -> void:
+	# Local profile: names are cleaned, saved and survive a reload.
+	_check(Progress.clean_name("  Ada 
+	 Lovelace  ") == "Ada Lovelace", "names are trimmed and spaces collapsed")
+	_check(Progress.clean_name("ABCDEFGHIJKLMNOPQRSTUVWXYZ").length() == Progress.NAME_MAX_LENGTH, "names are cut to the maximum length")
+	_check(Progress.new().display_name() == "Player", "an unnamed profile shows Player")
+	var odd := Progress.from_dict({"profile_name": "xy", "profile_avatar": 99})
+	_check(odd.profile_name == "x y" and odd.profile_avatar == Progress.AVATAR_COUNT - 1, "damaged profile fields are cleaned")
+	_check(AvatarView.CHOICES.size() == Progress.AVATAR_COUNT, "there is one avatar design per saved index")
+
+	var path := "user://test_profile_save.json"
+	var save := SaveService.new(path)
 	save.progress.record_result(1, 3, 6, 3, 0)
-	var screen := TrophiesScreen.new()
+	var screen := ProfileScreen.new()
 	root.add_child(screen)
-	screen.setup(save.progress, null, 100)
+	screen.setup(save.progress, null, 100, save)
 	_check(screen.stat_labels["cleared"].text == "1 / 100" and screen.stat_labels["stars"].text == "3 / 300", "the stats show clears and stars for the mode")
 	_check(screen.badge_rows.size() == Progress.BADGES.size(), "every badge is listed")
 	_check(screen.leaderboard_button.disabled, "the leaderboard button is off without Play Games")
+	_check(screen.name_label.text == "Player" and screen.edit_button.visible and not screen.sign_in_button.visible, "offline: local profile, editable, no sign-in offered")
+	screen.edit_button.pressed.emit()
+	_check(screen.editor.visible and not screen.edit_button.visible, "Edit opens the editor")
+	screen.name_edit.text = "  Ada  "
+	screen.avatar_buttons[3].pressed.emit()
+	screen.save_button.pressed.emit()
+	_check(not screen.editor.visible and screen.name_label.text == "Ada" and screen.avatar.choice == 3, "Save shows the new name and avatar")
+	var reloaded := SaveService.new(path)
+	reloaded.load_data()
+	_check(reloaded.progress.profile_name == "Ada" and reloaded.progress.profile_avatar == 3, "the profile is saved")
 	screen.queue_free()
 
+	# Play Games: sign-in offered, then the gamer name and picture replace the local profile.
+	var picture_path := "user://test_gamer_picture.png"
+	var img := Image.create(8, 8, false, Image.FORMAT_RGBA8)
+	img.fill(Color.RED)
 	var plugin := FakePlayGamesPlugin.new()
 	var pg := _play_games_with(plugin, save, ["CgkI_easy", "CgkI_hard"])
-	var online := TrophiesScreen.new()
+	var online := ProfileScreen.new()
 	root.add_child(online)
-	online.setup(save.progress, pg, 100)
-	_check(not online.leaderboard_button.disabled and online.leaderboard_button.text.contains("Sign in"), "signed out, the button offers sign-in")
-	online.leaderboard_button.pressed.emit()
-	_check(plugin.calls.has("signIn"), "pressing it starts the sign-in")
+	online.setup(save.progress, pg, 100, save)
+	_check(online.sign_in_button.visible and online.edit_button.visible, "signed out: sign-in is offered next to the local profile")
+	_check(not online.leaderboard_button.disabled and online.leaderboard_button.text.contains("Sign in"), "signed out, the leaderboard button offers sign-in")
+	online.sign_in_button.pressed.emit()
+	_check(plugin.calls.has("signIn"), "the profile's sign-in button starts the sign-in")
 	plugin.userAuthenticated.emit(true)
-	_check(online.leaderboard_button.text == "Show leaderboard", "after sign-in the button shows the leaderboard")
+	_check(plugin.calls.has("loadCurrentPlayer:false"), "signing in loads the Play Games profile")
+	_check(online.shows_play_games_profile() and not online.edit_button.visible and not online.sign_in_button.visible, "signed in: the Play Games profile replaces the local one")
+	plugin.currentPlayerLoaded.emit(JSON.stringify({"displayName": "ArrowAce", "hasHiResImage": true, "hiResImageUri": picture_path, "iconImageUri": "user://small.png"}))
+	_check(pg.player_name == "ArrowAce" and online.name_label.text == "ArrowAce", "the gamer name is shown")
+	_check(online.leaderboard_caption.text.contains("You appear as ArrowAce"), "the leaderboard card says which name is used")
+	_check(online.avatar.picture == null, "no picture until the download is saved")
+	img.save_png(picture_path)
+	plugin.imageStored.emit("user://someone_else.png")
+	_check(online.avatar.picture == null, "other images are ignored")
+	plugin.imageStored.emit(picture_path)
+	_check(online.avatar.picture != null and pg.player_picture.get_width() == 8, "the Play Games picture is shown once saved")
+	plugin.currentPlayerLoaded.emit("not json")
+	_check(pg.player_name == "ArrowAce", "a broken player record changes nothing")
 	online.leaderboard_button.pressed.emit()
-	_check(plugin.calls.has("show:CgkI_easy"), "pressing it opens this mode's leaderboard")
+	_check(plugin.calls.has("show:CgkI_easy"), "the leaderboard opens for this mode")
 	online.queue_free()
 	pg.queue_free()
 
@@ -1636,14 +1678,15 @@ func _test_trophies_screen() -> void:
 	root.add_child(select)
 	select.setup(_pack_repo(), Progress.new(), 0)
 	var asked := [false]
-	select.trophies_requested.connect(func() -> void: asked[0] = true)
-	var found := _find_icon_button(select, "star")
-	_check(found != null, "the menu has a trophies button")
+	select.profile_requested.connect(func() -> void: asked[0] = true)
+	var found := _find_icon_button(select, "person")
+	_check(found != null, "the menu has a profile button")
 	if found != null:
 		found.pressed.emit()
-	_check(asked[0], "the trophies button opens the trophies screen")
+	_check(asked[0], "the profile button opens the profile screen")
 	select.queue_free()
-	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_play_games.json"))
+	for f in [path, picture_path, "user://test_play_games.json"]:
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(f))
 
 
 func _find_icon_button(node: Node, glyph: String) -> IconButton:

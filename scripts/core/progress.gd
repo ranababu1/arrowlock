@@ -34,6 +34,11 @@ var sfx_volume: float = 1.0
 var tips_enabled: bool = true
 ## Short vibrations on blocked taps, wins and losses (phones only).
 var haptics_enabled: bool = true
+## Local profile, used when the player is not signed in to Play Games. Stays on
+## the phone; never sent anywhere. "" = not set ("Player" is shown).
+var profile_name: String = ""
+## Index into the built-in avatar designs (AvatarView.CHOICES).
+var profile_avatar: int = 0
 ## Tier -> the score the online leaderboard last confirmed. Kept across a
 ## tier switch: the leaderboard keeps the best score anyway.
 var leaderboard_sent: Dictionary = {}
@@ -269,6 +274,8 @@ func to_dict() -> Dictionary:
 		"difficulty": difficulty,
 		"haptics_enabled": haptics_enabled,
 		"leaderboard_sent": _sent_to_dict(),
+		"profile_name": profile_name,
+		"profile_avatar": profile_avatar,
 	}
 
 
@@ -322,7 +329,37 @@ static func from_dict(data: Dictionary) -> Progress:
 			var tier := int(str(key)) if str(key).is_valid_int() else -1
 			if tier >= 0 and tier < Difficulty.COUNT:
 				p.leaderboard_sent[tier] = clampi(int(sent[key]), 0, Economy.MAX_LEVEL_POINTS * 100)
+	p.profile_name = clean_name(str(data.get("profile_name", "")))
+	p.profile_avatar = clampi(int(data.get("profile_avatar", 0)), 0, AVATAR_COUNT - 1)
 	return p
+
+
+## Longest local profile name, in characters.
+const NAME_MAX_LENGTH := 16
+## How many built-in avatar designs there are (AvatarView.CHOICES has this many).
+const AVATAR_COUNT := 8
+
+
+## A safe local profile name: control characters removed, runs of spaces
+## collapsed, trimmed, at most NAME_MAX_LENGTH characters.
+static func clean_name(text: String) -> String:
+	var out := ""
+	var last_space := true
+	for ch in text:
+		var code := ch.unicode_at(0)
+		if code < 32 or code == 127 or ch == " " or ch == "\t":
+			if not last_space:
+				out += " "
+			last_space = true
+		else:
+			out += ch
+			last_space = false
+	return out.strip_edges().left(NAME_MAX_LENGTH).strip_edges()
+
+
+## Name to show for the local profile.
+func display_name() -> String:
+	return profile_name if profile_name != "" else "Player"
 
 
 ## Save v1 stored only {"completed": {id: moves}, "sound_enabled"}. Each

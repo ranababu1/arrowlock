@@ -82,7 +82,7 @@ func _on_node_added(node: Node) -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST or what == NOTIFICATION_WM_CLOSE_REQUEST:
-		if _current is GameScreen or _current is SettingsScreen or _current is TrophiesScreen:
+		if _current is GameScreen or _current is SettingsScreen or _current is ProfileScreen:
 			_show_select()
 		else:
 			get_tree().quit()
@@ -115,16 +115,16 @@ func _show_select() -> void:
 	select.setup(_repo, _save.progress, _last_index if _last_index >= 0 else _first_uncleared_index())
 	select.level_chosen.connect(_start_level)
 	select.settings_requested.connect(_show_settings)
-	select.trophies_requested.connect(_show_trophies)
+	select.profile_requested.connect(_show_profile)
 	# Back on the menu after a level: post a new score if there is one.
 	_play_games.sync(_save.progress.difficulty)
 
 
-func _show_trophies() -> void:
-	var trophies := TrophiesScreen.new()
-	_swap(trophies)
-	trophies.setup(_save.progress, _play_games, _repo.levels.size())
-	trophies.back_requested.connect(_show_select)
+func _show_profile() -> void:
+	var profile := ProfileScreen.new()
+	_swap(profile)
+	profile.setup(_save.progress, _play_games, _repo.levels.size(), _save)
+	profile.back_requested.connect(_show_select)
 
 
 func _show_settings() -> void:

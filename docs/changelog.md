@@ -2,6 +2,22 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-08 — Profile screen with Play Games name and picture (build 37)
+
+Owner: players should see a profile with their badges, leaderboard name and picture; take what Google allows from the Play account, otherwise let players enter their own details.
+
+### Added
+- **Profile screen** replaces the Trophies screen (`profile_screen.gd`, renamed from `trophies_screen.gd`); the menu's star button is now a person button.
+- **Signed in to Play Games:** the card shows the Play Games gamer name and profile picture (`PlayGames.player_name`, `player_picture`). The name is the one other players see on the leaderboard; the leaderboard card says "You appear as <name>". Loaded with the plugin's `loadCurrentPlayer`; the plugin downloads the picture through Google's ImageManager into the app's private files and reports it with `imageStored`. This is Play Games' public gamer profile, not the Google account: no email, no real name, no extra permission. Read-only in the game (Google does not let apps change it).
+- **Not signed in:** a local nickname (max 16 characters, cleaned of control characters) and one of 8 built-in avatars (`avatar_view.gd`), saved on the phone only and never sent anywhere. No photo upload: it would need storage access and raises privacy and moderation issues for a public leaderboard. A "Sign in with Play Games" button shows when Play Games is configured in the build.
+- Save gains `profile_name` and `profile_avatar` (save stays v2; older saves get "Player" and the first avatar).
+- New `person` glyph.
+- Tests: name cleaning, damaged fields, save round-trip, editor flow, sign-in from the profile, gamer name and caption, picture shown only after the right `imageStored`, broken player record ignored, menu button. 559 passed, 0 failed.
+
+### Known
+- Play Games part not run on a device and inert until the Play Console setup is done (Game ID and leaderboard ids, `docs/release.md` §1).
+- Play Games v2 has no in-game sign-out; players manage it in the Play Games app.
+
 ## 2026-11-08 — New app icon (build 36)
 
 Owner supplied the icon art (navy rounded square, green and white chevrons) for the phone's app list.

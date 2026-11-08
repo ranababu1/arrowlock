@@ -58,7 +58,7 @@ Do these on a real phone with the release APK. Write the result of each line in 
 - [ ] Win a level, close the app from the recent-apps list, reopen: stars and coins kept.
 - [ ] Press Home in the middle of a level and come back: the level is still there (Difficult: check the clock did not run out while away).
 - [ ] Android back: from a level goes to the menu; from the menu closes the app.
-- [ ] Trophies screen: stats right; "Sign in with Play Games" signs in; after a cleared level, the score (Trophies → Score) appears on the leaderboard (can take a few minutes).
+- [ ] Profile screen (person button): stats right; "Sign in with Play Games" signs in; your Play Games name and picture replace the local profile; after a cleared level, the score (Profile → Score) appears on the leaderboard (can take a few minutes).
 - [ ] Turn on airplane mode, clear a level, go back online and reopen: the new total is posted then.
 - [ ] Notch/cutout phone: nothing hidden under the camera or the gesture bar.
 - [ ] **Upgrade test:** install the previous build, clear 2 levels, then install the new one over it without uninstalling. Progress must still be there. (The automated tests cover the save format; this checks the real install path.)
