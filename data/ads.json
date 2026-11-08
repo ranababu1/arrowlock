@@ -1,0 +1,8 @@
+{
+	"_comment": "Interstitial ads after a game ends (docs/release.md 'Ads (AdMob)'). use_real_ads=false shows Google's test ads; it must match is_real in addons/AdmobPlugin/android_export.cfg. Unit id from AdMob > Apps > Ad units. Not secret.",
+	"enabled": true,
+	"use_real_ads": false,
+	"interstitial_unit_id": "",
+	"first_level": 11,
+	"min_seconds_between": 60
+}

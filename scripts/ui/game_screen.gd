@@ -23,6 +23,7 @@ var _index: int
 var _progress: Progress
 var _save: SaveService
 var _audio: AudioManager  ## optional; null in tests that do not need sound
+var _ads: Ads  ## optional; null in tests and anywhere without ads
 
 var _title: Label
 var _world_caption: Label
@@ -50,8 +51,9 @@ var _overlay_kind := ""
 
 
 ## Call after adding to the tree.
-func setup(levels: Array[Dictionary], index: int, progress: Progress, save: SaveService, audio: AudioManager = null) -> void:
+func setup(levels: Array[Dictionary], index: int, progress: Progress, save: SaveService, audio: AudioManager = null, ads: Ads = null) -> void:
 	_audio = audio
+	_ads = ads
 	_levels = levels
 	_index = index
 	_progress = progress
@@ -466,9 +468,9 @@ func _on_completed(moves: int) -> void:
 	_overlay_stars.visible = true
 	_overlay_stars.animate_to(stars, STAR_START_DELAY, STAR_STEP)
 	_overlay_detail.text = detail
-	_set_button(_overlay_primary, "Next" if _next_index() != -1 else "Menu", press_next, true)
-	_set_button(_overlay_extra, "Replay", restart)
-	_set_button(_overlay_secondary, "Menu", func() -> void: menu_requested.emit())
+	_set_button(_overlay_primary, "Next" if _next_index() != -1 else "Menu", _after_ad(press_next), true)
+	_set_button(_overlay_extra, "Replay", _after_ad(restart))
+	_set_button(_overlay_secondary, "Menu", _after_ad(func() -> void: menu_requested.emit()))
 	_show_overlay("won")
 	_confetti.burst()
 	Haptics.buzz(_progress, Haptics.WIN_MS)
@@ -484,16 +486,27 @@ func _on_lost(wasted: int) -> void:
 	if timed_out:
 		_overlay_detail.text = "No tap for %d seconds
 " % roundi(controller.countdown) + _overlay_detail.text
-	_set_button(_overlay_primary, "Retry", restart, true)
+	_set_button(_overlay_primary, "Retry", _after_ad(restart), true)
 	var can_continue := controller.extra_moves_granted == 0 and not timed_out
 	_set_button(_overlay_extra, "+%d moves  (%d coins)" % [Economy.EXTRA_MOVES, Economy.PRICE_EXTRA_MOVES], use_extra_moves)
 	_overlay_extra.visible = can_continue
 	_overlay_extra.disabled = not _progress.can_afford(Economy.PRICE_EXTRA_MOVES)
-	_set_button(_overlay_secondary, "Menu", func() -> void: menu_requested.emit())
+	_set_button(_overlay_secondary, "Menu", _after_ad(func() -> void: menu_requested.emit()))
 	_show_overlay("lost")
 	_sfx("lose")
 	Haptics.buzz(_progress, Haptics.LOSE_MS)
 	_refresh()
+
+
+## Wraps an end-of-game panel button so leaving the panel first shows an
+## interstitial when one is due (AdPolicy). "+3 moves" is not wrapped: it
+## continues the same game.
+func _after_ad(action: Callable) -> Callable:
+	return func() -> void:
+		if _ads == null:
+			action.call()
+		else:
+			_ads.show_after_game(_levels[_index]["id"], action)
 
 
 ## "42.3 s" under a minute, "1:05.2" above.

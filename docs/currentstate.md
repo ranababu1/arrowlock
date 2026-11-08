@@ -18,6 +18,7 @@
 | Trophies screen | Implemented: stats for the current mode, all 7 badges (earned, or how to earn), leaderboard button. Opened from the star button on the menu |
 | Vibration | Implemented: short buzz on a blocked tap, win and loss; Settings toggle. Needs the Vibrate permission in the export preset. Not felt on a device yet |
 | Online leaderboard (Play Games) | Code implemented and tested with a fake plugin: optional sign-in, two boards (score per mode: each level's best clear, 100 per star plus a speed bonus, summed), scores sent only from the saved state and retried after failures. Plugin `addons/GodotPlayGameServices` v3.4.0 (MIT) added. **Not working yet**: needs the owner's Play Console setup, leaderboard ids in `data/play_games.json`, the Game ID and a Gradle build (see `docs/release.md`). Never run on a device |
+| Ads (AdMob interstitial) | Implemented and tested with a fake plugin (owner request 2026-11-08): an interstitial when the player leaves the win/game-over panel (Next, Retry, Replay, Menu) on level 11+ in either tier, at most once per 60 s; "+3 moves" never shows one. Consent form (UMP) first, then SDK init and preload. Plugin `addons/AdmobPlugin` v7.0 (MIT). Signed APK b33 builds and carries the AdMob app id. **Uses Google's test ads**: the real App ID and unit id are not set yet (`docs/release.md` §6a). Never run on a device |
 | Audio | Implemented; not yet listened to by the owner (deferred by the owner; nothing waits on it) |
 | Settings | Difficulty, music, effects, tutorial tips, vibration, two volume sliders |
 | Tutorial | Levels 1 to 3; still matches the new level 1 (tests check it); not user-tested |
@@ -27,7 +28,7 @@
 
 ## Architecture
 - `scripts/core/` — pure logic: `board_state.gd`, `move_validator.gd`, `puzzle_solver.gd`, `game_controller.gd`, `economy.gd`, `progress.gd`, `difficulty.gd`, `tutorial.gd`, `board_canon.gd`, `level_metrics.gd`, `level_generator.gd`, `level_validator.gd`, `level_fingerprint.gd`, `leaderboard_sync.gd`.
-- `scripts/services/` — `puzzle_repository.gd`, `save_service.gd`, `audio_manager.gd`, `haptics.gd`, `play_games.gd` (talks to the plugin's Android singleton; a no-op elsewhere).
+- `scripts/services/` — `puzzle_repository.gd`, `save_service.gd`, `audio_manager.gd`, `haptics.gd`, `play_games.gd` (talks to the plugin's Android singleton; a no-op elsewhere), `ads.gd` (consent, preload and showing of interstitials through the AdmobPlugin's Admob node; a no-op elsewhere). `scripts/core/ad_policy.gd` decides which game ends earn an ad. `data/ads.json` holds the ad settings; `addons/AdmobPlugin/android_export.cfg` holds the manifest app id.
 - `scripts/ui/` — `main.gd` (router), `level_select.gd`, `settings_screen.gd`, `trophies_screen.gd`, `game_screen.gd`, `board_view.gd` and the design-system widgets.
 - `data/packs/`, `data/packs_hard/` (levels), `data/levels.lock.json` (frozen fingerprints), `data/play_games.json` (leaderboard ids, empty for now), `data/levels.json` (4 levels, tests only).
 - `addons/GodotPlayGameServices/` — third-party plugin, enabled in `project.godot`. Its autoload is not used by this game's code.
@@ -39,7 +40,8 @@ Godot 4.7.2 stable. `config/features` says 4.3; the project runs on 4.7.2.
 
 ## Build/test status
 Verified 2026-11-05 in a Linux container with the official Godot 4.7.2 build:
-- `godot --headless --path . -s tests/run_tests.gd` → **503 passed, 0 failed (2026-11-07, Windows, Godot 4.7.2)**.
+- `godot --headless --path . -s tests/run_tests.gd` → **544 passed, 0 failed (2026-11-08, Windows, Godot 4.7.2)**.
+- `tools/build_android.sh --bump` → signed `arrowlock-0.3.0-b33-arm64-v8a.apk`, 90.8 MB (was 80.6 MB; the ads SDK adds about 10 MB). Its manifest has the AdMob app id (Google's sample) and the AD_ID permissions (2026-11-08, Windows). Not installed on a device.
 - `godot --headless --path . -s tools/generate_levels.gd` (and `-- --hard`) → 100 levels each, 0 variants, 0 failures.
 - `godot --headless --path . --quit-after 120` → starts with no script errors.
 - Not done here: Android export, emulator or device runs (no Android SDK in that container). The plugin's editor code was not run there either.
@@ -54,6 +56,7 @@ Verified 2026-11-05 in a Linux container with the official Godot 4.7.2 build:
 - Levels are frozen: changing a released level breaks the tests on purpose. Add new levels only after level 100.
 
 ## Next steps
+0. Owner: AdMob app, interstitial unit and GDPR message; then set the ids (`docs/release.md` §6a). Install b33 and check that a test ad appears after a game on level 11.
 1. Owner: Play Console app, Play Games project, two leaderboards, OAuth client; put the leaderboard ids in `data/play_games.json` (`docs/release.md` §1).
 2. Owner: export preset with Gradle build, Vibrate permission, Game ID and signing; export the release candidate (`docs/release.md` §2–3).
 3. Owner: device checks and the upgrade test on a physical phone, then the internal test track (`docs/release.md` §4–5).

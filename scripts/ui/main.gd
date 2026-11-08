@@ -16,6 +16,7 @@ var _last_index := -1
 var _audio := AudioManager.new()
 var _backdrop: Backdrop
 var _play_games := PlayGames.new()
+var _ads := Ads.new()
 
 
 func _ready() -> void:
@@ -30,6 +31,8 @@ func _ready() -> void:
 	_audio.start_music()
 	add_child(_play_games)
 	_play_games.start(_save.progress, _save)
+	add_child(_ads)
+	_ads.start()
 	# Every button, present and future, gets the click sound.
 	get_tree().node_added.connect(_on_node_added)
 	_host = MarginContainer.new()
@@ -147,6 +150,6 @@ func _start_level(index: int) -> void:
 	_last_index = index
 	var screen := GameScreen.new()
 	_swap(screen)
-	screen.setup(_repo.levels, index, _save.progress, _save, _audio)
+	screen.setup(_repo.levels, index, _save.progress, _save, _audio, _ads)
 	screen.menu_requested.connect(_show_select)
 	screen.next_requested.connect(_start_level)

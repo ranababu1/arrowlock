@@ -60,6 +60,9 @@ func _initialize() -> void:
 	_test_trophies_screen()
 	_test_economy_balance()
 	_test_speed_score()
+	_test_ad_policy()
+	_test_ads_service()
+	_test_ads_after_game()
 	print("Tests: %d passed, %d failed" % [_passed, _failed])
 	quit(1 if _failed > 0 else 0)
 
@@ -1735,3 +1738,220 @@ func _test_speed_score() -> void:
 	_check(c.elapsed == 0.0, "restart resets the time")
 	_check(GameScreen.format_seconds(42.25) == "42.2 s" or GameScreen.format_seconds(42.25) == "42.3 s", "seconds format")
 	_check(GameScreen.format_seconds(65.2) == "1:05.2", "minutes format")
+
+
+func _test_ad_policy() -> void:
+	var p := AdPolicy.new()
+	_check(not p.should_show(1, 0.0) and not p.should_show(10, 0.0), "levels 1-10 never show ads")
+	_check(p.should_show(11, 0.0) and p.should_show(100, 0.0), "level 11 and up show an ad")
+	_check(not p.should_show(Difficulty.make_id(Difficulty.DIFFICULT, 10), 0.0), "Difficult 1-10 never show ads")
+	_check(p.should_show(Difficulty.make_id(Difficulty.DIFFICULT, 11), 0.0), "Difficult 11 and up show an ad")
+	p.mark_shown(100.0)
+	_check(not p.should_show(11, 159.0), "no second ad within 60 seconds")
+	_check(p.should_show(11, 160.0), "an ad again once 60 seconds have passed")
+
+	var tuned := AdPolicy.from_config({"first_level": 5, "min_seconds_between": 0})
+	_check(tuned.first_level == 5 and tuned.min_seconds_between == 0.0 and tuned.should_show(5, 0.0), "config sets the first level and the gap")
+	var odd := AdPolicy.from_config({"first_level": -3, "min_seconds_between": "soon"})
+	_check(odd.first_level == AdPolicy.DEFAULT_FIRST_LEVEL and odd.min_seconds_between == AdPolicy.DEFAULT_MIN_SECONDS_BETWEEN, "bad config values fall back to the defaults")
+	_check(not AdPolicy.from_config({"enabled": false}).should_show(50, 0.0), "enabled=false switches ads off")
+
+	# Shipped config: owner rule, and the manifest app id switch agrees with the runtime switch.
+	var shipped := Ads.load_config(Ads.CONFIG_PATH)
+	var shipped_policy := AdPolicy.from_config(shipped)
+	_check(shipped_policy.first_level == 11 and shipped_policy.min_seconds_between == 60.0, "shipped ads start at level 11 with a 60 second gap")
+	var export_cfg := ConfigFile.new()
+	_check(export_cfg.load("res://addons/AdmobPlugin/android_export.cfg") == OK, "the AdMob export config exists")
+	var is_real: bool = export_cfg.get_value("General", "is_real", false)
+	_check(is_real == bool(shipped.get("use_real_ads", false)), "android_export.cfg is_real matches ads.json use_real_ads")
+	if is_real:
+		_check(str(export_cfg.get_value("Release", "app_id", "")).begins_with("ca-app-pub-") and str(shipped.get("interstitial_unit_id", "")).begins_with("ca-app-pub-"), "real ads need the AdMob app id and the unit id")
+
+
+## Stands in for the Admob node: same signals and methods, records calls.
+class FakeAdmob:
+	extends Node
+	signal consent_info_updated
+	signal consent_info_update_failed(error: Variant)
+	signal consent_form_loaded
+	signal consent_form_failed_to_load(error: Variant)
+	signal consent_form_dismissed(error: Variant)
+	signal initialization_completed(status: Variant)
+	signal interstitial_ad_loaded(ad: Variant, info: Variant)
+	signal interstitial_ad_failed_to_load(ad: Variant, error: Variant)
+	signal interstitial_ad_dismissed_full_screen_content(ad: Variant)
+	signal interstitial_ad_failed_to_show_full_screen_content(ad: Variant, error: Variant)
+	var calls: Array[String] = []
+	var consent := "NOT_REQUIRED"
+	var form_available := true
+	var ad_loaded := false
+
+	func update_consent_info() -> void:
+		calls.append("update_consent_info")
+
+	func get_consent_status() -> UserConsent:
+		return UserConsent.new(consent)
+
+	func is_consent_form_available() -> bool:
+		return form_available
+
+	func load_consent_form() -> void:
+		calls.append("load_consent_form")
+
+	func show_consent_form() -> void:
+		calls.append("show_consent_form")
+
+	func initialize() -> void:
+		calls.append("initialize")
+
+	func load_interstitial_ad() -> void:
+		calls.append("load")
+
+	func is_interstitial_ad_loaded() -> bool:
+		return ad_loaded
+
+	func show_interstitial_ad() -> void:
+		calls.append("show")
+		ad_loaded = false
+
+
+func _ads_with(fake: FakeAdmob, config: Dictionary) -> Ads:
+	var path := "user://test_ads.json"
+	_write_text(path, JSON.stringify(config))
+	var ads := Ads.new()
+	root.add_child(ads)
+	ads.add_child(fake)
+	ads.start(fake, path)
+	return ads
+
+
+func _test_ads_service() -> void:
+	var offline := Ads.new()
+	root.add_child(offline)
+	offline.start(null, "user://no_such_ads.json")
+	var ran := [0]
+	_check(not offline.show_after_game(50, func() -> void: ran[0] += 1) and ran[0] == 1, "without the plugin the game just carries on")
+	offline.queue_free()
+
+	# Outside the EEA: no form, straight to init and a preload.
+	var fake := FakeAdmob.new()
+	var ads := _ads_with(fake, {"first_level": 11, "min_seconds_between": 60})
+	var now := [1000.0]
+	ads.clock = func() -> float: return now[0]
+	_check(fake.calls == ["update_consent_info"], "consent is checked before anything else")
+	_check(not ads.show_after_game(50, func() -> void: ran[0] += 1) and ran[0] == 2, "before init the game carries on without an ad")
+	fake.consent_info_updated.emit()
+	_check(fake.calls.has("initialize") and not fake.calls.has("load_consent_form"), "no form when consent is not required")
+	fake.initialization_completed.emit(null)
+	_check(ads.is_active() and fake.calls.count("load") == 1, "an interstitial is preloaded after init")
+	fake.ad_loaded = true
+	fake.interstitial_ad_loaded.emit(null, null)
+
+	_check(not ads.show_after_game(10, func() -> void: ran[0] += 1) and ran[0] == 3, "level 10 goes on without an ad")
+	var after := [0]
+	_check(ads.show_after_game(11, func() -> void: after[0] += 1) and fake.calls.has("show"), "level 11 shows the ad")
+	_check(after[0] == 0, "the game waits while the ad is up")
+	fake.interstitial_ad_dismissed_full_screen_content.emit(null)
+	_check(after[0] == 1 and fake.calls.count("load") == 2, "closing the ad carries on and preloads the next one")
+	fake.ad_loaded = true
+	now[0] += 30.0
+	_check(not ads.show_after_game(12, func() -> void: after[0] += 1) and after[0] == 2, "a quick retry within 60 seconds has no ad")
+	now[0] += 30.0
+	_check(ads.show_after_game(12, func() -> void: after[0] += 1) and after[0] == 2, "60 seconds later the next game shows an ad")
+	fake.interstitial_ad_failed_to_show_full_screen_content.emit(null, null)
+	_check(after[0] == 3, "an ad that fails to show still lets the game go on")
+	fake.ad_loaded = false
+	now[0] += 100.0
+	_check(not ads.show_after_game(12, func() -> void: after[0] += 1) and after[0] == 4, "no ad ready: no wait")
+	fake.interstitial_ad_failed_to_load.emit(null, null)
+	_check(ads._retry_seconds == Ads.RETRY_FIRST_SECONDS * 2.0, "a failed load backs off before retrying")
+	ads.queue_free()
+
+	# EEA: the form is shown, and ads start only after an answer.
+	var eu := FakeAdmob.new()
+	eu.consent = "REQUIRED"
+	var eu_ads := _ads_with(eu, {})
+	eu.consent_info_updated.emit()
+	_check(eu.calls.has("load_consent_form") and not eu.calls.has("initialize"), "consent required: the form loads first")
+	eu.consent_form_loaded.emit()
+	_check(eu.calls.has("show_consent_form"), "the loaded form is shown")
+	eu.consent = "OBTAINED"
+	eu.consent_form_dismissed.emit(null)
+	_check(eu.calls.has("initialize"), "after the answer the SDK starts")
+	eu_ads.queue_free()
+
+	# Consent check offline with no earlier answer: no ads this session.
+	var cut := FakeAdmob.new()
+	cut.consent = "UNKNOWN"
+	var cut_ads := _ads_with(cut, {})
+	cut.consent_info_update_failed.emit(null)
+	_check(not cut.calls.has("initialize"), "no consent answer, no ads")
+	cut_ads.queue_free()
+
+	# enabled=false: the plugin is never touched.
+	var off := FakeAdmob.new()
+	var off_ads := _ads_with(off, {"enabled": false})
+	_check(off.calls.is_empty(), "enabled=false never touches the plugin")
+	off_ads.queue_free()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_ads.json"))
+
+
+func _test_ads_after_game() -> void:
+	var repo := _pack_repo()
+	var save := SaveService.new("user://test_ads_game_save.json")
+	var fake := FakeAdmob.new()
+	var ads := _ads_with(fake, {"first_level": 11, "min_seconds_between": 0})
+	fake.consent_info_updated.emit()
+	fake.initialization_completed.emit(null)
+	fake.ad_loaded = true
+
+	var screen := GameScreen.new()
+	root.add_child(screen)
+	screen.setup(repo.levels, 10, Progress.new(), save, null, ads)
+	var board: BoardState = repo.levels[10]["board"]
+	for id in PuzzleSolver.solve(board):
+		screen.tap_cell(board.arrow_position(id))
+	_check(screen.overlay_kind() == "won", "level 11 can be won")
+	_check(not fake.calls.has("show"), "no ad pops up over the win panel")
+	var menus := [0]
+	screen.menu_requested.connect(func() -> void: menus[0] += 1)
+	screen._overlay_secondary.pressed.emit()
+	_check(fake.calls.has("show") and menus[0] == 0, "leaving the win panel shows the ad first")
+	fake.interstitial_ad_dismissed_full_screen_content.emit(null)
+	_check(menus[0] == 1, "after the ad the menu opens")
+
+	# Replay waits for its ad, then restarts.
+	fake.ad_loaded = true
+	screen._overlay_extra.pressed.emit()
+	_check(screen.overlay_kind() == "won", "Replay waits while its ad is up")
+	fake.interstitial_ad_dismissed_full_screen_content.emit(null)
+	_check(screen.overlay_kind() == "" and screen.controller.moves_used == 0, "Replay restarts after its ad")
+
+	# Lost: +3 moves continues the same game and never shows an ad.
+	fake.ad_loaded = true
+	var shows := fake.calls.count("show")
+	var blocked := _blocked_cell(screen.controller)
+	for _i in screen.controller.moves_limit:
+		screen.tap_cell(blocked)
+	_check(screen.overlay_kind() == "lost", "level 11 can be lost")
+	screen._progress.coins = 1000
+	screen._overlay_extra.disabled = false
+	screen._overlay_extra.pressed.emit()
+	_check(fake.calls.count("show") == shows and screen.overlay_kind() == "", "+3 moves never shows an ad")
+	screen.queue_free()
+
+	# Level 1: no ad at all.
+	var early := GameScreen.new()
+	root.add_child(early)
+	early.setup(repo.levels, 0, Progress.new(), save, null, ads)
+	var b0: BoardState = repo.levels[0]["board"]
+	for id in PuzzleSolver.solve(b0):
+		early.tap_cell(b0.arrow_position(id))
+	var nexts := [0]
+	early.next_requested.connect(func(_i: int) -> void: nexts[0] += 1)
+	early._overlay_primary.pressed.emit()
+	_check(nexts[0] == 1 and fake.calls.count("show") == shows, "level 1 goes straight to the next level")
+	early.queue_free()
+	ads.queue_free()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_ads_game_save.json"))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_ads.json"))

@@ -71,13 +71,32 @@ Do these on a real phone with the release APK. Write the result of each line in 
 
 - [ ] App name, short and full description, icon 512x512, feature graphic 1024x500, at least 2 phone screenshots.
 - [ ] Category: Puzzle. Contact email.
-- [ ] Privacy policy URL. It must mention: Google Play Games sign-in (optional), the player ID and score sent to Google's leaderboard, everything else stays on the device, no ads, no analytics.
-- [ ] Data safety form: the only data leaving the phone is the Play Games player ID and the score, sent to Google only for players who sign in. Declare it as optional, used for app functionality, not shared and not sold, encrypted in transit. Nothing else is collected (no crash reports, no analytics). Check the exact categories against Google's form, since its wording changes.
-- [ ] Ads declaration: no ads.
+- [ ] Privacy policy URL. It must mention: Google Play Games sign-in (optional), the player ID and score sent to Google's leaderboard, **ads served by Google AdMob, which collects the advertising ID, device and usage data (Google's policy: https://policies.google.com/technologies/partner-sites)**, no analytics. AdMob also requires the policy URL.
+- [ ] Data safety form: Play Games player ID and score (optional, app functionality). **AdMob: Device or other IDs (advertising ID), App interactions, Diagnostics, Approximate location (from IP); collected and shared with Google for advertising; encrypted in transit.** Check Google's own AdMob Data-safety guidance, since the form's wording changes.
+- [ ] Ads declaration: **Yes, the app contains ads.**
+- [ ] Advertising ID declaration (App content → Advertising ID): **Yes, used for advertising.** The ads SDK adds the `AD_ID` permission to the manifest.
 - [ ] Content rating questionnaire: no violence, no user content, no purchases → expected Everyone / PEGI 3.
 - [ ] Target audience: not designed for children under 13 unless you want the Families policy (it adds requirements).
 - [ ] Target SDK meets the current Play requirement (Godot 4.7 export default; confirm in Play Console's warnings).
 - [ ] No production release without your explicit approval (`instructions.md` §7).
+
+## 6a. Ads (AdMob) (Owner)
+
+The game shows an interstitial when the player leaves the win or game-over panel (Next, Retry, Replay or Menu) on level 11 or higher in either tier, at most once every 60 seconds. "+3 moves" never shows an ad. Settings are in `data/ads.json` (`first_level`, `min_seconds_between`, `enabled`). Plugin: `addons/AdmobPlugin` v7.0 (MIT, Google Mobile Ads 24.9.0).
+
+Builds use **Google's test ads** until you switch them over. Never tap your own real ads; AdMob bans accounts for it.
+
+1. https://admob.google.com → Apps → Add app → Android → "Is the app listed on a store?" No for now (link it after the Play listing exists). Name: Arrowlock.
+2. Copy the **App ID** (`ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY`).
+3. Ad units → Add ad unit → **Interstitial** → name "After game". Copy the **unit id** (`ca-app-pub-XXXXXXXXXXXXXXXX/ZZZZZZZZZZ`).
+4. Privacy & messaging → GDPR → create a message for Arrowlock and publish it (needs the privacy policy URL). Without it, players in the EEA/UK get no consent form and **no ads**.
+5. In the repo, all three must change together (a test fails if the two switches differ):
+   - `addons/AdmobPlugin/android_export.cfg`: `is_real=true`, `[Release] app_id="<App ID>"`.
+   - `data/ads.json`: `"use_real_ads": true`, `"interstitial_unit_id": "<unit id>"`.
+6. Build, install, play to level 11 and finish a game. New ad units can take a few hours to serve; until then nothing shows (the game just carries on).
+7. app-ads.txt: AdMob asks for one on the developer website listed on Play. Optional, but it improves fill.
+
+For your own phones, keep internal builds on test ads (`use_real_ads=false` and `is_real=false`) and switch to real ids only for the Play upload. Alternatively, register your phones as test devices in AdMob → Settings → Test devices.
 
 ## 7. After release: levels are frozen
 

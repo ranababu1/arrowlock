@@ -2,6 +2,26 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-08 — Interstitial ads after level 10 (build 33)
+
+Owner: show ads after level 10, after every game. Owner choices: levels 11+ in both tiers, at most one ad per 60 seconds, wins and losses both. This approves the ads SDK that `instructions.md` §2 and §4 require approval for.
+
+### Added
+- **AdMob interstitials.** Shown when the player leaves an end-of-game panel (Next, Retry, Replay, Menu), not when the panel opens: AdMob forbids interstitials that appear over content the player is looking at, and the result and stars stay visible. "+3 moves" continues the same game, so it never shows an ad. If no ad is loaded, the game carries on at once (it never waits on the network).
+- `scripts/core/ad_policy.gd` (which games earn an ad), `scripts/services/ads.gd` (consent → init → preload → show → preload the next; failed loads retry after 30 s, doubling to 5 min). Settings in `data/ads.json`.
+- **Consent (UMP)** runs at launch before the SDK starts: the form appears for players who need it (EEA/UK). Without an answer (for example offline on first launch), no ads are requested that session.
+- Dependency: `addons/AdmobPlugin` v7.0 + `addons/GMPShared` (MIT, github.com/godot-sdk-integrations/godot-admob, released 2026-05-27; pulls `play-services-ads:24.9.0` through Gradle). Chosen because it is maintained, MIT, supports Godot 4.4+ and includes UMP consent. Alternatives (Poing Studios, mircea35) are older or unmaintained.
+- Tests: policy rules, shipped config, the two real/test switches agree, the consent paths, show/close/failed-to-show, backoff, and the game screen (no ad over the panel, ad before the menu, Replay waits, +3 moves never, level 1 never). 544 passed, 0 failed.
+
+### Changed
+- APK is about 10 MB bigger (80.6 → 90.8 MB, arm64). The manifest gains `AD_ID` and the ad-services permissions from the SDK.
+- `docs/release.md`: new §6a (AdMob setup); privacy policy, Data safety and ads declarations now say the app has ads.
+
+### Known
+- Builds show **Google's test ads** until the owner creates the AdMob app and unit and sets the ids (`docs/release.md` §6a).
+- Not run on a device: consent form, ad display and the return to the game are verified only with a fake plugin.
+- Music may keep playing behind the ad, depending on how Godot pauses on Android; check on a phone.
+
 ## 2026-11-07 — 0.3.0 (build 32): speed score for the leaderboard, logo splash screen
 
 Owner: the game is fairly easy, so a star leaderboard (max 300) would fill up with ties; give more points for faster solves.
