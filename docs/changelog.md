@@ -2,6 +2,12 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-08 — Real AdMob ids (build 34)
+
+- Owner created the AdMob app and the interstitial unit. `android_export.cfg`: `is_real=true`, app id `ca-app-pub-1106747567696734~9418380851`. `data/ads.json`: `use_real_ads=true`, unit `ca-app-pub-1106747567696734/1268428091`. Ids are public by design (they ship in every APK).
+- b34 manifest checked: carries the real app id. Tests: 545 passed, 0 failed (the real-ids check now runs). Not run on a device.
+- Builds from now on serve real ads, including on the owner's phones: register them as AdMob test devices so own impressions/taps are not counted as invalid traffic.
+
 ## 2026-11-08 — Interstitial ads after level 10 (build 33)
 
 Owner: show ads after level 10, after every game. Owner choices: levels 11+ in both tiers, at most one ad per 60 seconds, wins and losses both. This approves the ads SDK that `instructions.md` §2 and §4 require approval for.

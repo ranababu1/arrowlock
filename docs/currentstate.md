@@ -18,7 +18,7 @@
 | Trophies screen | Implemented: stats for the current mode, all 7 badges (earned, or how to earn), leaderboard button. Opened from the star button on the menu |
 | Vibration | Implemented: short buzz on a blocked tap, win and loss; Settings toggle. Needs the Vibrate permission in the export preset. Not felt on a device yet |
 | Online leaderboard (Play Games) | Code implemented and tested with a fake plugin: optional sign-in, two boards (score per mode: each level's best clear, 100 per star plus a speed bonus, summed), scores sent only from the saved state and retried after failures. Plugin `addons/GodotPlayGameServices` v3.4.0 (MIT) added. **Not working yet**: needs the owner's Play Console setup, leaderboard ids in `data/play_games.json`, the Game ID and a Gradle build (see `docs/release.md`). Never run on a device |
-| Ads (AdMob interstitial) | Implemented and tested with a fake plugin (owner request 2026-11-08): an interstitial when the player leaves the win/game-over panel (Next, Retry, Replay, Menu) on level 11+ in either tier, at most once per 60 s; "+3 moves" never shows one. Consent form (UMP) first, then SDK init and preload. Plugin `addons/AdmobPlugin` v7.0 (MIT). Signed APK b33 builds and carries the AdMob app id. **Uses Google's test ads**: the real App ID and unit id are not set yet (`docs/release.md` §6a). Never run on a device |
+| Ads (AdMob interstitial) | Implemented and tested with a fake plugin (owner request 2026-11-08): an interstitial when the player leaves the win/game-over panel (Next, Retry, Replay, Menu) on level 11+ in either tier, at most once per 60 s; "+3 moves" never shows one. Consent form (UMP) first, then SDK init and preload. Plugin `addons/AdmobPlugin` v7.0 (MIT). Signed APK b33 builds and carries the AdMob app id. **Real AdMob ids set 2026-11-08** (app `~9418380851`, interstitial `/1268428091`); APK b34 carries the real app id. Never run on a device |
 | Audio | Implemented; not yet listened to by the owner (deferred by the owner; nothing waits on it) |
 | Settings | Difficulty, music, effects, tutorial tips, vibration, two volume sliders |
 | Tutorial | Levels 1 to 3; still matches the new level 1 (tests check it); not user-tested |
@@ -56,7 +56,7 @@ Verified 2026-11-05 in a Linux container with the official Godot 4.7.2 build:
 - Levels are frozen: changing a released level breaks the tests on purpose. Add new levels only after level 100.
 
 ## Next steps
-0. Owner: AdMob app, interstitial unit and GDPR message; then set the ids (`docs/release.md` §6a). Install b33 and check that a test ad appears after a game on level 11.
+0. Owner: publish the GDPR message in AdMob (Privacy & messaging) and register your phones as AdMob test devices; install b34 and check that an ad appears after a game on level 11 (new units can take an hour to serve).
 1. Owner: Play Console app, Play Games project, two leaderboards, OAuth client; put the leaderboard ids in `data/play_games.json` (`docs/release.md` §1).
 2. Owner: export preset with Gradle build, Vibrate permission, Game ID and signing; export the release candidate (`docs/release.md` §2–3).
 3. Owner: device checks and the upgrade test on a physical phone, then the internal test track (`docs/release.md` §4–5).
