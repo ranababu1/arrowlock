@@ -22,8 +22,8 @@ const RETRY_MAX_SECONDS := 300.0
 var policy := AdPolicy.new()
 var use_real_ads := false
 var interstitial_unit_id := ""
-## Seconds on a steady clock. Tests replace it.
-var clock: Callable = func() -> float: return Time.get_ticks_msec() / 1000.0
+## Wall-clock Unix time in seconds. Tests replace it.
+var clock: Callable = func() -> float: return Time.get_unix_time_from_system()
 
 ## The Admob node, or a stand-in with the same signals and methods in tests.
 var _backend: Node
@@ -39,9 +39,11 @@ var _pending := Callable()
 ## plugin is present. A build stamped "test_ads" by the build script (the
 ## device-testing APK) always uses Google's test ad unit, whatever ads.json says,
 ## so the owner's own phones never load real ads.
-func start(backend: Node = null, config_path: String = CONFIG_PATH, build_info_path: String = BuildInfo.PATH) -> void:
+func start(backend: Node = null, config_path: String = CONFIG_PATH, build_info_path: String = BuildInfo.PATH, state_path: String = AdPolicy.DEFAULT_STATE_PATH) -> void:
 	var config := load_config(config_path)
 	policy = AdPolicy.from_config(config)
+	policy.state_path = state_path
+	policy.load_state(clock.call())
 	use_real_ads = bool(config.get("use_real_ads", false)) and not BuildInfo.forces_test_ads(build_info_path)
 	interstitial_unit_id = str(config.get("interstitial_unit_id", "")).strip_edges()
 	if not policy.enabled:
@@ -69,13 +71,16 @@ func is_active() -> bool:
 	return _sdk_ready
 
 
-## Call when the player leaves an end-of-game panel. Shows an interstitial
-## first if finishing `level_id` earns one and an ad is ready, then runs
-## `then`; otherwise runs `then` at once. Returns true if an ad was shown.
+## Call when the player leaves an end-of-game panel. Records the finished
+## round, then shows an interstitial first if that game earns one and an ad
+## is ready, then runs `then`; otherwise runs `then` at once. Returns true
+## if an ad was shown. A missing ad is not marked as shown, so the next
+## eligible leave can still show one.
 func show_after_game(level_id: int, then: Callable) -> bool:
 	# An earlier ad that never reported closing must not fire its action later.
 	_pending = Callable()
 	var now: float = clock.call()
+	policy.record_round(level_id, now)
 	if not _sdk_ready or not policy.should_show(level_id, now) or not _backend.is_interstitial_ad_loaded():
 		then.call()
 		return false

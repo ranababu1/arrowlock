@@ -1798,30 +1798,128 @@ func _test_speed_score() -> void:
 
 func _test_ad_policy() -> void:
 	var p := AdPolicy.new()
-	_check(not p.should_show(1, 0.0) and not p.should_show(10, 0.0), "levels 1-10 never show ads")
-	_check(p.should_show(11, 0.0) and p.should_show(100, 0.0), "level 11 and up show an ad")
-	_check(not p.should_show(Difficulty.make_id(Difficulty.DIFFICULT, 10), 0.0), "Difficult 1-10 never show ads")
-	_check(p.should_show(Difficulty.make_id(Difficulty.DIFFICULT, 11), 0.0), "Difficult 11 and up show an ad")
-	p.mark_shown(100.0)
-	_check(not p.should_show(11, 159.0), "no second ad within 60 seconds")
-	_check(p.should_show(11, 160.0), "an ad again once 60 seconds have passed")
+	p.state_path = ""
+	# Rule 1: levels 1-10 never show ads, in either tier, even when rounds and time are met.
+	for i in 3:
+		p.record_round(11, 0.0)
+	_check(not p.should_show(1, 180.0) and not p.should_show(10, 180.0), "levels 1-10 never show ads")
+	_check(not p.should_show(Difficulty.make_id(Difficulty.DIFFICULT, 10), 180.0), "Difficult 1-10 never show ads")
+	_check(p.should_show(11, 180.0) and p.should_show(100, 180.0), "level 11 and up can show an ad once 3 rounds and 180 seconds are met")
+	_check(p.should_show(Difficulty.make_id(Difficulty.DIFFICULT, 11), 180.0), "Difficult 11 and up can show an ad once 3 rounds and 180 seconds are met")
 
-	var tuned := AdPolicy.from_config({"first_level": 5, "min_seconds_between": 0})
-	_check(tuned.first_level == 5 and tuned.min_seconds_between == 0.0 and tuned.should_show(5, 0.0), "config sets the first level and the gap")
-	var odd := AdPolicy.from_config({"first_level": -3, "min_seconds_between": "soon"})
-	_check(odd.first_level == AdPolicy.DEFAULT_FIRST_LEVEL and odd.min_seconds_between == AdPolicy.DEFAULT_MIN_SECONDS_BETWEEN, "bad config values fall back to the defaults")
-	_check(not AdPolicy.from_config({"enabled": false}).should_show(50, 0.0), "enabled=false switches ads off")
+	# First ad of a fresh install also needs 3 eligible rounds and 180 seconds.
+	# The timer starts on the first eligible round, not at time zero.
+	var fresh := AdPolicy.new()
+	fresh.state_path = ""
+	_check(not fresh.should_show(11, 1000.0), "no ad before any eligible round")
+	fresh.record_round(11, 2000.0)
+	_check(not fresh.should_show(11, 2000.0 + 180.0), "one eligible round is not enough, even after 180 seconds")
+	fresh.record_round(11, 2000.0)
+	_check(not fresh.should_show(11, 2000.0 + 180.0), "two eligible rounds are not enough, even after 180 seconds")
+	fresh.record_round(11, 2000.0)
+	_check(not fresh.should_show(11, 2179.0), "three eligible rounds still wait until 180 seconds from the first one")
+	_check(fresh.should_show(11, 2180.0), "first ad once 3 rounds and 180 seconds from the first eligible round")
+
+	# Ineligible rounds (levels 1-10, either tier) do not count and do not start the timer.
+	var mixed := AdPolicy.new()
+	mixed.state_path = ""
+	mixed.record_round(1, 0.0)
+	mixed.record_round(10, 0.0)
+	mixed.record_round(Difficulty.make_id(Difficulty.DIFFICULT, 5), 0.0)
+	_check(not mixed.should_show(11, 180.0), "ineligible rounds do not start the timer or count")
+	mixed.record_round(11, 100.0)
+	mixed.record_round(10, 100.0)
+	mixed.record_round(11, 100.0)
+	_check(not mixed.should_show(11, 280.0), "an ineligible round between eligible ones is ignored")
+	mixed.record_round(11, 100.0)
+	_check(mixed.should_show(11, 280.0), "three eligible rounds still qualify after ignored early levels")
+
+	# Replaying the same eligible level counts as a new round.
+	var replay := AdPolicy.new()
+	replay.state_path = ""
+	replay.record_round(11, 0.0)
+	replay.record_round(11, 0.0)
+	replay.record_round(11, 0.0)
+	_check(replay.should_show(11, 180.0), "the same level played three times counts as three rounds")
+
+	# AND logic: 3 rounds without 180 seconds is not enough; 180 seconds without 3 rounds is not enough.
+	var and_rule := AdPolicy.new()
+	and_rule.state_path = ""
+	and_rule.record_round(11, 0.0)
+	and_rule.record_round(11, 0.0)
+	and_rule.record_round(11, 0.0)
+	_check(not and_rule.should_show(11, 179.0), "3 rounds but fewer than 180 seconds: no ad")
+	var time_only := AdPolicy.new()
+	time_only.state_path = ""
+	time_only.record_round(12, 0.0)
+	time_only.record_round(13, 0.0)
+	_check(not time_only.should_show(14, 180.0), "180 seconds but only 2 eligible rounds: no ad")
+	time_only.record_round(14, 180.0)
+	_check(time_only.should_show(14, 180.0), "the third eligible round after 180 seconds shows an ad")
+
+	# After an ad, both counters reset; the next ad needs 3 more rounds and 180 more seconds.
+	and_rule.mark_shown(200.0)
+	_check(not and_rule.should_show(11, 380.0), "after an ad, time alone is not enough")
+	and_rule.record_round(11, 200.0)
+	and_rule.record_round(11, 200.0)
+	and_rule.record_round(11, 200.0)
+	_check(not and_rule.should_show(11, 379.0), "after an ad, 3 rounds still wait 180 seconds")
+	_check(and_rule.should_show(11, 380.0), "the next ad once 3 rounds and 180 seconds have both passed again")
+
+	var tuned := AdPolicy.from_config({"first_level": 5, "min_seconds_between": 0, "min_rounds_between": 1})
+	tuned.state_path = ""
+	tuned.record_round(5, 0.0)
+	_check(tuned.first_level == 5 and tuned.min_seconds_between == 0.0 and tuned.min_rounds_between == 1 and tuned.should_show(5, 0.0), "config sets the first level, the gap and the round count")
+	var odd := AdPolicy.from_config({"first_level": -3, "min_seconds_between": "soon", "min_rounds_between": 0})
+	_check(odd.first_level == AdPolicy.DEFAULT_FIRST_LEVEL and odd.min_seconds_between == AdPolicy.DEFAULT_MIN_SECONDS_BETWEEN and odd.min_rounds_between == AdPolicy.DEFAULT_MIN_ROUNDS_BETWEEN, "bad config values fall back to the defaults")
+	_check(not AdPolicy.from_config({"enabled": false}).should_show(50, 1000.0), "enabled=false switches ads off")
+
+	# Persistence: counters survive a new policy instance, and a future timestamp is treated as now.
+	var state := "user://test_ad_policy_persist.json"
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(state))
+	var saved := AdPolicy.new()
+	saved.state_path = state
+	saved.record_round(11, 5000.0)
+	saved.record_round(12, 5000.0)
+	var loaded := AdPolicy.new()
+	loaded.state_path = state
+	loaded.load_state(5100.0)
+	_check(not loaded.should_show(11, 5180.0), "loaded state still needs a third eligible round")
+	loaded.record_round(13, 5180.0)
+	_check(loaded.should_show(13, 5180.0), "loaded rounds and window start survive a restart")
+
+	var skew_path := "user://test_ad_policy_skew.json"
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(skew_path))
+	var ahead := AdPolicy.new()
+	ahead.state_path = skew_path
+	ahead.record_round(11, 9000.0)
+	ahead.record_round(11, 9000.0)
+	ahead.record_round(11, 9000.0)
+	var skewed := AdPolicy.new()
+	skewed.state_path = skew_path
+	# Saved window start 9000 is in the future relative to 8000; treat as now.
+	skewed.load_state(8000.0)
+	_check(not skewed.should_show(11, 8179.0), "a future saved time is treated as now, so 180 seconds must still pass")
+	_check(skewed.should_show(11, 8180.0), "after clamping a future timestamp, the ad is due 180 seconds later")
+	# The clamp is persisted, so a later load at the same clock does not reset the timer again.
+	var skewed_again := AdPolicy.new()
+	skewed_again.state_path = skew_path
+	skewed_again.load_state(8180.0)
+	_check(skewed_again.should_show(11, 8180.0), "the clamped time is saved, so a later load does not reset the wait")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(state))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(skew_path))
 
 	# Shipped config: owner rule, and the manifest app id switch agrees with the runtime switch.
 	var shipped := Ads.load_config(Ads.CONFIG_PATH)
 	var shipped_policy := AdPolicy.from_config(shipped)
-	_check(shipped_policy.first_level == 11 and shipped_policy.min_seconds_between == 60.0, "shipped ads start at level 11 with a 60 second gap")
+	_check(shipped_policy.first_level == 11 and shipped_policy.min_seconds_between == 180.0 and shipped_policy.min_rounds_between == 3, "shipped ads start at level 11, need 3 rounds and a 180 second gap")
 	var export_cfg := ConfigFile.new()
 	_check(export_cfg.load("res://addons/AdmobPlugin/android_export.cfg") == OK, "the AdMob export config exists")
 	var is_real: bool = export_cfg.get_value("General", "is_real", false)
 	_check(is_real == bool(shipped.get("use_real_ads", false)), "android_export.cfg is_real matches ads.json use_real_ads")
 	if is_real:
 		_check(str(export_cfg.get_value("Release", "app_id", "")).begins_with("ca-app-pub-") and str(shipped.get("interstitial_unit_id", "")).begins_with("ca-app-pub-"), "real ads need the AdMob app id and the unit id")
+		_check(str(shipped.get("interstitial_unit_id", "")) == "ca-app-pub-1106747567696734/1268428091", "the shipped interstitial unit id is unchanged")
 
 
 ## Stands in for the Admob node: same signals and methods, records calls.
@@ -1874,28 +1972,30 @@ class FakeAdmob:
 func _ads_with(fake: FakeAdmob, config: Dictionary) -> Ads:
 	var path := "user://test_ads.json"
 	_write_text(path, JSON.stringify(config))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_ad_policy.json"))
 	var ads := Ads.new()
 	root.add_child(ads)
 	ads.add_child(fake)
-	ads.start(fake, path)
+	ads.start(fake, path, "user://no_build_info.json", "user://test_ad_policy.json")
 	return ads
 
 
 func _test_ads_service() -> void:
 	var offline := Ads.new()
 	root.add_child(offline)
-	offline.start(null, "user://no_such_ads.json")
+	offline.start(null, "user://no_such_ads.json", "user://no_build_info.json", "user://test_ad_policy.json")
 	var ran := [0]
 	_check(not offline.show_after_game(50, func() -> void: ran[0] += 1) and ran[0] == 1, "without the plugin the game just carries on")
 	offline.queue_free()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_ad_policy.json"))
 
 	# Outside the EEA: no form, straight to init and a preload.
 	var fake := FakeAdmob.new()
-	var ads := _ads_with(fake, {"first_level": 11, "min_seconds_between": 60})
+	var ads := _ads_with(fake, {"first_level": 11, "min_seconds_between": 180, "min_rounds_between": 3})
 	var now := [1000.0]
 	ads.clock = func() -> float: return now[0]
 	_check(fake.calls == ["update_consent_info"], "consent is checked before anything else")
-	_check(not ads.show_after_game(50, func() -> void: ran[0] += 1) and ran[0] == 2, "before init the game carries on without an ad")
+	_check(not ads.show_after_game(10, func() -> void: ran[0] += 1) and ran[0] == 2, "before init the game carries on without an ad")
 	fake.consent_info_updated.emit()
 	_check(fake.calls.has("initialize") and not fake.calls.has("load_consent_form"), "no form when consent is not required")
 	fake.initialization_completed.emit(null)
@@ -1905,23 +2005,37 @@ func _test_ads_service() -> void:
 
 	_check(not ads.show_after_game(10, func() -> void: ran[0] += 1) and ran[0] == 3, "level 10 goes on without an ad")
 	var after := [0]
-	_check(ads.show_after_game(11, func() -> void: after[0] += 1) and fake.calls.has("show"), "level 11 shows the ad")
-	_check(after[0] == 0, "the game waits while the ad is up")
+	# First ad needs 3 eligible rounds and 180 seconds from the first of them.
+	_check(not ads.show_after_game(11, func() -> void: after[0] += 1) and after[0] == 1, "the first eligible round starts the timer and shows no ad")
+	now[0] += 180.0
+	_check(not ads.show_after_game(11, func() -> void: after[0] += 1) and after[0] == 2, "two eligible rounds are not enough even after 180 seconds")
+	_check(ads.show_after_game(11, func() -> void: after[0] += 1) and fake.calls.has("show"), "the third eligible round after 180 seconds shows the ad")
+	_check(after[0] == 2, "the game waits while the ad is up")
 	fake.interstitial_ad_dismissed_full_screen_content.emit(null)
-	_check(after[0] == 1 and fake.calls.count("load") == 2, "closing the ad carries on and preloads the next one")
+	_check(after[0] == 3 and fake.calls.count("load") == 2, "closing the ad carries on and preloads the next one")
 	fake.ad_loaded = true
-	now[0] += 30.0
-	_check(not ads.show_after_game(12, func() -> void: after[0] += 1) and after[0] == 2, "a quick retry within 60 seconds has no ad")
-	now[0] += 30.0
-	_check(ads.show_after_game(12, func() -> void: after[0] += 1) and after[0] == 2, "60 seconds later the next game shows an ad")
+	now[0] += 10.0
+	_check(not ads.show_after_game(12, func() -> void: after[0] += 1) and after[0] == 4, "after an ad, one more round is not enough")
+	now[0] += 180.0
+	_check(not ads.show_after_game(12, func() -> void: after[0] += 1) and after[0] == 5, "180 seconds after the last ad but only two rounds: no ad")
+	_check(ads.show_after_game(12, func() -> void: after[0] += 1) and after[0] == 5, "the third eligible round after 180 seconds shows the next ad")
 	fake.interstitial_ad_failed_to_show_full_screen_content.emit(null, null)
-	_check(after[0] == 3, "an ad that fails to show still lets the game go on")
+	_check(after[0] == 6, "an ad that fails to show still lets the game go on")
 	fake.ad_loaded = false
-	now[0] += 100.0
-	_check(not ads.show_after_game(12, func() -> void: after[0] += 1) and after[0] == 4, "no ad ready: no wait")
+	now[0] += 180.0
+	# Three eligible rounds with no ad loaded must not wait, and must not consume the slot.
+	_check(not ads.show_after_game(12, func() -> void: after[0] += 1) and after[0] == 7, "no ad ready: no wait")
+	ads.show_after_game(12, func() -> void: after[0] += 1)
+	ads.show_after_game(12, func() -> void: after[0] += 1)
+	_check(after[0] == 9, "further finished rounds with no ad loaded still carry on")
+	fake.ad_loaded = true
+	_check(ads.show_after_game(12, func() -> void: after[0] += 1) and after[0] == 9, "once an ad is ready, a met 3-round and 180-second window still shows it")
+	fake.interstitial_ad_dismissed_full_screen_content.emit(null)
+	_check(after[0] == 10, "closing that late-loaded ad carries on")
 	fake.interstitial_ad_failed_to_load.emit(null, null)
 	_check(ads._retry_seconds == Ads.RETRY_FIRST_SECONDS * 2.0, "a failed load backs off before retrying")
 	ads.queue_free()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_ad_policy.json"))
 
 	# EEA: the form is shown, and ads start only after an answer.
 	var eu := FakeAdmob.new()
@@ -1954,7 +2068,7 @@ func _test_ads_service() -> void:
 	root.add_child(apk_ads)
 	var apk_fake := FakeAdmob.new()
 	apk_ads.add_child(apk_fake)
-	apk_ads.start(apk_fake, cfg_path, stamp)
+	apk_ads.start(apk_fake, cfg_path, stamp, "user://test_ad_policy.json")
 	_check(not apk_ads.use_real_ads, "a test-ads build stamp forces Google's test ads")
 	apk_ads.queue_free()
 	_write_text(stamp, '{"build": 38, "test_ads": false}')
@@ -1962,14 +2076,14 @@ func _test_ads_service() -> void:
 	root.add_child(aab_ads)
 	var aab_fake := FakeAdmob.new()
 	aab_ads.add_child(aab_fake)
-	aab_ads.start(aab_fake, cfg_path, stamp)
+	aab_ads.start(aab_fake, cfg_path, stamp, "user://test_ad_policy.json")
 	_check(aab_ads.use_real_ads, "a release build stamp keeps the real ads from ads.json")
 	aab_ads.queue_free()
 	var bare_ads := Ads.new()
 	root.add_child(bare_ads)
 	var bare_fake := FakeAdmob.new()
 	bare_ads.add_child(bare_fake)
-	bare_ads.start(bare_fake, cfg_path, "user://no_build_info.json")
+	bare_ads.start(bare_fake, cfg_path, "user://no_build_info.json", "user://test_ad_policy.json")
 	_check(bare_ads.use_real_ads, "without a stamp ads.json decides")
 	bare_ads.queue_free()
 	_write_text(stamp, "garbage")
@@ -1982,13 +2096,15 @@ func _test_ads_service() -> void:
 	_check(off.calls.is_empty(), "enabled=false never touches the plugin")
 	off_ads.queue_free()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_ads.json"))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_ad_policy.json"))
 
 
 func _test_ads_after_game() -> void:
 	var repo := _pack_repo()
 	var save := SaveService.new("user://test_ads_game_save.json")
+	# Placement tests use 1 round and no gap so a single finish can show an ad.
 	var fake := FakeAdmob.new()
-	var ads := _ads_with(fake, {"first_level": 11, "min_seconds_between": 0})
+	var ads := _ads_with(fake, {"first_level": 11, "min_seconds_between": 0, "min_rounds_between": 1})
 	fake.consent_info_updated.emit()
 	fake.initialization_completed.emit(null)
 	fake.ad_loaded = true
@@ -2043,3 +2159,4 @@ func _test_ads_after_game() -> void:
 	ads.queue_free()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_ads_game_save.json"))
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_ads.json"))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_ad_policy.json"))

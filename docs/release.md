@@ -115,7 +115,7 @@ Do these on a real phone with the release APK. Write the result of each line in 
 
 ## 6a. Ads (AdMob) (Owner)
 
-The game shows an interstitial when the player leaves the win or game-over panel (Next, Retry, Replay or Menu) on level 11 or higher in either tier, at most once every 60 seconds. "+3 moves" never shows an ad. Settings are in `data/ads.json` (`first_level`, `min_seconds_between`, `enabled`). Plugin: `addons/AdmobPlugin` v7.0 (MIT, Google Mobile Ads 24.9.0).
+The game shows an interstitial when the player leaves the win or game-over panel (Next, Retry, Replay or Menu) on level 11 or higher in either tier, and only when both at least 3 eligible rounds (level 11+, win or loss, including replays of the same level) have been finished since the last ad and at least 180 seconds have passed. The first ad of a fresh install also needs both; the timer starts on the first eligible finished round. Those counters are stored on the device so a restart does not reset them. "+3 moves" never shows an ad. Settings are in `data/ads.json` (`first_level`, `min_seconds_between`, `min_rounds_between`, `enabled`). Plugin: `addons/AdmobPlugin` v7.0 (MIT, Google Mobile Ads 24.9.0).
 
 The real ids are set (2026-11-08). Only the Play AAB serves real ads; every APK from `tools/build_android.sh` is stamped to use Google's test ad unit (§3). Never tap your own real ads; AdMob bans accounts for it.
 

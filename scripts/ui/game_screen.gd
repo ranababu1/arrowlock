@@ -499,8 +499,9 @@ func _on_lost(wasted: int) -> void:
 
 
 ## Wraps an end-of-game panel button so leaving the panel first shows an
-## interstitial when one is due (AdPolicy). "+3 moves" is not wrapped: it
-## continues the same game.
+## interstitial when one is due (AdPolicy). Ads are only considered at this
+## end-of-round transition, never mid-round. "+3 moves" is not wrapped: it
+## continues the same game, so it is not a finished round.
 func _after_ad(action: Callable) -> Callable:
 	return func() -> void:
 		if _ads == null:
