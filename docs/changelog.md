@@ -2,6 +2,21 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-12 — Interstitial frequency: 3 eligible rounds and 180 seconds
+
+Owner: no ads until level 10 is crossed; ads only after a win or a loss, never mid-round; an ad at most once every 3 finished rounds or 3 minutes, whichever is higher. Interpreted as both conditions (3 eligible rounds and 180 seconds) because "whichever is higher" is the more restrictive of the two. Version is not bumped; this is not a release.
+
+### Changed
+- `AdPolicy` now requires both at least 3 finished eligible rounds (level 11+ in either tier, win or loss; replaying the same level counts) and at least 180 seconds since the last ad. Levels 1–10 never count and never start the timer. The first ad of a fresh install also needs both; the 180-second timer starts on the first eligible finished round, not at install. Counters (rounds since the last ad, and the window-start Unix time) are stored in `user://ad_policy.json` so a restart does not reset them. If a saved window start is in the future (clock skew), it is treated as now and that correction is saved.
+- A finished round is recorded when the player leaves the win or lose panel (Next, Retry, Replay, Menu), which is also the only moment an ad may appear. "+3 moves" is still not a finished round and never shows an ad. If an ad is due but none is loaded, the slot is not consumed, so a later leave can still show it.
+- `data/ads.json`: `min_seconds_between` is 180, and a new `min_rounds_between` is 3. AdMob unit ids are unchanged.
+- The ads service now uses wall-clock Unix time for the policy (was a session-only monotonic clock).
+- `docs/release.md` §6a and `docs/currentstate.md` updated to the new rule.
+
+### Tests
+- Policy: levels 1–10 never (both tiers), first ad needs 3 rounds and 180 seconds from the first eligible round, ineligible rounds ignored, same-level replays count, AND logic both ways, reset after a shown ad, persistence across a new instance, future timestamps clamped and saved, shipped config is 11 / 180 / 3, unit id unchanged.
+- Ads service and game screen: consent and stamp paths unchanged; frequency uses the new AND rule; a missing loaded ad does not consume the slot; placement tests still check no ad over the panel, ad before Menu, Replay waits, +3 moves never, level 1 never.
+- `godot --headless --path . -s tests/run_tests.gd` with Godot 4.7.2 stable: **595 passed, 0 failed**.
 ## 2026-11-08 — Release check fix: AAB asset pack path; build 38 verified
 
 - The owner ran `tools/build_android.sh --release` and both artifacts were exported and signed, but the check stopped with `KeyError: base/assets/data/build_info.json`. Godot 4.7 puts the game files of an AAB in an install-time asset pack (`assetPackInstallTime/assets/`), not `base/assets/` (diagnosed by the owner's review agent; confirmed by listing the bundle). The check now looks in the asset pack, then `base/assets/`, and says clearly if the stamp is missing. The APK check already used the right path (`assets/`).
