@@ -2,10 +2,14 @@ class_name Ads
 extends Node
 ## Interstitial ads after a finished game (AdMob).
 ##
-## Uses the Admob node of the AdmobPlugin addon (addons/AdmobPlugin, MIT, v7.0,
-## Google Mobile Ads 24.9.0). On desktop, in tests, when "enabled" is false, or
-## when real ads are switched on without a unit id, everything here quietly
-## does nothing and the game plays exactly as before.
+## Uses the Admob node of the AdmobPlugin addon (addons/AdmobPlugin, MIT, v7.0;
+## Google Mobile Ads 24.9.0 on Android, 12.14.0 on iOS). On desktop, in tests,
+## when "enabled" is false, or when real ads are switched on without a unit id
+## for this platform, everything here quietly does nothing and the game plays
+## exactly as before.
+##
+## Android and iOS are separate apps in AdMob, each with its own ad unit:
+## "interstitial_unit_id" is Android's, "ios_interstitial_unit_id" is iOS's.
 ##
 ## Start-up order follows Google's UMP guidance: ask for consent info first,
 ## show the consent form when it is required (EEA/UK), and only then initialise
@@ -15,13 +19,18 @@ extends Node
 
 const SINGLETON := "AdmobPlugin"
 const CONFIG_PATH := "res://data/ads.json"
+const ANDROID_UNIT_KEY := "interstitial_unit_id"
+const IOS_UNIT_KEY := "ios_interstitial_unit_id"
 ## Wait before retrying a failed load; doubles after each failure up to the max.
 const RETRY_FIRST_SECONDS := 30.0
 const RETRY_MAX_SECONDS := 300.0
 
 var policy := AdPolicy.new()
 var use_real_ads := false
+## The real ad unit of the platform this build runs on ("" = none set).
 var interstitial_unit_id := ""
+## Which unit id is used. Tests replace it.
+var is_ios := OS.has_feature("ios")
 ## Wall-clock Unix time in seconds. Tests replace it.
 var clock: Callable = func() -> float: return Time.get_unix_time_from_system()
 
@@ -35,17 +44,17 @@ var _retry_seconds := RETRY_FIRST_SECONDS
 var _pending := Callable()
 
 
-## `backend` is for tests; normally an Admob node is made when the Android
-## plugin is present. A build stamped "test_ads" by the build script (the
-## device-testing APK) always uses Google's test ad unit, whatever ads.json says,
-## so the owner's own phones never load real ads.
+## `backend` is for tests; normally an Admob node is made when the native
+## plugin (Android or iOS) is present. A build stamped "test_ads" by the build
+## script (the device-testing build) always uses Google's test ad unit, whatever
+## ads.json says, so the owner's own phones never load real ads.
 func start(backend: Node = null, config_path: String = CONFIG_PATH, build_info_path: String = BuildInfo.PATH, state_path: String = AdPolicy.DEFAULT_STATE_PATH) -> void:
 	var config := load_config(config_path)
 	policy = AdPolicy.from_config(config)
 	policy.state_path = state_path
 	policy.load_state(clock.call())
 	use_real_ads = bool(config.get("use_real_ads", false)) and not BuildInfo.forces_test_ads(build_info_path)
-	interstitial_unit_id = str(config.get("interstitial_unit_id", "")).strip_edges()
+	interstitial_unit_id = unit_id_for(config, is_ios)
 	if not policy.enabled:
 		return
 	if backend == null:
@@ -97,6 +106,11 @@ static func consent_allows_ads(consent: Object) -> bool:
 	return consent.status == UserConsent.Status.NOT_REQUIRED or consent.status == UserConsent.Status.OBTAINED
 
 
+## The real interstitial unit id in `config` for iOS or for Android.
+static func unit_id_for(config: Dictionary, ios: bool) -> String:
+	return str(config.get(IOS_UNIT_KEY if ios else ANDROID_UNIT_KEY, "")).strip_edges()
+
+
 ## Reads data/ads.json; {} (ads on, test ads, defaults) when missing or broken.
 static func load_config(path: String) -> Dictionary:
 	if not FileAccess.file_exists(path):
@@ -112,12 +126,15 @@ func _make_admob() -> Node:
 	if not Engine.has_singleton(SINGLETON):
 		return null
 	if use_real_ads and interstitial_unit_id == "":
-		push_warning("Ads: use_real_ads is on but interstitial_unit_id is empty; ads are off")
+		push_warning("Ads: use_real_ads is on but %s is empty; ads are off" % (IOS_UNIT_KEY if is_ios else ANDROID_UNIT_KEY))
 		return null
 	var admob := Admob.new()
 	# Set before add_child: Admob._ready picks the ad unit ids from these.
 	admob.is_real = use_real_ads
-	admob.android_real_interstitial_id = interstitial_unit_id
+	if is_ios:
+		admob.ios_real_interstitial_id = interstitial_unit_id
+	else:
+		admob.android_real_interstitial_id = interstitial_unit_id
 	# A shown interstitial cannot be shown again; drop it so the next load counts.
 	admob.remove_interstitial_ads_after_displayed = true
 	add_child(admob)

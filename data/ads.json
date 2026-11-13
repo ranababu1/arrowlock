@@ -1,8 +1,9 @@
 {
-	"_comment": "Interstitial ads after a game ends (docs/release.md 'Ads (AdMob)'). use_real_ads=false shows Google's test ads; it must match is_real in addons/AdmobPlugin/android_export.cfg. Unit id from AdMob > Apps > Ad units. Not secret. An ad is due only after level 10, when leaving a win or lose panel, and only when both min_rounds_between eligible rounds and min_seconds_between have passed.",
+	"_comment": "Interstitial ads after a game ends (docs/release.md 'Ads (AdMob)'). use_real_ads=false shows Google's test ads; it must match is_real in addons/AdmobPlugin/android_export.cfg. Unit ids from AdMob > Apps > Ad units: interstitial_unit_id is the Android app's, ios_interstitial_unit_id the iOS app's (empty = no ads on iOS; it must be set exactly when is_real is true in addons/AdmobPlugin/ios_export.cfg). Not secret. An ad is due only after level 10, when leaving a win or lose panel, and only when both min_rounds_between eligible rounds and min_seconds_between have passed.",
 	"enabled": true,
 	"use_real_ads": true,
 	"interstitial_unit_id": "ca-app-pub-1106747567696734/1268428091",
+	"ios_interstitial_unit_id": "",
 	"first_level": 11,
 	"min_seconds_between": 180,
 	"min_rounds_between": 3

@@ -1649,6 +1649,8 @@ func _test_profile_screen() -> void:
 	_check(screen.stat_labels["cleared"].text == "1 / 100" and screen.stat_labels["stars"].text == "3 / 300", "the stats show clears and stars for the mode")
 	_check(screen.badge_rows.size() == Progress.BADGES.size(), "every badge is listed")
 	_check(screen.leaderboard_button.disabled, "the leaderboard button is off without Play Games")
+	_check(not screen.leaderboard_card.visible, "without Play Games (iOS, desktop) the leaderboard card is hidden")
+	_check(not screen.sign_in_button.visible and _reachable_texts(screen, [screen.leaderboard_card, screen.sign_in_button]).all(func(t: String) -> bool: return not _names_google(t)), "without Play Games no text the player can reach names Google, Play or Android (App Store rule)")
 	_check(screen.name_label.text == "Player" and screen.edit_button.visible and not screen.sign_in_button.visible, "offline: local profile, editable, no sign-in offered")
 	screen.edit_button.pressed.emit()
 	_check(screen.editor.visible and not screen.edit_button.visible, "Edit opens the editor")
@@ -1672,6 +1674,7 @@ func _test_profile_screen() -> void:
 	online.setup(save.progress, pg, 100, save)
 	_check(online.sign_in_button.visible and online.edit_button.visible, "signed out: sign-in is offered next to the local profile")
 	_check(not online.leaderboard_button.disabled and online.leaderboard_button.text.contains("Sign in"), "signed out, the leaderboard button offers sign-in")
+	_check(online.leaderboard_card.visible and online.editor_note.text.contains("Play Games"), "with Play Games the leaderboard card and the sign-in note are shown")
 	online.sign_in_button.pressed.emit()
 	_check(plugin.calls.has("signIn"), "the profile's sign-in button starts the sign-in")
 	plugin.userAuthenticated.emit(true)
@@ -1920,6 +1923,62 @@ func _test_ad_policy() -> void:
 	if is_real:
 		_check(str(export_cfg.get_value("Release", "app_id", "")).begins_with("ca-app-pub-") and str(shipped.get("interstitial_unit_id", "")).begins_with("ca-app-pub-"), "real ads need the AdMob app id and the unit id")
 		_check(str(shipped.get("interstitial_unit_id", "")) == "ca-app-pub-1106747567696734/1268428091", "the shipped interstitial unit id is unchanged")
+
+	# iOS is a separate AdMob app: its own unit id, its own Info.plist app id.
+	var both := {"interstitial_unit_id": " ca-app-pub-1/2 ", "ios_interstitial_unit_id": "ca-app-pub-1/3"}
+	_check(Ads.unit_id_for(both, false) == "ca-app-pub-1/2" and Ads.unit_id_for(both, true) == "ca-app-pub-1/3", "each platform reads its own interstitial unit id")
+	_check(Ads.unit_id_for({"interstitial_unit_id": "ca-app-pub-1/2"}, true) == "", "iOS never falls back to the Android unit id")
+	var ios_path := "user://test_ads_ios.json"
+	var ios_file := FileAccess.open(ios_path, FileAccess.WRITE)
+	ios_file.store_string(JSON.stringify({"use_real_ads": true, "interstitial_unit_id": "ca-app-pub-1/2"}))
+	ios_file.close()
+	var ios_ads := Ads.new()
+	ios_ads.is_ios = true
+	root.add_child(ios_ads)
+	ios_ads.start(null, ios_path, "user://no_build_info.json", "user://test_ad_policy_ios.json")
+	var ios_ran := [0]
+	_check(ios_ads.interstitial_unit_id == "" and not ios_ads.is_active(), "on iOS, real ads without an iOS unit id leave ads off")
+	_check(not ios_ads.show_after_game(50, func() -> void: ios_ran[0] += 1) and ios_ran[0] == 1, "with ads off on iOS the game just carries on")
+	ios_ads.queue_free()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(ios_path))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_ad_policy_ios.json"))
+
+	var ios_cfg := ConfigFile.new()
+	_check(ios_cfg.load("res://addons/AdmobPlugin/ios_export.cfg") == OK, "the iOS AdMob export config exists")
+	var ios_real: bool = ios_cfg.get_value("General", "is_real", false)
+	var ios_unit := Ads.unit_id_for(shipped, true)
+	var ios_app := str(ios_cfg.get_value("Release", "app_id", ""))
+	_check(str(ios_cfg.get_value("Debug", "app_id", "")).begins_with("ca-app-pub-3940256099942544~"), "the iOS debug app id is Google's sample app")
+	_check(ios_real == (ios_unit != ""), "ios_export.cfg is_real is true exactly when ads.json has an iOS unit id")
+	_check(ios_cfg.has_section_key("ATT", "att_enabled") and ios_cfg.has_section_key("ATT", "att_text"), "ios_export.cfg has the ATT keys the export plugin reads")
+	if ios_real:
+		_check(bool(shipped.get("use_real_ads", false)), "real iOS ads need use_real_ads")
+		_check(ios_app.begins_with("ca-app-pub-") and ios_app.contains("~") and ios_unit.begins_with("ca-app-pub-") and ios_unit.contains("/"), "real iOS ads need the iOS AdMob app id and unit id")
+		_check(ios_app != str(export_cfg.get_value("Release", "app_id", "")) and ios_unit != Ads.unit_id_for(shipped, false), "the iOS app id and unit id are not copies of Android's")
+		if bool(ios_cfg.get_value("ATT", "att_enabled", false)):
+			_check(str(ios_cfg.get_value("ATT", "att_text", "")).strip_edges() != "", "ATT needs a usage text")
+	_check(FileAccess.file_exists("res://ios/plugins/AdmobPlugin.gdip"), "the AdMob iOS plugin descriptor is in the project")
+
+
+## Text of every Label, Button and LineEdit under `node` that the player can
+## get to: hidden nodes count too (a hidden editor can be opened), but nothing
+## at or under a node in `skip` does.
+func _reachable_texts(node: Node, skip: Array[Node]) -> Array[String]:
+	var texts: Array[String] = []
+	if skip.has(node):
+		return texts
+	if node is Label or node is Button:
+		texts.append(node.text)
+	elif node is LineEdit:
+		texts.append(node.placeholder_text)
+	for child in node.get_children():
+		texts.append_array(_reachable_texts(child, skip))
+	return texts
+
+
+func _names_google(text: String) -> bool:
+	var lower := text.to_lower()
+	return lower.contains("google") or lower.contains("play games") or lower.contains("play store") or lower.contains("android")
 
 
 ## Stands in for the Admob node: same signals and methods, records calls.

@@ -4,6 +4,10 @@ extends Control
 ## in, otherwise a local nickname and a built-in avatar), stats for the mode
 ## being played, the online leaderboard and every badge (earned or how to earn
 ## it). Presentation only.
+##
+## Play Games exists only in the Android build. Where it is not set up (iOS,
+## desktop) the screen never mentions it: no sign-in button, no leaderboard
+## card. The App Store rejects apps that refer to other platforms.
 
 signal back_requested
 
@@ -22,6 +26,11 @@ var name_edit: LineEdit
 var avatar_buttons: Array[Button] = []
 var save_button: Button
 
+## Note under the editor: where the profile is kept.
+var editor_note: Label
+
+## The whole leaderboard card; hidden where Play Games is not set up.
+var leaderboard_card: Control
 var leaderboard_button: Button
 var leaderboard_caption: Label
 ## Badge id -> the row shown for it (tests read these).
@@ -180,11 +189,13 @@ func _editor() -> Control:
 		b.pressed.connect(func() -> void: _pick_avatar(i))
 		grid.add_child(b)
 		avatar_buttons.append(b)
-	var note := Label.new()
-	note.text = "Saved on this phone only. Sign in with Play Games to use your Play Games name and picture on the leaderboard."
-	note.theme_type_variation = "Caption"
-	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	editor.add_child(note)
+	editor_note = Label.new()
+	editor_note.text = "Saved on this phone only."
+	if _has_play_games():
+		editor_note.text += " Sign in with Play Games to use your Play Games name and picture on the leaderboard."
+	editor_note.theme_type_variation = "Caption"
+	editor_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	editor.add_child(editor_note)
 	save_button = _button("Save", true, _save_profile)
 	editor.add_child(save_button)
 	editor.add_child(_button("Cancel", false, func() -> void:
@@ -232,7 +243,7 @@ func _refresh_profile() -> void:
 		avatar.choice = _progress.profile_avatar
 		source_label.text = "Profile on this phone."
 		edit_button.visible = not editor.visible
-		sign_in_button.visible = _play_games != null and _play_games.is_configured()
+		sign_in_button.visible = _has_play_games()
 
 
 func _stats_card() -> Control:
@@ -275,7 +286,8 @@ func _leaderboard_card() -> Control:
 	leaderboard_button.focus_mode = Control.FOCUS_NONE
 	leaderboard_button.pressed.connect(_on_leaderboard_pressed)
 	box.add_child(leaderboard_button)
-	return box.get_parent()
+	leaderboard_card = box.get_parent()
+	return leaderboard_card
 
 
 func _badges_card() -> Control:
@@ -308,8 +320,9 @@ func _badges_card() -> Control:
 
 func _refresh_leaderboard() -> void:
 	var tier := _progress.difficulty
+	leaderboard_card.visible = _has_play_games()
 	if _play_games == null or not _play_games.available(tier):
-		leaderboard_caption.text = "The online leaderboard works in the Google Play version of the game."
+		leaderboard_caption.text = "The online leaderboard is not available for this mode."
 		leaderboard_button.text = "Leaderboard unavailable"
 		leaderboard_button.disabled = true
 	elif not _play_games.signed_in:
@@ -321,6 +334,11 @@ func _refresh_leaderboard() -> void:
 		leaderboard_caption.text = "Your %s score is posted automatically. Each level counts its best clear: 100 points per star plus a speed bonus.%s" % [Difficulty.name_of(tier), shown_as]
 		leaderboard_button.text = "Show leaderboard"
 		leaderboard_button.disabled = false
+
+
+## True when this build has Play Games set up, so it may be offered and named.
+func _has_play_games() -> bool:
+	return _play_games != null and _play_games.is_configured()
 
 
 func _on_auth_changed(_signed_in: bool) -> void:
