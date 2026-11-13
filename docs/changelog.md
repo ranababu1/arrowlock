@@ -2,6 +2,44 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-13 — iOS port started: ads, profile screen, icon, build script (commits `f714d05`, `091940e`)
+
+Owner asked for an App Store readiness check, then for everything that can be done in code. The audit found that iOS had not been started (the plan names Android as the initial platform). Version is not bumped; nothing was released. Steps for the owner are in the new `docs/release-ios.md`.
+
+### Decisions (mine, for the owner to confirm)
+- **No leaderboard on iOS in this version.** Play Games is Android-only. Game Center would be a new account service, which `instructions.md` §2 reserves for the owner.
+- **App Tracking Transparency off.** No tracking prompt; ads are served without the advertising identifier. Turning it on is described in `release-ios.md` §6.
+- **iPhone only**, minimum iOS 14.3 (the ads plugin's minimum).
+
+### Added
+- `ios/plugins/`: the iOS half of the AdMob plugin already used on Android (godot-admob v7.0, MIT; `AdmobPlugin-iOS-v7.0.zip`, SHA-256 `96aada90e397e54ecd7c60676a44bc06b5ead17998302b4cf179851e1f90b3cc`). Its GDScript files are identical to the ones in `addons/`. It pulls Google Mobile Ads 12.14.0 as a Swift package at export time.
+- `addons/AdmobPlugin/ios_export.cfg`: the Info.plist AdMob app id and the ATT switch. Shipped with `is_real=false` (Google's sample app id) because the iOS AdMob app does not exist yet.
+- `data/ads.json`: `ios_interstitial_unit_id` (empty). `Ads` reads the unit id of the platform it runs on and never falls back to the Android one; with no iOS unit id, ads stay off on iOS and the SDK is not started.
+- `assets/icon/ios_1024.png` from `tools/make_icon.py`: 1024 x 1024, no transparency, the art enlarged 10% over the navy gradient so the source's rounder corners do not show inside the iOS mask.
+- `tools/build_ios.sh`: device build (Xcode project, test ads), `--release` (archive, automatic signing, .ipa, then checks on bundle id, version, build, AdMob app id, plist keys, privacy manifest, build stamp and signature), `--verify`, `--bump`. Reads no credentials. Writes `build/.gdignore` so build output is not packed into the game.
+- `.gitignore`: `*.ipa`, `*.xcarchive`, `*.p12`, `*.p8`, `*.cer`, `*.mobileprovision`.
+
+### Changed
+- Profile screen: where Play Games is not set up (iOS, desktop) the leaderboard card is hidden and no text names Google or Play Games; the editor note says only "Saved on this phone only." It used to say "The online leaderboard works in the Google Play version of the game.", which the App Store rejects. Android builds with Play Games configured look the same as before. When Play Games is set up but one mode has no board, the caption now reads "The online leaderboard is not available for this mode."
+- `addons/GodotPlayGameServices/export_plugin.gd` (third-party, local patch): `_export_begin` returns at once for platforms other than Android. Without it every iOS export logged "Cannot call method 'store_string' on a null value".
+
+### Found while testing
+- The plugin's native library is only linked when the iOS preset has `plugins/AdmobPlugin=true`; without it the export succeeds and the app never shows an ad. The build script checks the preset and the generated project.
+- Godot 4.7.2's iOS libraries reference iOS 26 SDK symbols, so Xcode 16.4 cannot link the app. Xcode 26 is required.
+
+### Tests and builds (macOS 15, Godot 4.7.2, Xcode 16.4)
+- New tests: each platform reads its own unit id; iOS without a unit id leaves ads off and the game carries on; `ios_export.cfg` exists, has the ATT keys, and `is_real` is true exactly when the iOS unit id is set; real iOS ids are not copies of Android's; the plugin descriptor is present; the iOS icon is 1024 x 1024 without transparency; without Play Games the leaderboard card is hidden and no reachable text names Google, Play or Android; with it the card and the note are shown.
+- `godot --headless --path . -s tests/run_tests.gd`: **608 passed, 0 failed**.
+- `tools/build_ios.sh`: exported `build/ios/Arrowlock.xcodeproj`, export log without errors; Info.plist has `GADApplicationIdentifier`, 49 `SKAdNetworkItems`, `ITSAppUsesNonExemptEncryption` false, portrait only; the game data carries the stamp `{"build": 1, …, "test_ads": true}`.
+- `xcodebuild -project Arrowlock.xcodeproj -target Arrowlock -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO build`: all sources and Google's SDK compiled; the link failed only on `_CADynamicRangeAutomatic`, `_CADynamicRangeConstrainedHigh`, `_CADynamicRangeHigh`, `_CADynamicRangeStandard`, `_MTLTensorDomain` (iOS 26 SDK); the storyboard and asset catalog were not compiled because that Xcode has no iOS platform installed.
+- `tools/build_ios.sh --release` and `--verify`, with temporary values that were reverted: stopped with the right message at a missing Team ID, missing iOS ad ids, and Xcode older than 26.
+- **Not run:** archive, signing, .ipa export, the checks on a signed app, and any run on an iPhone or simulator.
+
+### Machine changes on the owner's Mac (outside the repository)
+- Godot 4.7.2 export templates installed in `~/Library/Application Support/Godot/export_templates/4.7.2.stable`.
+- Ruby gem `xcodeproj` 1.28.1 installed for the user (`gem install --user-install`).
+- `export_presets.cfg` (gitignored) created with an iOS preset; the Team ID is empty.
+
 ## 2026-11-12 — Interstitial frequency: 3 eligible rounds and 180 seconds
 
 Owner: no ads until level 10 is crossed; ads only after a win or a loss, never mid-round; an ad at most once every 3 finished rounds or 3 minutes, whichever is higher. Interpreted as both conditions (3 eligible rounds and 180 seconds) because "whichever is higher" is the more restrictive of the two. Version is not bumped; this is not a release.

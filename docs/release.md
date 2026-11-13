@@ -1,5 +1,7 @@
 # Release Guide (R7: Android release candidate)
 
+Android only; the iOS guide is `release-ios.md`.
+
 How to turn `main` into a build on the Play Console internal test track. Steps marked **Owner** need your Google account, signing key or a physical phone, so an agent cannot do them. Everything else is already in the repository.
 
 Current candidate: version name **0.3.0** (`project.godot` → `application/config/version`), version code **38**, subject to Play Console: Play has received no upload yet, so 38 is free there. Local sideload APKs have used codes up to 38; Play only rejects codes it has itself received. Release build: `tools/build_android.sh --release <key folder>` (§3).

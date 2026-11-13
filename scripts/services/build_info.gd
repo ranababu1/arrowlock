@@ -1,11 +1,12 @@
 class_name BuildInfo
 extends RefCounted
-## Facts stamped into each exported build by tools/build_android.sh, read from
-## res://data/build_info.json (gitignored, absent in the editor and in tests):
-##   "build"    : the Android version code
+## Facts stamped into each exported build by tools/build_android.sh and
+## tools/build_ios.sh, read from res://data/build_info.json (gitignored, absent
+## in the editor and in tests):
+##   "build"    : the Android version code or the iOS build number
 ##   "commit"   : short git commit
-##   "test_ads" : true for device-testing APKs (Google's test ad unit), false
-##                for the Play AAB (the real ad unit)
+##   "test_ads" : true for device-testing builds (Google's test ad unit), false
+##                for store builds (the real ad unit)
 
 const PATH := "res://data/build_info.json"
 
