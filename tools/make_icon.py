@@ -1,4 +1,4 @@
-"""Builds the Android launcher icons from the owner's icon art.
+"""Builds the Android launcher icons and the iOS app icon from the owner's icon art.
 
 Usage: python -I tools/make_icon.py [source.png]   (default tools/icon_source.png)
 
@@ -8,6 +8,9 @@ Writes to assets/icon/:
   adaptive_foreground_432.png   the two chevrons only, inside the 66 dp safe zone
   adaptive_background_432.png   the navy gradient
   adaptive_monochrome_432.png   white chevrons for Android 13 themed icons
+  ios_1024.png                  iOS / App Store icon: square, no transparency
+                                (Apple rejects alpha), navy to every edge so
+                                iOS can round the corners itself
 
 The source is a 1254x1254 RGB render: a navy rounded square on black with a
 green and a white chevron. The chevrons are cut out by brightness (the navy
@@ -36,6 +39,11 @@ SQUARE_INSET, SQUARE_RADIUS = 6, 380
 # diagonal stays inside that circle.
 ADAPTIVE = 432
 CHEVRON_HEIGHT = 190
+IOS_SIZE = 1024
+# The source's corners are rounder than the mask iOS applies (radius about 30%
+# of the side against about 22%), so its edge would show inside the icon. The
+# art is enlarged about its centre until that edge lies outside the iOS mask.
+IOS_ZOOM = 1.10
 
 
 def gradient(size: int) -> Image.Image:
@@ -94,6 +102,16 @@ def main() -> None:
     mono = Image.new("RGBA", fg.size, (255, 255, 255, 0))
     mono.putalpha(fg.getchannel("A"))
     mono.save(OUT / "adaptive_monochrome_432.png")
+
+    # iOS: the rounded square, enlarged, over the same navy gradient, so neither
+    # its edge nor the black corners of the source show inside the iOS mask.
+    side = src.size[0]
+    zoomed = round(side * IOS_ZOOM)
+    art = rounded(src).resize((zoomed, zoomed), Image.LANCZOS)
+    offset = (zoomed - side) // 2
+    ios = gradient(side).convert("RGBA")
+    ios.alpha_composite(art.crop((offset, offset, offset + side, offset + side)))
+    ios.convert("RGB").resize((IOS_SIZE, IOS_SIZE), Image.LANCZOS).save(OUT / "ios_1024.png")
 
     print("bbox", cut.size, "->", sorted(p.name for p in OUT.glob("*.png")))
 

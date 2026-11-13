@@ -10,10 +10,16 @@ build/
 *.apk
 *.aab
 *.idsig
+*.ipa
+*.xcarchive
 
 # Signing / secrets
 *.keystore
 *.jks
+*.p12
+*.p8
+*.cer
+*.mobileprovision
 .env
 
 # Editor / OS
@@ -23,5 +29,5 @@ build/
 Thumbs.db
 *.tmp
 
-# Stamped by tools/build_android.sh
+# Stamped by tools/build_android.sh and tools/build_ios.sh
 data/build_info.json

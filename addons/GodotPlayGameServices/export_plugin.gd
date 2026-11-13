@@ -37,6 +37,10 @@ class AndroidExportPlugin extends EditorExportPlugin:
 
 
 	func _export_begin(features: PackedStringArray, is_debug: bool, path: String, flags: int) -> void:
+		# Arrowlock patch: Godot calls this for every platform. Without the
+		# check an iOS export fails here ("store_string on a null value").
+		if not _supports_platform(get_export_platform()):
+			return
 		var id = get_option("godot_play_game_services/game_id")
 		if id == "":
 			printerr("[{plugin_name}] Export [Game id] is empty.".format({"plugin_name": _plugin_name}))

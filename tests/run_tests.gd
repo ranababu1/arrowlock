@@ -1958,6 +1958,9 @@ func _test_ad_policy() -> void:
 		if bool(ios_cfg.get_value("ATT", "att_enabled", false)):
 			_check(str(ios_cfg.get_value("ATT", "att_text", "")).strip_edges() != "", "ATT needs a usage text")
 	_check(FileAccess.file_exists("res://ios/plugins/AdmobPlugin.gdip"), "the AdMob iOS plugin descriptor is in the project")
+	# The App Store rejects icons that are not 1024x1024 or that have transparency.
+	var ios_icon := Image.load_from_file(ProjectSettings.globalize_path("res://assets/icon/ios_1024.png"))
+	_check(ios_icon != null and ios_icon.get_width() == 1024 and ios_icon.get_height() == 1024 and ios_icon.detect_alpha() == Image.ALPHA_NONE, "the iOS app icon is 1024x1024 with no transparency")
 
 
 ## Text of every Label, Button and LineEdit under `node` that the player can
