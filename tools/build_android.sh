@@ -207,6 +207,9 @@ apk_sha1=$("$BUILD_TOOLS/apksigner.bat" verify --print-certs "$apk" 2>/dev/null 
 unzip -p "$apk" assets/data/build_info.json | grep -q '"test_ads": true' || fail "APK is not a test-ads build"
 echo "  APK signature verified; same upload key; test ads"
 
+# Play requires 16 KB page support for apps targeting Android 15+.
+python -I tools/check_16kb.py "$aab" "$apk" || fail "16 KB page size check (see above)"
+
 echo
 echo "Release build OK (version $version, build $code, commit $commit)"
 for f in "$aab" "$apk"; do

@@ -72,7 +72,8 @@ The password never goes on a command line, into the repository, or into logs: ex
 4. AAB manifest (read by `tools/aab_manifest.py`, no third-party tool): it is an app bundle, package, versionName and versionCode match, arm64-v8a native libs present, Play Games `APP_ID` and the real AdMob app id present, Game ID in the resources, build stamp says real ads.
 5. AAB signature: `jarsigner -verify` passes and `keytool -printcert -jarfile` shows the upload key SHA-1 (`$UPLOAD_SHA1`, default above).
 6. APK signature: `apksigner verify` passes with the same SHA-1, and the APK is stamped for test ads.
-7. Prints each artifact's path, size and SHA-256.
+7. 16 KB page size (`tools/check_16kb.py`, required by Play for Android 15+ targets): every 64-bit native library in the AAB and APK has 16 KB-aligned LOAD segments, and uncompressed libraries in the APK start at a 16 KB offset.
+8. Prints each artifact's path, size and SHA-256.
 
 To re-run only the checks on artifacts that already exist (no rebuild, no key): `tools/build_android.sh --verify`.
 
