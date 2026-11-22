@@ -1,0 +1,615 @@
+{
+	"levels": [
+		{
+			"arrows": [
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 0
+				}
+			],
+			"generator_version": 1,
+			"height": 4,
+			"id": 101,
+			"metrics": {
+				"arrows": 4,
+				"bait": 1,
+				"blocked_at_start": 3,
+				"depth": 0,
+				"free_at_start": 1,
+				"height": 4,
+				"safe_starts": 1,
+				"trap_steps": 0,
+				"traps": 0,
+				"turners": 1,
+				"width": 4
+			},
+			"moves_limit": 7,
+			"name": "Narrow Ridge",
+			"seed": 20261165885224,
+			"width": 4
+		},
+		{
+			"arrows": [
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 0,
+					"y": 2
+				}
+			],
+			"generator_version": 1,
+			"height": 4,
+			"id": 102,
+			"metrics": {
+				"arrows": 5,
+				"bait": 0,
+				"blocked_at_start": 4,
+				"depth": 0,
+				"free_at_start": 1,
+				"height": 4,
+				"safe_starts": 1,
+				"trap_steps": 0,
+				"traps": 0,
+				"turners": 1,
+				"width": 4
+			},
+			"moves_limit": 8,
+			"name": "Iron Tower",
+			"seed": 20261165886233,
+			"width": 4
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 0
+				}
+			],
+			"generator_version": 1,
+			"height": 4,
+			"id": 103,
+			"metrics": {
+				"arrows": 5,
+				"bait": 0,
+				"blocked_at_start": 3,
+				"depth": 0,
+				"free_at_start": 2,
+				"height": 4,
+				"safe_starts": 1,
+				"trap_steps": 1,
+				"traps": 1,
+				"turners": 1,
+				"width": 4
+			},
+			"moves_limit": 8,
+			"name": "Crimson Window",
+			"seed": 20261165887243,
+			"width": 4
+		},
+		{
+			"arrows": [
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 0
+				}
+			],
+			"generator_version": 1,
+			"height": 5,
+			"id": 104,
+			"metrics": {
+				"arrows": 6,
+				"bait": 0,
+				"blocked_at_start": 5,
+				"depth": 0,
+				"free_at_start": 1,
+				"height": 5,
+				"safe_starts": 1,
+				"trap_steps": 1,
+				"traps": 1,
+				"turners": 2,
+				"width": 4
+			},
+			"moves_limit": 10,
+			"name": "Bright Anchor",
+			"seed": 20261165888251,
+			"width": 4
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 1
+				}
+			],
+			"generator_version": 1,
+			"height": 5,
+			"id": 105,
+			"metrics": {
+				"arrows": 7,
+				"bait": 1,
+				"blocked_at_start": 6,
+				"depth": 0,
+				"free_at_start": 1,
+				"height": 5,
+				"safe_starts": 1,
+				"trap_steps": 1,
+				"traps": 1,
+				"turners": 2,
+				"width": 4
+			},
+			"moves_limit": 12,
+			"name": "Winding Canyon",
+			"seed": 20261165889261,
+			"width": 4
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 1
+				}
+			],
+			"generator_version": 1,
+			"height": 5,
+			"id": 106,
+			"metrics": {
+				"arrows": 7,
+				"bait": 1,
+				"blocked_at_start": 4,
+				"depth": 0,
+				"free_at_start": 3,
+				"height": 5,
+				"safe_starts": 1,
+				"trap_steps": 1,
+				"traps": 2,
+				"turners": 2,
+				"width": 5
+			},
+			"moves_limit": 12,
+			"name": "Tidy Ember",
+			"seed": 20261165890270,
+			"width": 5
+		},
+		{
+			"arrows": [
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 3
+				}
+			],
+			"generator_version": 1,
+			"height": 5,
+			"id": 107,
+			"metrics": {
+				"arrows": 8,
+				"bait": 1,
+				"blocked_at_start": 6,
+				"depth": 0,
+				"free_at_start": 2,
+				"height": 5,
+				"safe_starts": 1,
+				"trap_steps": 2,
+				"traps": 2,
+				"turners": 2,
+				"width": 5
+			},
+			"moves_limit": 13,
+			"name": "Pale Glacier",
+			"seed": 20261165891279,
+			"width": 5
+		},
+		{
+			"arrows": [
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 1
+				}
+			],
+			"generator_version": 1,
+			"height": 6,
+			"id": 108,
+			"metrics": {
+				"arrows": 9,
+				"bait": 1,
+				"blocked_at_start": 6,
+				"depth": 0,
+				"free_at_start": 3,
+				"height": 6,
+				"safe_starts": 1,
+				"trap_steps": 1,
+				"traps": 2,
+				"turners": 3,
+				"width": 5
+			},
+			"moves_limit": 15,
+			"name": "Misty Drift",
+			"seed": 20261165892289,
+			"width": 5
+		},
+		{
+			"arrows": [
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 4,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 0,
+					"y": 5
+				}
+			],
+			"generator_version": 1,
+			"height": 6,
+			"id": 109,
+			"metrics": {
+				"arrows": 9,
+				"bait": 1,
+				"blocked_at_start": 7,
+				"depth": 0,
+				"free_at_start": 2,
+				"height": 6,
+				"safe_starts": 1,
+				"trap_steps": 2,
+				"traps": 3,
+				"turners": 3,
+				"width": 5
+			},
+			"moves_limit": 15,
+			"name": "Hidden Harbor",
+			"seed": 20261165893296,
+			"width": 5
+		},
+		{
+			"arrows": [
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 0
+				}
+			],
+			"generator_version": 1,
+			"height": 6,
+			"id": 110,
+			"metrics": {
+				"arrows": 10,
+				"bait": 0,
+				"blocked_at_start": 8,
+				"depth": 0,
+				"free_at_start": 2,
+				"height": 6,
+				"safe_starts": 1,
+				"trap_steps": 2,
+				"traps": 3,
+				"turners": 3,
+				"width": 5
+			},
+			"moves_limit": 16,
+			"name": "Quiet Orbit",
+			"seed": 20261165894306,
+			"width": 5
+		}
+	],
+	"version": 2
+}

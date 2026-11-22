@@ -7,14 +7,23 @@ extends RefCounted
 ## arrow can leave. Taps on empty cells are free. The level is lost when the
 ## moves run out while arrows remain.
 ##
+## Turners: after every arrow that leaves, each remaining turner turns 90
+## degrees clockwise (blocked taps turn nothing). Undo turns them back.
+##
 ## Optional countdown: the clock starts at the first tap on an arrow and is
 ## refilled by every later one (and by Undo and Hint). Running out of time
 ## loses the level.
 
 enum State { PLAYING, WON, LOST }
 
+## Search budget (positions) for hints on boards with turners.
+const HINT_SEARCH_BUDGET := 20000
+
 signal arrow_removed(id: int, info: Dictionary)
 signal arrow_restored(id: int)
+## Remaining turners turned by `steps` quarter turns (1 after a removal,
+## -1 when an undo takes one back).
+signal turners_rotated(steps: int)
 signal move_blocked(id: int, blocker_id: int)
 signal completed(moves_used: int)
 signal lost(wasted_taps: int)
@@ -128,7 +137,11 @@ func tap(pos: Vector2i) -> bool:
 		return false
 	var info := board.remove_arrow(id)
 	_history.append({"id": id, "info": info})
+	var turned := board.has_turners()
+	board.rotate_turners(1)
 	arrow_removed.emit(id, info)
+	if turned:
+		turners_rotated.emit(1)
 	# A win on the last allowed move counts as a win, so check it first.
 	if board.is_empty():
 		state = State.WON
@@ -139,12 +152,32 @@ func tap(pos: Vector2i) -> bool:
 
 
 ## ID of a currently clear arrow, or -1 if none. Costs no move; the caller
-## charges coins.
+## charges coins. With turners on the board a clear arrow can be a trap, so
+## the hint is the first move of a winning line; -1 means no line exists
+## (see is_dead_end). If the search runs out of budget it falls back to any
+## clear arrow.
 func hint() -> int:
 	if state != State.PLAYING:
 		return -1
 	var options := MoveValidator.removable_ids(board)
-	return options[0] if not options.is_empty() else -1
+	if options.is_empty() or not board.has_turners():
+		return options[0] if not options.is_empty() else -1
+	var found := PuzzleSolver.solve_search(board, HINT_SEARCH_BUDGET)
+	if found["status"] == PuzzleSolver.SOLVED:
+		return found["order"][0]
+	if found["status"] == PuzzleSolver.UNSOLVABLE:
+		return -1
+	return options[0]
+
+
+## True when arrows remain but no order of moves can clear them any more.
+## Only possible with turners; plain boards can never get stuck.
+func is_dead_end() -> bool:
+	if state != State.PLAYING or board.is_empty():
+		return false
+	if not board.has_turners():
+		return MoveValidator.removable_ids(board).is_empty()
+	return PuzzleSolver.solve_search(board, HINT_SEARCH_BUDGET)["status"] == PuzzleSolver.UNSOLVABLE
 
 
 ## Continue a lost level with `count` more moves, once per attempt.
@@ -175,8 +208,12 @@ func undo() -> bool:
 		wasted_taps -= 1
 		refill_clock()
 		return true
+	var turned := board.has_turners()
+	board.rotate_turners(-1)
 	board.restore_arrow(entry["id"], entry["info"])
 	refill_clock()
+	if turned:
+		turners_rotated.emit(-1)
 	arrow_restored.emit(entry["id"])
 	return true
 

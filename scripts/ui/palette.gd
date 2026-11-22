@@ -29,11 +29,13 @@ const GLASS_BORDER := Color(1, 1, 1, 0.14)
 const WORLD_COLORS: Array[Color] = [
 	Color("6c5cff"), Color("2dd4ff"), Color("35e0a1"), Color("ff8a5b"), Color("ffc83d"),
 	Color("ff6fb5"), Color("5b8cff"), Color("c084fc"), Color("2fd6c4"), Color("ff5d73"),
+	Color("a3e635"), Color("f59e0b"),
 ]
 ## Short names shown on each world card.
 const WORLD_NAMES: Array[String] = [
 	"First Steps", "Crossroads", "Long Lines", "Late Blockers", "Tight Squeeze",
 	"Dense Lanes", "Deep Chains", "Pressure", "Expert", "Gridlock",
+	"Turning Point", "Spin Cycle",
 ]
 
 

@@ -7,12 +7,20 @@ extends RefCounted
 ## every arrow already placed. It may sit in the way of earlier arrows, which
 ## creates dependencies. So removing arrow IDs in ascending order is always a
 ## valid solution (ID 0 is removed first), and no blocking cycle can form.
+##
+## Turner worlds (spec key "turners") start from such a board and turn some
+## arrows into turners. Arrow `id` leaves after `id` other removals, so it is
+## given the starting direction that turns into its placed direction by then.
+## Removing IDs in ascending order therefore still clears the board, but other
+## orders can now fail: those are the traps the spec asks for ("traps").
 
 const GENERATOR_VERSION := 1
 const LEVELS_PER_WORLD := 10
 const MAX_FILL := 0.55  ## arrows never occupy more than this share of the cells
 const DEFAULT_MIN_SLACK := 2  ## spare moves every level gets unless its spec says otherwise
 const DEFAULT_DEPTH_RATIO := 0.3
+## Hill-climb steps per candidate in turner worlds (spec key "climb").
+const DEFAULT_CLIMB_STEPS := 120
 const NAME_ADJECTIVES: Array[String] = [
 	"Amber", "Quiet", "Crimson", "Gentle", "Hidden", "Iron", "Lunar", "Misty", "Narrow", "Open",
 	"Pale", "Rapid", "Silver", "Tidy", "Upper", "Velvet", "Winding", "Young", "Zesty", "Bright",
@@ -119,7 +127,10 @@ static func board_to_arrows(board: BoardState) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	for id in board.arrow_ids():
 		var pos := board.arrow_position(id)
-		out.append({"x": pos.x, "y": pos.y, "dir": board.arrow_direction(id)})
+		var entry := {"x": pos.x, "y": pos.y, "dir": board.arrow_direction(id)}
+		if board.is_turner(id):
+			entry["turn"] = true
+		out.append(entry)
 	return out
 
 
@@ -129,6 +140,8 @@ static func board_to_arrows(board: BoardState) -> Array[Dictionary]:
 ## pack can be made to never get shallower from one level to the next. Returns
 ## {"level": Dictionary, "canon": String} or {} when no unique board was found.
 static func generate_level(spec: Dictionary, world: int, index: int, level_id: int, master_seed: int, candidates: int, used_canon: Dictionary, min_depth: int = 0) -> Dictionary:
+	if spec.has("turners"):
+		return generate_turner_level(spec, index, level_id, master_seed, candidates, used_canon, min_depth)
 	var params := slot_params(spec, index)
 	var count: int = params["arrows"]
 	var target_depth := mini(count - 1, maxi(min_depth, target_depth_for(spec, world, index, count)))
@@ -171,6 +184,163 @@ static func generate_level(spec: Dictionary, world: int, index: int, level_id: i
 	return best
 
 
+## Number of turners and the trap target for level `index` of a turner world.
+static func turner_targets(spec: Dictionary, index: int, count: int) -> Dictionary:
+	var t := float(index) / float(LEVELS_PER_WORLD - 1)
+	var turners := clampi(roundi(lerpf(spec["turners"][0], spec["turners"][1], t)), 1, count)
+	var traps_range: Array = spec.get("traps", [0, 0])
+	return {"turners": turners, "traps": roundi(lerpf(traps_range[0], traps_range[1], t))}
+
+
+## Copy of `board` with `k` of its arrows turned into turners. Arrow IDs are the
+## removal order, so arrow `id` starts `id` quarter turns back from its placed
+## direction and points that way again when its turn comes.
+static func with_turners(board: BoardState, k: int, rng: RandomNumberGenerator) -> BoardState:
+	var ids := board.arrow_ids()
+	# Arrow 0 leaves first and would never turn before it goes; skip it.
+	var pool: Array[int] = ids.filter(func(i: int) -> bool: return i > 0)
+	for i in range(pool.size() - 1, 0, -1):
+		var j := rng.randi_range(0, i)
+		var swap := pool[i]
+		pool[i] = pool[j]
+		pool[j] = swap
+	var chosen: Dictionary = {}
+	for i in mini(k, pool.size()):
+		chosen[pool[i]] = true
+	var out := BoardState.new(board.width, board.height)
+	for id in ids:
+		var dir := board.arrow_direction(id)
+		if chosen.has(id):
+			out.add_arrow(id, board.arrow_position(id), BoardState.rotated(dir, -id), true)
+		else:
+			out.add_arrow(id, board.arrow_position(id), dir)
+	return out
+
+
+## Like generate_level, for a world with turners. Each candidate starts from a
+## constructed (solvable) board and is then improved by a short hill climb
+## (see climb_traps) towards the slot's trap target; `min_traps` (the previous
+## level's traps) is a floor that is only broken when nothing better turns up.
+## Every board kept must be solved by the same search the in-game hint uses,
+## within its budget.
+static func generate_turner_level(spec: Dictionary, index: int, level_id: int, master_seed: int, candidates: int, used_canon: Dictionary, min_traps: int = 0) -> Dictionary:
+	var params := slot_params(spec, index)
+	var count: int = params["arrows"]
+	var targets := turner_targets(spec, index, count)
+	var target_traps := maxi(min_traps, int(targets["traps"]))
+	var steps := int(spec.get("climb", DEFAULT_CLIMB_STEPS))
+	var rng := RandomNumberGenerator.new()
+	var best: Dictionary = {}
+	var best_cost := 1 << 30
+	for k in int(spec.get("candidates", candidates)):
+		var seed_value := master_seed * 1000003 + level_id * 1009 + k
+		rng.seed = seed_value
+		var plain := generate_board(params["width"], params["height"], count, float(spec["bias"]), rng, float(spec.get("chain", 0.0)))
+		if plain == null:
+			continue
+		var start := with_turners(plain, targets["turners"], rng)
+		if PuzzleSolver.solve_search(start, GameController.HINT_SEARCH_BUDGET)["status"] != PuzzleSolver.SOLVED:
+			continue
+		var climbed := climb_traps(start, target_traps, steps, rng, used_canon)
+		if climbed.is_empty():
+			continue
+		var board: BoardState = climbed["board"]
+		var metrics := LevelMetrics.compute(board)
+		var cost := _trap_cost(metrics, target_traps)
+		if metrics["traps"] < min_traps:
+			cost += (min_traps - metrics["traps"]) * 1000000
+		if cost < best_cost:
+			best_cost = cost
+			best = {
+				"canon": climbed["canon"],
+				"level": {
+					"id": level_id,
+					"name": level_name(level_id),
+					"moves_limit": params["moves_limit"],
+					"width": params["width"],
+					"height": params["height"],
+					"arrows": board_to_arrows(board),
+					"seed": seed_value,
+					"generator_version": GENERATOR_VERSION,
+					"metrics": metrics,
+				},
+			}
+			if cost == 0:
+				break
+	return best
+
+
+## Distance from the trap target; among equals, fewer safe opening moves wins.
+static func _trap_cost(metrics: Dictionary, target_traps: int) -> int:
+	return absi(int(metrics["traps"]) - target_traps) * 100 + int(metrics["safe_starts"])
+
+
+## Hill climb on a solvable turner board: each step either points one turner
+## a different way or swaps which arrow is a turner (the count stays the
+## same). A change is kept when the board is still solvable within the hint
+## budget, its layout is not already used, and it is no further from
+## `target_traps`. Returns {"board", "canon"} or {} if the start is unusable.
+static func climb_traps(start: BoardState, target_traps: int, steps: int, rng: RandomNumberGenerator, used_canon: Dictionary) -> Dictionary:
+	var current := start
+	var current_canon := BoardCanon.canonical(start)
+	var current_cost := _trap_cost(LevelMetrics.turner_metrics(start), target_traps)
+	var usable := not used_canon.has(current_canon)
+	for _s in steps:
+		if usable and current_cost == 0:
+			break
+		var next := _mutate_turners(current, rng)
+		if next == null or PuzzleSolver.solve_search(next, GameController.HINT_SEARCH_BUDGET)["status"] != PuzzleSolver.SOLVED:
+			continue
+		var canon := BoardCanon.canonical(next)
+		if used_canon.has(canon):
+			continue
+		var cost := _trap_cost(LevelMetrics.turner_metrics(next), target_traps)
+		if cost <= current_cost or not usable:
+			current = next
+			current_canon = canon
+			current_cost = cost
+			usable = true
+	if not usable:
+		return {}
+	return {"board": current, "canon": current_canon}
+
+
+## One random change to a turner board, or null when it has no turner.
+static func _mutate_turners(board: BoardState, rng: RandomNumberGenerator) -> BoardState:
+	var ids := board.arrow_ids()
+	var turners: Array[int] = ids.filter(func(i: int) -> bool: return board.is_turner(i))
+	var plain: Array[int] = ids.filter(func(i: int) -> bool: return not board.is_turner(i))
+	if turners.is_empty():
+		return null
+	var dirs: Dictionary = {}
+	var flags: Dictionary = {}
+	for id in ids:
+		dirs[id] = board.arrow_direction(id)
+		flags[id] = board.is_turner(id)
+	var pick: int = turners[rng.randi_range(0, turners.size() - 1)]
+	if plain.is_empty() or rng.randf() < 0.6:
+		dirs[pick] = BoardState.rotated(dirs[pick], rng.randi_range(1, 3))
+	else:
+		var other: int = plain[rng.randi_range(0, plain.size() - 1)]
+		flags[pick] = false
+		flags[other] = true
+		dirs[other] = BoardState.rotated(dirs[other], rng.randi_range(0, 3))
+	var out := BoardState.new(board.width, board.height)
+	for id in ids:
+		out.add_arrow(id, board.arrow_position(id), dirs[id], flags[id])
+	return out
+
+
+## A plain board built from a JSON-style level dictionary (arrow i gets id i).
+static func board_from_level(level: Dictionary) -> BoardState:
+	var board := BoardState.new(int(level["width"]), int(level["height"]))
+	var next_id := 0
+	for a in level["arrows"]:
+		board.add_arrow(next_id, Vector2i(int(a["x"]), int(a["y"])), str(a["dir"]), bool(a.get("turn", false)))
+		next_id += 1
+	return board
+
+
 ## A rotated or mirrored copy of `source` under a new id and name. `source` is
 ## a JSON-style level dictionary. Returns {} if every transform looks identical.
 static func make_variant(source: Dictionary, new_id: int) -> Dictionary:
@@ -207,6 +377,10 @@ static func make_variant(source: Dictionary, new_id: int) -> Dictionary:
 ## - "allow_variants" (default true): a level with no unique board becomes a
 ##   variant of an earlier level (never in the first world, at least 10 levels
 ##   back). When false, or when no variant fits, it is reported as a failure.
+## - "keep_levels": JSON-style levels already released (ids 1..n, whole
+##   worlds). They are returned unchanged, their worlds are not generated
+##   again, and new levels must not repeat their layouts.
+## In turner worlds the rising floor is the trap count instead of the depth.
 static func generate_pack(config: Dictionary) -> Dictionary:
 	var levels: Array[Dictionary] = []
 	var failures: Array[String] = []
@@ -218,16 +392,28 @@ static func generate_pack(config: Dictionary) -> Dictionary:
 	var rising := bool(config.get("rising_depth", false))
 	var allow_variants := bool(config.get("allow_variants", true))
 	var previous_depth := 0
-	for w in worlds.size():
+	var previous_traps := 0
+	var kept: Array = config.get("keep_levels", [])
+	for level in kept:
+		used[BoardCanon.canonical(board_from_level(level))] = int(level["id"])
+		levels.append(level)
+		previous_depth = int(level.get("metrics", {}).get("depth", 0))
+	var kept_worlds := kept.size() / LEVELS_PER_WORLD
+	for w in range(kept_worlds, worlds.size()):
 		var spec: Dictionary = worlds[w].duplicate()
 		spec["breathers"] = bool(config.get("breathers", true))
+		var turner_world := spec.has("turners")
 		for i in LEVELS_PER_WORLD:
 			var level_id := w * LEVELS_PER_WORLD + i + 1
-			var made := generate_level(spec, w, i, level_id, master_seed, candidates, used, previous_depth if rising else 0)
+			var floor_value := previous_traps if turner_world else previous_depth
+			var made := generate_level(spec, w, i, level_id, master_seed, candidates, used, floor_value if rising else 0)
 			if not made.is_empty():
 				used[made["canon"]] = level_id
 				levels.append(made["level"])
-				previous_depth = made["level"]["metrics"]["depth"]
+				if turner_world:
+					previous_traps = made["level"]["metrics"]["traps"]
+				else:
+					previous_depth = made["level"]["metrics"]["depth"]
 				continue
 			var variant := {}
 			if w > 0 and allow_variants:

@@ -12,7 +12,7 @@ const BADGE_INFO := {
 	"first_clear": ["First clear", "Clear any level."],
 	"clears_10": ["10 levels cleared", "Clear 10 levels."],
 	"clears_50": ["50 levels cleared", "Clear 50 levels."],
-	"clears_100": ["All 100 levels cleared", "Clear every level of one mode."],
+	"clears_100": ["100 levels cleared", "Clear 100 levels of one mode."],
 	"perfect_clear": ["Perfect level", "Clear a level without a wasted tap."],
 	"world_perfect": ["Perfect world", "Get 3 stars on all 10 levels of a world."],
 	"hard_clear": ["Difficult cleared", "Clear a level in Difficult mode."],

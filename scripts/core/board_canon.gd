@@ -14,7 +14,7 @@ static func transform(board: BoardState, t: int) -> BoardState:
 	var h := board.height
 	var entries: Array[Array] = []
 	for id in board.arrow_ids():
-		entries.append([id, board.arrow_position(id), board.arrow_direction(id)])
+		entries.append([id, board.arrow_position(id), board.arrow_direction(id), board.is_turner(id)])
 	if t >= 4:
 		for e in entries:
 			var pos: Vector2i = e[1]
@@ -30,7 +30,7 @@ static func transform(board: BoardState, t: int) -> BoardState:
 		h = swap
 	var out := BoardState.new(w, h)
 	for e in entries:
-		out.add_arrow(e[0], e[1], e[2])
+		out.add_arrow(e[0], e[1], e[2], e[3])
 	return out
 
 
@@ -39,15 +39,17 @@ static func layout_key(board: BoardState) -> String:
 	var parts: Array[String] = []
 	for id in board.arrow_ids():
 		var pos := board.arrow_position(id)
-		parts.append("%d,%d,%s" % [pos.x, pos.y, board.arrow_direction(id)])
+		parts.append("%d,%d,%s%s" % [pos.x, pos.y, board.arrow_direction(id), ",t" if board.is_turner(id) else ""])
 	parts.sort()
 	return "%dx%d|%s" % [board.width, board.height, ";".join(parts)]
 
 
-## Same string for any rotation or mirror image of the same layout.
+## Same string for any rotation or mirror image of the same layout. A mirror
+## would turn clockwise turners into counter-clockwise ones, a different
+## puzzle, so boards with turners only match under the four rotations.
 static func canonical(board: BoardState) -> String:
 	var best := ""
-	for t in TRANSFORM_COUNT:
+	for t in (4 if board.has_turners() else TRANSFORM_COUNT):
 		var key := layout_key(transform(board, t))
 		if best == "" or key < best:
 			best = key

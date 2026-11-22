@@ -151,3 +151,19 @@ Further owner direction the same day:
 - **The per-tap clock is Difficult-only** (10 s). Easy has no clock at all (it had 20 s from level 31).
 - Coin balance and the level freeze were left to the agent: see the changelog of 2026-11-05.
 - Audio and tutorial review: later; nothing waits for it.
+
+
+## 12. Levels 101–120: turning arrows (owner request, 2026-11-22)
+
+Owner decisions: make the game harder with a new rule, only in new levels after 100; levels 1–100 stay frozen.
+
+- **Rule:** a turner (arrow with a ring) turns 90° clockwise after every arrow that leaves. Blocked taps do not turn it. Undo turns it back. Turning only clockwise was my choice (open question 2 of the proposal), because it is simpler to read.
+- **Dead ends:** a board can become unwinnable before the moves run out. The owner rule "lost only at 0 moves" is kept. Hint finds a safe move, or says "No way out from here. Undo or retry." for free. That note was my choice (open question 1); the owner can turn it down.
+- **Difficulty measure:** `traps` = free arrows whose removal loses the level, counted at every position along the winning line.
+
+| World | Levels | Easy (arrows / turners / traps) | Difficult (arrows / turners / traps) |
+|---|---|---|---|
+| 11 Turning Point | 101–110 | 4–10 / 1–3 / 0–3 | 12–18 / 3–6 / 3–6 |
+| 12 Spin Cycle | 111–120 | 10–16 / 3–6 / 3–6 | 18–24 / 6–9 / 4–9 |
+
+- **Next:** the owner plays 101–120 in both modes, then decides whether to freeze them and whether to make more turner worlds or add a second mechanic (sliding arrows or walls, see `level-plan-500.md`).

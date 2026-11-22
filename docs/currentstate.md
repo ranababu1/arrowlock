@@ -1,6 +1,6 @@
 # Current State
 
-**Phase:** Release 1 (`docs/level-plan-100.md`). R1 to R4 done; both 100-level packs are final for release 1 and frozen; badges/stats screen, vibration and the Play Games leaderboard code are in. Next: the owner-only steps of the Android release candidate (R7, `docs/release.md`). An iOS port was started on 2026-11-13 (owner request): code, export and build script are in; no iOS build has been signed or run (`docs/release-ios.md`). **Last updated:** 2026-11-13.
+**Phase:** Release 1 (`docs/level-plan-100.md`). R1 to R4 done; both 100-level packs are final for release 1 and frozen; badges/stats screen, vibration and the Play Games leaderboard code are in. Next: the owner-only steps of the Android release candidate (R7, `docs/release.md`). An iOS port was started on 2026-11-13 (owner request): code, export and build script are in; no iOS build has been signed or run (`docs/release-ios.md`). **2026-11-22:** levels 101–120 with a new rule, turning arrows, added to both packs (owner request: the game was too easy). Not committed, not frozen, not played (`docs/level-plan-100.md` §12). **Last updated:** 2026-11-22.
 **Branch/commit:** `main`, remote `origin` = https://github.com/ranababu1/arrowlock.git. Version name 0.3.0 (`project.godot`), version code 38 (export preset, gitignored), the Play release candidate, subject to Play Console. Device APK: `tools/build_android.sh`; Play release (signed AAB + upload-key APK, verified): `tools/build_android.sh --release <key folder>` (`docs/release.md` §3).
 
 ## Feature status
@@ -9,6 +9,7 @@
 | Godot project scaffold | Implemented; loads and starts headless |
 | Rules engine, solvers, move limits | Implemented; tests pass. Undo takes back exactly one tap (wasted or not) and refunds it; empty-cell taps are free; a level is lost only at 0 moves (owner decision, even if already unwinnable) |
 | Level select, game screen, win/game-over panels, hint/undo/extra moves | Implemented; verified on the emulator on 2026-11-01 (before today's changes) |
+| Turning arrows (levels 101–120) | Implemented and tested 2026-11-22: rule, search solver, safe hint with "No way out" note, generator with trap targets, ring and turn animation, tips on 101–103. 20 new levels per pack, **not frozen**, not played by anyone, not run on a device |
 | Content | Easy and Difficult packs, 100 levels each, regenerated 2026-11-05 to get harder level by level (no breathers, no reused layouts) and **frozen** in `data/levels.lock.json`. Not reviewed by the owner (owner chose not to review now) |
 | Level tooling | Generator with depth ranges per world, rising-depth floor and a switch to forbid reuse; validator; `tools/generate_levels.gd`, `tools/freeze_levels.gd` |
 | Save v2 + rewards | Implemented and tested: stars, coins, world unlock, badges, v1 migration, vibration setting, leaderboard state. Older 0.1.0 saves load unchanged (defaults fill the new fields) |
@@ -46,6 +47,7 @@ Verified 2026-11-05 in a Linux container with the official Godot 4.7.2 build:
 - `tools/build_android.sh --bump` → signed `arrowlock-0.3.0-b33-arm64-v8a.apk`, 90.8 MB (was 80.6 MB; the ads SDK adds about 10 MB). Its manifest has the AdMob app id (Google's sample) and the AD_ID permissions (2026-11-08, Windows). Not installed on a device.
 - `godot --headless --path . -s tools/generate_levels.gd` (and `-- --hard`) → 100 levels each, 0 variants, 0 failures.
 - `godot --headless --path . --quit-after 120` → starts with no script errors.
+- 2026-11-22, macOS, Godot 4.7.2: `godot --headless --path . -s tests/run_tests.gd` → **669 passed, 0 failed** (turning arrows added).
 - 2026-11-13, macOS 15, Godot 4.7.2: `godot --headless --path . -s tests/run_tests.gd` → **608 passed, 0 failed**. `tools/build_ios.sh` → `build/ios/Arrowlock.xcodeproj` exported, no errors. `xcodebuild … -sdk iphoneos CODE_SIGNING_ALLOWED=NO build` with Xcode 16.4: compiles; link fails on `CADynamicRange*` and `MTLTensorDomain` (iOS 26 SDK); storyboard and asset catalog not compiled (no iOS platform installed in that Xcode).
 - Not done here: Android export, emulator or device runs (no Android SDK in that container). The plugin's editor code was not run there either.
 
@@ -60,6 +62,7 @@ Verified 2026-11-05 in a Linux container with the official Godot 4.7.2 build:
 - A level is lost only at 0 moves even if already unwinnable (by design).
 - Emulator `adb` is flaky; `DirAccess.rename_absolute` overwrite on Windows and save atomicity are unverified.
 - Levels are frozen: changing a released level breaks the tests on purpose. Add new levels only after level 100.
+- Levels 101–120 are not frozen yet; regenerating Difficult takes about 30 minutes. In Difficult, traps dip inside World 12 (for example, level 118 has 4 after 7).
 
 ## Next steps
 iOS (owner, `docs/release-ios.md`): Apple Developer Program and Team ID; Xcode 26; Team ID in the export preset; iOS app and interstitial unit in AdMob, then the two ids in the repo; run on an iPhone; `tools/build_ios.sh --release`; TestFlight; listing, privacy policy and App Privacy form.

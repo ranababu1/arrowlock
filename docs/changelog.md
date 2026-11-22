@@ -2,6 +2,32 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-22 — Turning arrows: a new rule for levels 101–120 (not committed)
+
+Owner request: the game is too easy. Cause: removing an arrow can only unblock others, so any free arrow is always a safe move. There are no wrong moves, only wrong taps. Owner decisions: add a new rule rather than retune, use it only in new levels after 100, leave levels 1–100 frozen and unchanged.
+
+### Added
+- **Turners**: arrows with a ring that turn 90° clockwise every time another arrow leaves the board. Blocked taps turn nothing; Undo turns them back. A free arrow can now be a trap that makes the board unwinnable. `BoardState` (`turn` flag, `rotate_turners`), `GameController` (`turners_rotated` signal).
+- `PuzzleSolver.solve_search`: depth-first search over removal orders. Since every removal turns every turner, the remaining set is the whole state; proven dead positions are shared between searches. `replay_wins` checks a found order through `GameController`.
+- Hint on turner boards gives the first move of a winning line. When none exists it says "No way out from here. Undo or retry." and charges nothing. `GameController.is_dead_end`. The rule "lost only at 0 moves" is unchanged.
+- Level metrics for turner boards: `turners`, `traps` (fatal free moves along the winning line), `trap_steps`, `safe_starts`.
+- Generator: turner worlds (spec keys `turners`, `traps`, `candidates`, `climb`). It builds a solvable board, turns arrows into turners with matching start directions, then hill-climbs towards the trap target. `tools/generate_levels.gd` keeps every locked level as it is and writes only the new worlds (`--all` regenerates everything).
+- Content: World 11 "Turning Point" and World 12 "Spin Cycle" in both packs (levels 101–120, Difficult 1101–1120). Easy: 4–16 arrows, 1–6 turners, traps rise 0 → 6 and never drop. Difficult: 12–24 arrows, 3–9 turners, traps 3 → 9 with dips inside World 12 (the generator could not hold the floor on the larger boards).
+- Board view: three-quarter ring with an arrowhead on turners (a shape cue, not only colour), and a 0.22 s quarter-turn animation.
+- Tutorial tips on levels 101–103 of either mode, shown even when tips are off.
+
+### Changed
+- Fingerprints add `,t` only for turner arrows, so all 200 frozen fingerprints are unchanged (tested). Boards with turners count as duplicates only under rotation, not mirroring.
+- Badge "All 100 levels cleared" is now "100 levels cleared" ("Clear 100 levels of one mode."); the threshold is unchanged.
+
+### Not done
+- Levels 101–120 are **not frozen** (`data/levels.lock.json` still holds 100 per pack). Run `tools/freeze_levels.gd` once the owner has played them.
+- Not played by a person; not run on a device. The animation and ring were not looked at on screen.
+
+### Tests (macOS, Godot 4.7.2)
+- `godot --headless --path . -s tests/run_tests.gd` → 669 passed, 0 failed (was 608).
+- `tools/generate_levels.gd`: Easy 20 levels in about 80 s, deterministic (a second run gave identical metrics). `-- --hard`: about 30 min. Both report 0 failures.
+
 ## 2026-11-13 — iOS port started: ads, profile screen, icon, build script (commits `f714d05`, `091940e`)
 
 Owner asked for an App Store readiness check, then for everything that can be done in code. The audit found that iOS had not been started (the plan names Android as the initial platform). Version is not bumped; nothing was released. Steps for the owner are in the new `docs/release-ios.md`.

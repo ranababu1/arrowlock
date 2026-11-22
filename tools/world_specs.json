@@ -14,6 +14,8 @@
 		{"name": "World 7", "width": [7, 7], "height": [8, 9], "arrows": [24, 28], "slack": 0.20, "bias": 0.84, "depth": [10, 11], "chain": 0.55, "free_weight": 1.5},
 		{"name": "World 8", "width": [7, 8], "height": [9, 9], "arrows": [28, 32], "slack": 0.15, "bias": 0.86, "depth": [11, 12], "chain": 0.60, "free_weight": 1.5},
 		{"name": "World 9", "width": [8, 8], "height": [9, 10], "arrows": [32, 36], "slack": 0.12, "bias": 0.88, "depth": [12, 14], "chain": 0.65, "free_weight": 2.0},
-		{"name": "World 10", "width": [8, 8], "height": [10, 11], "arrows": [36, 40], "slack": 0.10, "bias": 0.90, "depth": [14, 16], "chain": 0.70, "free_weight": 2.0}
+		{"name": "World 10", "width": [8, 8], "height": [10, 11], "arrows": [36, 40], "slack": 0.10, "bias": 0.90, "depth": [14, 16], "chain": 0.70, "free_weight": 2.0},
+		{"name": "World 11", "width": [4, 5], "height": [4, 6], "arrows": [4, 10], "slack": 0.60, "bias": 0.65, "chain": 0.30, "candidates": 12, "turners": [1, 3], "traps": [0, 3], "free_weight": 0.5},
+		{"name": "World 12", "width": [5, 6], "height": [6, 7], "arrows": [10, 16], "slack": 0.40, "bias": 0.75, "chain": 0.40, "candidates": 12, "turners": [3, 6], "traps": [3, 6], "free_weight": 0.5}
 	]
 }

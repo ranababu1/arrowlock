@@ -6,6 +6,11 @@ extends RefCounted
 ## on in Settings.
 
 const LAST_TIP_LEVEL := 3
+## Turners arrive in World 11. Their tips show on these levels (local
+## numbers, both modes) even after the first-run tips have switched off,
+## because they explain a new rule.
+const TURNER_TIP_FIRST := 101
+const TURNER_TIP_LAST := 103
 ## Taps after which the plain-text tips on levels 2 and 3 disappear.
 const TEXT_TIP_TAPS := 3
 
@@ -14,6 +19,9 @@ const TEXT_BLOCKED := "The red arrow is blocked by the white one. Tapping a bloc
 const TEXT_REST := "Nice! Now clear the rest of the board."
 const TEXT_MOVES := "Every tap costs a move, even on a blocked arrow. Watch MOVES LEFT."
 const TEXT_HINT := "Stuck? Hint shows an arrow that is free to go. It costs a few coins."
+const TEXT_TURNER := "Arrows with a ring turn a quarter clockwise every time another arrow leaves. Plan the order!"
+const TEXT_TURNER_TRAP := "A free arrow can be a trap: after it leaves, a ringed arrow may turn into a wall."
+const TEXT_TURNER_HINT := "Hint knows which free arrows are safe. If it says there is no way out, undo or retry."
 
 ## What a pointer means: "clear" = tap this one, "blocked" = this one is stuck.
 const KIND_CLEAR := "clear"
@@ -24,6 +32,10 @@ const KIND_BLOCKED := "blocked"
 ## (-1 for none) and blocker is the arrow in its way when kind is "blocked"
 ## (-1 otherwise). Returns {} when there is nothing to say.
 static func step_for(level_id: int, board: BoardState, moves_used: int, tips_enabled: bool) -> Dictionary:
+	var local := Difficulty.local_id(level_id)
+	if local >= TURNER_TIP_FIRST and local <= TURNER_TIP_LAST and not board.is_empty():
+		var texts := [TEXT_TURNER, TEXT_TURNER_TRAP, TEXT_TURNER_HINT]
+		return _text_only(texts[local - TURNER_TIP_FIRST], moves_used)
 	if not tips_enabled or level_id < 1 or level_id > LAST_TIP_LEVEL or board.is_empty():
 		return {}
 	match level_id:

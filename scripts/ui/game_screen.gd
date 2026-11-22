@@ -14,6 +14,7 @@ const STAR_STEP := 0.3
 ## A longer frame (app paused, debugger) never eats more than this much clock.
 const MAX_TICK_SECONDS := 0.25
 const LOW_TIME_RATIO := 0.3
+const DEAD_END_NOTE := "No way out from here. Undo or retry."
 
 var controller := GameController.new()
 var board_view: BoardView
@@ -67,6 +68,11 @@ func coach_text() -> String:
 	return _coach_label.text if _coach.visible else ""
 
 
+## The one-line note under the board (costs, hints, dead ends).
+func note_text() -> String:
+	return _note.text
+
+
 func overlay_kind() -> String:
 	return _overlay_kind
 
@@ -112,6 +118,9 @@ func use_undo() -> void:
 func use_hint() -> void:
 	var id := controller.hint()
 	if id == -1:
+		# Only turners can paint a board into a corner; say so, free of charge.
+		if controller.state == GameController.State.PLAYING and not controller.board.is_empty():
+			_note.text = DEAD_END_NOTE
 		return
 	if not _progress.spend(Economy.PRICE_HINT):
 		_note.text = "Hint costs %d coins" % Economy.PRICE_HINT

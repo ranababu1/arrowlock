@@ -6,6 +6,8 @@ extends RefCounted
 ## A blocked arrow is "bait" when its ray is clear for at least this many
 ## cells before the first blocker, so it looks free at a glance.
 const BAIT_MIN_CLEAR_RUN := 2
+## Search budget for each opening move when counting traps.
+const TRAP_SEARCH_BUDGET := 4000
 
 
 static func compute(board: BoardState) -> Dictionary:
@@ -21,8 +23,11 @@ static func compute(board: BoardState) -> Dictionary:
 			var distance := (board.arrow_position(ray[0]) - board.arrow_position(id)).abs()
 			if distance.x + distance.y - 1 >= BAIT_MIN_CLEAR_RUN:
 				bait += 1
-		depth = maxi(depth, _depth_of(board, id, depth_memo))
-	return {
+		# With turners the starting directions can block each other in a
+		# ring that the turns later break, so the chain depth is undefined.
+		if not board.has_turners():
+			depth = maxi(depth, _depth_of(board, id, depth_memo))
+	var out := {
 		"arrows": board.remaining_count(),
 		"width": board.width,
 		"height": board.height,
@@ -31,6 +36,44 @@ static func compute(board: BoardState) -> Dictionary:
 		"depth": depth,
 		"bait": bait,
 	}
+	if board.has_turners():
+		out.merge(turner_metrics(board))
+	return out
+
+
+## For boards with turners, measured along one winning line (the search's):
+## "turners" (how many), "traps" (over every position on that line, the clear
+## arrows whose removal leaves a board that can no longer be cleared),
+## "trap_steps" (positions on the line with at least one such arrow) and
+## "safe_starts" (clear opening moves that still win). A move the search
+## cannot settle within `budget` counts as safe. `depth` is reported as 0 for
+## such boards.
+static func turner_metrics(board: BoardState, budget: int = TRAP_SEARCH_BUDGET) -> Dictionary:
+	var traps := 0
+	var trap_steps := 0
+	var safe_starts := 0
+	var dead: Dictionary = {}
+	var line: Array = PuzzleSolver.solve_search(board, PuzzleSolver.SEARCH_BUDGET, dead)["order"]
+	var work := board.duplicate_state()
+	for step in line.size():
+		var here := 0
+		if work.has_turners():
+			for id in MoveValidator.removable_ids(work):
+				var after := work.duplicate_state()
+				after.remove_arrow(id)
+				after.rotate_turners(1)
+				if PuzzleSolver.solve_search(after, budget, dead)["status"] == PuzzleSolver.UNSOLVABLE:
+					here += 1
+				elif step == 0:
+					safe_starts += 1
+		elif step == 0:
+			safe_starts = MoveValidator.removable_ids(work).size()
+		traps += here
+		if here > 0:
+			trap_steps += 1
+		work.remove_arrow(line[step])
+		work.rotate_turners(1)
+	return {"turners": board.turner_count(), "traps": traps, "trap_steps": trap_steps, "safe_starts": safe_starts}
 
 
 ## 0 for an arrow with a clear ray; otherwise 1 + the deepest arrow it waits for.

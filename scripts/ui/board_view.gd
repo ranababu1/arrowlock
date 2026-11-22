@@ -27,6 +27,12 @@ const ARROW_CORNER_STEPS := 5
 const ARROW_SCALE := 1.15
 ## The silhouette spans x = -0.30 .. 0.34; this recentres it on the cell.
 const ARROW_CENTER_X := 0.02
+## Turners: a three-quarter ring with an arrowhead (clockwise) marks them, so
+## the cue is a shape, not a colour. They swing a quarter turn in this time.
+const TURN_SECONDS := 0.22
+const TURN_RING_RADIUS := 0.43  ## in cells
+const TURN_RING_WIDTH := 0.045  ## in cells
+const TURN_RING_COLOR := Color(1, 1, 1, 0.6)
 
 var _controller: GameController
 ## id -> {"info": Dictionary, "t": float}; arrows animating off the board.
@@ -40,6 +46,9 @@ var _coach_id: int = -1
 var _coach_kind := ""
 var _coach_blocker: int = -1
 var _clock: float = 0.0
+## Progress (0..1) of the last quarter turn and its direction (+1 / -1).
+var _turn_t: float = 1.0
+var _turn_steps: int = 0
 var _rng := RandomNumberGenerator.new()
 var _tile_style := StyleBoxFlat.new()
 static var _shape_cache := PackedVector2Array()
@@ -58,6 +67,7 @@ func bind(controller: GameController) -> void:
 	controller.arrow_removed.connect(_on_arrow_removed)
 	controller.move_blocked.connect(func(id: int, _blocker: int) -> void: _flashing[id] = BLOCKED_FLASH_SECONDS)
 	controller.arrow_restored.connect(func(id: int) -> void: _exiting.erase(id))
+	controller.turners_rotated.connect(_on_turners_rotated)
 
 
 func clear_animations() -> void:
@@ -67,6 +77,8 @@ func clear_animations() -> void:
 	_hint_id = -1
 	_coach_id = -1
 	_coach_blocker = -1
+	_turn_t = 1.0
+	_turn_steps = 0
 	queue_redraw()
 
 
@@ -109,6 +121,17 @@ func spark_count() -> int:
 	return _sparks.size()
 
 
+## True while turners are swinging to their new direction.
+func is_turning() -> bool:
+	return _turn_t < 1.0
+
+
+func _on_turners_rotated(steps: int) -> void:
+	_turn_steps = steps
+	_turn_t = 0.0
+	queue_redraw()
+
+
 func _on_arrow_removed(id: int, info: Dictionary) -> void:
 	_exiting[id] = {"info": info, "t": 0.0}
 	var l := _layout()
@@ -120,9 +143,10 @@ func _on_arrow_removed(id: int, info: Dictionary) -> void:
 
 
 func _process(delta: float) -> void:
-	if _exiting.is_empty() and _flashing.is_empty() and _sparks.is_empty() and _hint_id == -1 and _coach_id == -1:
+	if _exiting.is_empty() and _flashing.is_empty() and _sparks.is_empty() and _hint_id == -1 and _coach_id == -1 and _turn_t >= 1.0:
 		return
 	_clock += delta
+	_turn_t = minf(1.0, _turn_t + delta / TURN_SECONDS)
 	for id in _exiting.keys():
 		_exiting[id]["t"] += delta / EXIT_SECONDS
 		if _exiting[id]["t"] >= 1.0:
@@ -196,7 +220,13 @@ func _draw() -> void:
 		if id == _hint_id:
 			_draw_frame(origin, cell, b.arrow_position(id), HINT_COLOR, HINT_PULSE_HZ)
 			color = HINT_COLOR
-		_draw_arrow(origin, cell, b.arrow_position(id), b.arrow_direction(id), color, 1.0, 0.0, offset, 1.0)
+		var spin := 0.0
+		if b.is_turner(id):
+			_draw_turn_ring(origin, cell, b.arrow_position(id), offset)
+			# Swing from the old direction into the new one.
+			var eased := 1.0 - pow(1.0 - _turn_t, 3.0)
+			spin = -float(_turn_steps) * (1.0 - eased) * PI * 0.5
+		_draw_arrow(origin, cell, b.arrow_position(id), b.arrow_direction(id), color, 1.0, 0.0, offset, 1.0, spin)
 	for id in _exiting.keys():
 		var info: Dictionary = _exiting[id]["info"]
 		var t: float = _exiting[id]["t"]
@@ -218,9 +248,25 @@ func _draw_frame(origin: Vector2, cell: float, pos: Vector2i, color: Color, puls
 	draw_style_box(style, Rect2(origin + Vector2(pos) * cell, Vector2(cell, cell)).grow(-3.0))
 
 
+## The turner mark: a clockwise three-quarter ring with a small arrowhead.
+func _draw_turn_ring(origin: Vector2, cell: float, pos: Vector2i, offset: Vector2) -> void:
+	var center := origin + (Vector2(pos) + Vector2(0.5, 0.5)) * cell + offset
+	var radius := cell * TURN_RING_RADIUS
+	var width := maxf(1.5, cell * TURN_RING_WIDTH)
+	var start := -PI * 0.75
+	var end := start + PI * 1.5
+	draw_arc(center, radius, start, end, 28, TURN_RING_COLOR, width, true)
+	var tip := center + Vector2.from_angle(end) * radius
+	var along := Vector2.from_angle(end + PI * 0.5)
+	var out := Vector2.from_angle(end)
+	var head := cell * 0.09
+	draw_colored_polygon(PackedVector2Array([tip + along * head * 1.4, tip - along * head * 0.4 + out * head, tip - along * head * 0.4 - out * head]), TURN_RING_COLOR)
+
+
 ## One flat, rounded silhouette. Direction lives in the shape, not just the colour.
-func _draw_arrow(origin: Vector2, cell: float, pos: Vector2i, dir: String, color: Color, alpha: float, shift_cells: float, offset: Vector2, scale: float) -> void:
-	var step := Vector2(BoardState.DIRECTIONS[dir])
+## `spin` (radians, clockwise positive) turns the shape away from `dir`.
+func _draw_arrow(origin: Vector2, cell: float, pos: Vector2i, dir: String, color: Color, alpha: float, shift_cells: float, offset: Vector2, scale: float, spin: float = 0.0) -> void:
+	var step := Vector2(BoardState.DIRECTIONS[dir]).rotated(spin)
 	var center := origin + (Vector2(pos) + Vector2(0.5, 0.5) + step * shift_cells) * cell + offset
 	var perp := Vector2(-step.y, step.x)
 	var unit := cell * scale * ARROW_SCALE

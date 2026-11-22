@@ -96,8 +96,11 @@ func _parse_level(raw: Variant) -> Dictionary:
 	var board := BoardState.new(w, h)
 	var next_id := 0
 	for a in raw_arrows:
+		if typeof(a) == TYPE_DICTIONARY and a.has("turn") and typeof(a["turn"]) != TYPE_BOOL:
+			errors.append("Level %d has an arrow whose 'turn' is not true or false" % id)
+			return {}
 		if typeof(a) != TYPE_DICTIONARY \
-				or not board.add_arrow(next_id, Vector2i(int(a.get("x", -1)), int(a.get("y", -1))), str(a.get("dir", ""))):
+				or not board.add_arrow(next_id, Vector2i(int(a.get("x", -1)), int(a.get("y", -1))), str(a.get("dir", "")), bool(a.get("turn", false))):
 			errors.append("Level %d has an invalid, duplicate or out-of-bounds arrow" % id)
 			return {}
 		next_id += 1

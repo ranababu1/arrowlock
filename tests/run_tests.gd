@@ -3,6 +3,11 @@ extends SceneTree
 ## Run: godot --headless --path . -s tests/run_tests.gd
 ## Exit code is non-zero when any check fails.
 
+## Levels per pack: 100 frozen plain levels, then the turner worlds.
+const PACK_SIZE := 120
+## Levels 1..PLAIN_LEVELS have no turners (released, frozen).
+const PLAIN_LEVELS := 100
+
 var _passed := 0
 var _failed := 0
 
@@ -64,6 +69,11 @@ func _initialize() -> void:
 	_test_ad_policy()
 	_test_ads_service()
 	_test_ads_after_game()
+	_test_turner_rules()
+	_test_turner_solver()
+	_test_turner_identity_and_data()
+	_test_turner_packs()
+	_test_turner_ui()
 	print("Tests: %d passed, %d failed" % [_passed, _failed])
 	quit(1 if _failed > 0 else 0)
 
@@ -516,12 +526,12 @@ func _test_validator() -> void:
 func _test_generated_pack_files() -> void:
 	var repo := PuzzleRepository.new()
 	_check(repo.load_dir("res://data/packs"), "draft pack loads: " + "; ".join(repo.errors))
-	_check(repo.levels.size() == 100, "draft pack has 100 levels")
+	_check(repo.levels.size() == PACK_SIZE, "draft pack has %d levels" % PACK_SIZE)
 	var in_order := true
 	for i in repo.levels.size():
 		in_order = in_order and repo.levels[i]["id"] == i + 1
-	_check(in_order, "draft pack ids run 1..100 in order")
-	_check(LevelValidator.validate_pack(repo.levels, {"expected_count": 100}).is_empty(), "draft pack passes the content validator")
+	_check(in_order, "draft pack ids run 1..%d in order" % PACK_SIZE)
+	_check(LevelValidator.validate_pack(repo.levels, {"expected_count": PACK_SIZE}).is_empty(), "draft pack passes the content validator")
 	var previous_mean := 0.0
 	var rising := true
 	for w in 10:
@@ -538,8 +548,8 @@ func _test_generated_pack_files() -> void:
 func _test_hard_pack() -> void:
 	var repo := PuzzleRepository.new()
 	_check(repo.load_dir("res://data/packs_hard"), "Difficult pack loads: " + "; ".join(repo.errors))
-	_check(repo.levels.size() == 100, "Difficult pack has 100 levels")
-	_check(LevelValidator.validate_pack(repo.levels, {"expected_count": 100}).is_empty(), "Difficult pack passes the content validator")
+	_check(repo.levels.size() == PACK_SIZE, "Difficult pack has %d levels" % PACK_SIZE)
+	_check(LevelValidator.validate_pack(repo.levels, {"expected_count": PACK_SIZE}).is_empty(), "Difficult pack passes the content validator")
 	var shifted := PuzzleRepository.new()
 	_check(shifted.load_dir("res://data/packs_hard", Difficulty.HARD_ID_BASE), "Difficult pack loads with an id offset")
 	_check(shifted.levels[0]["id"] == 1001 and shifted.levels[99]["id"] == 1100, "ids are offset into the Difficult range")
@@ -554,8 +564,8 @@ func _test_hard_pack() -> void:
 		bigger = bigger and count > easy.levels[i]["board"].remaining_count()
 	_check(spare_ok, "Difficult levels leave at most two spare moves")
 	_check(bigger, "every Difficult level has more arrows than its Easy counterpart")
-	var tough := Array(repo.levels).filter(func(l: Dictionary) -> bool: return LevelMetrics.compute(l["board"])["depth"] >= 7)
-	_check(tough.size() == 100, "every Difficult level has a dependency chain at least 7 deep")
+	var tough := Array(repo.levels.slice(0, PLAIN_LEVELS)).filter(func(l: Dictionary) -> bool: return LevelMetrics.compute(l["board"])["depth"] >= 7)
+	_check(tough.size() == PLAIN_LEVELS, "every plain Difficult level has a dependency chain at least 7 deep")
 
 
 func _test_chain_generation() -> void:
@@ -604,7 +614,7 @@ func _test_level_select_ui() -> void:
 	var select := LevelSelect.new()
 	root.add_child(select)
 	select.setup(repo, progress)
-	_check(select.level_button_count() == 100, "level select lists all 100 levels")
+	_check(select.level_button_count() == PACK_SIZE, "level select lists all %d levels" % PACK_SIZE)
 	_check(select.enabled_level_count() == 10, "only world 1 is playable at the start")
 	var chosen := [-1]
 	select.level_chosen.connect(func(i: int) -> void: chosen[0] = i)
@@ -812,7 +822,7 @@ func _test_audio_manager() -> void:
 
 
 func _test_design_components() -> void:
-	_check(Palette.world_color(0) == Palette.WORLD_COLORS[0] and Palette.world_color(10) == Palette.WORLD_COLORS[0], "world colours wrap around")
+	_check(Palette.world_color(0) == Palette.WORLD_COLORS[0] and Palette.world_color(Palette.WORLD_COLORS.size()) == Palette.WORLD_COLORS[0] and Palette.WORLD_COLORS.size() == Palette.WORLD_NAMES.size(), "world colours wrap around, one per named world")
 	_check(Palette.world_name(0) == "First Steps" and Palette.world_name(9) == "Gridlock", "world names")
 	var seen: Dictionary = {}
 	for dir in ["up", "down", "left", "right"]:
@@ -912,7 +922,7 @@ func _test_level_select_design() -> void:
 	var select := LevelSelect.new()
 	root.add_child(select)
 	select.setup(repo, progress, 2)
-	_check(select.level_button_count() == 100, "redesigned level select still lists 100 levels")
+	_check(select.level_button_count() == PACK_SIZE, "redesigned level select still lists %d levels" % PACK_SIZE)
 	var tiles: Array[LevelTile] = []
 	for i in 12:
 		tiles.append(select._level_buttons[i])
@@ -1297,7 +1307,7 @@ func _test_difficulty_ui() -> void:
 	select.setup(hard, progress, 0)
 	await process_frame
 	_check(select.mode_label.text == "Difficult mode", "the menu names the mode being played")
-	_check(select.level_button_count() == 100 and select.enabled_level_count() == 10, "Difficult starts with its first world open")
+	_check(select.level_button_count() == PACK_SIZE and select.enabled_level_count() == 10, "Difficult starts with its first world open")
 	var picked: Array = []
 	select.level_chosen.connect(func(index: int) -> void: picked.append(index))
 	select.press_level(3)
@@ -1407,10 +1417,11 @@ func _pack_levels(dir: String) -> Array[Dictionary]:
 
 
 ## Both packs get harder level by level: never fewer arrows, never a shallower
-## dependency chain, never more spare moves per arrow. Level 100 is the peak.
+## dependency chain, never more spare moves per arrow. Level 100 is the peak
+## of the plain levels (the turner worlds after it have their own ramp).
 func _test_pack_ramp() -> void:
 	for dir in ["res://data/packs", "res://data/packs_hard"]:
-		var levels := _pack_levels(dir)
+		var levels := _pack_levels(dir).slice(0, PLAIN_LEVELS)
 		var arrows_ok := true
 		var depth_ok := true
 		var spare_ok := true
@@ -2222,3 +2233,221 @@ func _test_ads_after_game() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_ads_game_save.json"))
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_ads.json"))
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_ad_policy.json"))
+
+
+## Trap board: turner 0 at (1,1) points right and is free; arrow 1 below it
+## points up into it; arrow 2 is free. Removing 2 first turns 0 to face down
+## into 1, and nothing can ever move again. Removing 0 first wins.
+func _trap_board() -> BoardState:
+	var b := BoardState.new(3, 3)
+	b.add_arrow(0, Vector2i(1, 1), "right", true)
+	b.add_arrow(1, Vector2i(1, 2), "up")
+	b.add_arrow(2, Vector2i(0, 0), "up")
+	return b
+
+
+func _test_turner_rules() -> void:
+	_check(BoardState.rotated("up", 1) == "right" and BoardState.rotated("left", 1) == "up" and BoardState.rotated("up", -1) == "left" and BoardState.rotated("down", 6) == "up", "rotated turns clockwise and back")
+	var b := _trap_board()
+	_check(b.has_turners() and b.turner_count() == 1 and b.is_turner(0) and not b.is_turner(1), "turner flags and count")
+	var copy := b.duplicate_state()
+	copy.rotate_turners(1)
+	_check(copy.arrow_direction(0) == "down" and b.arrow_direction(0) == "right" and copy.arrow_direction(2) == "up", "rotate_turners turns only turners, and only on that copy")
+	var info := copy.remove_arrow(0)
+	_check(not copy.has_turners(), "removing the last turner clears has_turners")
+	copy.restore_arrow(0, info)
+	_check(copy.has_turners() and copy.arrow_direction(0) == "down", "restore brings the turner back as it left")
+	_check(not _board(2, 2, [[0, 0, "up"]]).has_turners(), "plain boards have no turners")
+
+	var c := GameController.new()
+	c.start(_trap_board(), 5)
+	var turns: Array[int] = []
+	c.turners_rotated.connect(func(steps: int) -> void: turns.append(steps))
+	_check(not c.tap(Vector2i(1, 2)), "arrow 1 is blocked by the turner")
+	_check(c.board.arrow_direction(0) == "right" and turns.is_empty(), "a blocked tap turns nothing")
+	c.undo()
+	_check(c.tap(Vector2i(0, 0)), "free plain arrow leaves")
+	_check(c.board.arrow_direction(0) == "down" and str(turns) == "[1]", "a removal turns the remaining turner clockwise")
+	_check(c.hint() == -1 and c.is_dead_end(), "after the trap move there is no way out, and hint says so")
+	_check(c.state == GameController.State.PLAYING, "a dead end is not a loss (lost only at 0 moves)")
+	c.undo()
+	_check(c.board.arrow_direction(0) == "right" and c.board.has_arrow(2) and str(turns) == "[1, -1]", "undo turns the turner back")
+	_check(c.hint() == 0 and not c.is_dead_end(), "hint picks the safe turner, not the trap arrow")
+	_check(c.tap(Vector2i(1, 1)), "the turner leaves while it faces a clear way")
+	_check(turns.size() == 2, "no turn signal when no turner remains")
+	c.undo()
+	_check(c.board.arrow_direction(0) == "right" and c.board.is_turner(0), "undo of a turner's own exit restores its direction")
+	var winner := GameController.new()
+	winner.start(_trap_board(), 3)
+	for cell in [Vector2i(1, 1), Vector2i(1, 2), Vector2i(0, 0)]:
+		winner.tap(cell)
+	_check(winner.state == GameController.State.WON, "the safe order wins")
+
+
+## Brute force through the game's own controller (tap and undo), independent
+## of PuzzleSolver: can this position still be cleared?
+func _brute_can_win(c: GameController) -> bool:
+	if c.board.is_empty():
+		return true
+	for id in c.board.arrow_ids():
+		var pos := c.board.arrow_position(id)
+		if MoveValidator.can_remove(c.board, id):
+			c.tap(pos)
+			var ok := _brute_can_win(c)
+			c.undo()
+			if ok:
+				return true
+	return false
+
+
+func _test_turner_solver() -> void:
+	var trap := _trap_board()
+	var found := PuzzleSolver.solve_search(trap)
+	_check(found["status"] == PuzzleSolver.SOLVED and found["order"][0] == 0, "search finds the winning order on the trap board")
+	_check(PuzzleSolver.solve(trap).size() == 3 and PuzzleSolver.replay_wins(trap, PuzzleSolver.solve(trap)), "solve() uses the search for turner boards and its order wins")
+	_check(not PuzzleSolver.replay_wins(trap, [2, 0, 1] as Array[int]), "the trap order does not win when replayed")
+	var stuck := trap.duplicate_state()
+	stuck.remove_arrow(2)
+	stuck.rotate_turners(1)
+	_check(PuzzleSolver.solve_search(stuck)["status"] == PuzzleSolver.UNSOLVABLE, "the position after the trap move is proven unsolvable")
+	var m := LevelMetrics.compute(trap)
+	_check(m["turners"] == 1 and m["traps"] == 1 and m["trap_steps"] == 1 and m["safe_starts"] == 1, "turner metrics count the trap and the safe start")
+	_check(not LevelMetrics.compute(_board(3, 3, [[1, 1, "up"]])).has("traps"), "plain boards keep their old metrics")
+	# Search against brute force on random small turner boards.
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 515151
+	var dirs := ["up", "down", "left", "right"]
+	var agree := true
+	var unsolvable := 0
+	var solvable := 0
+	for _i in 200:
+		var b := BoardState.new(4, 4)
+		var placed := 0
+		while placed < 6:
+			if b.add_arrow(placed, Vector2i(rng.randi_range(0, 3), rng.randi_range(0, 3)), dirs[rng.randi_range(0, 3)], rng.randf() < 0.5):
+				placed += 1
+		var c := GameController.new()
+		c.start(b, 50)
+		var brute := _brute_can_win(c)
+		var result := PuzzleSolver.solve_search(b)
+		var searched: bool = result["status"] == PuzzleSolver.SOLVED
+		agree = agree and brute == searched and result["status"] != PuzzleSolver.OUT_OF_BUDGET
+		if searched:
+			agree = agree and PuzzleSolver.replay_wins(b, result["order"])
+			solvable += 1
+		else:
+			unsolvable += 1
+	_check(agree, "turner search agrees with brute force on 200 random boards")
+	_check(solvable > 0 and unsolvable > 0, "the random boards include both outcomes (%d solvable, %d not)" % [solvable, unsolvable])
+	var dead: Dictionary = {}
+	_check(PuzzleSolver.solve_search(stuck, 100, dead)["status"] == PuzzleSolver.UNSOLVABLE and not dead.is_empty(), "proven dead positions are remembered")
+	_check(PuzzleSolver.solve_search(stuck, 0, dead)["status"] == PuzzleSolver.UNSOLVABLE, "a remembered dead position needs no budget")
+	# The generator's construction: ascending ids still win after turning arrows into turners.
+	var gen := RandomNumberGenerator.new()
+	var all_win := true
+	for k in 30:
+		gen.seed = 900 + k
+		var plain := LevelGenerator.generate_board(5, 6, 12, 0.8, gen, 0.4)
+		var spun := LevelGenerator.with_turners(plain, 4, gen)
+		var ascending: Array[int] = spun.arrow_ids()
+		all_win = all_win and spun.turner_count() == 4 and PuzzleSolver.replay_wins(spun, ascending)
+	_check(all_win, "with_turners keeps ascending ids a winning order")
+	var level := {"id": 1, "name": "Trap", "board": trap, "moves_limit": 3, "variant_of": -1}
+	_check(LevelValidator.validate_level(level).is_empty(), "a solvable turner level passes the validator")
+	var dead_level := {"id": 2, "name": "Stuck", "board": stuck, "moves_limit": 3, "variant_of": -1}
+	_check(_has(LevelValidator.validate_level(dead_level), "turner search"), "an unsolvable turner level is reported")
+
+
+func _test_turner_identity_and_data() -> void:
+	var plain := _board(3, 3, [[1, 1, "right"], [1, 2, "up"], [0, 0, "up"]])
+	var plain_level := {"id": 7, "board": plain, "moves_limit": 5}
+	var turner_level := {"id": 7, "board": _trap_board(), "moves_limit": 5}
+	_check(LevelFingerprint.of(plain_level) != LevelFingerprint.of(turner_level), "the turner flag is part of the fingerprint")
+	var trap := _trap_board()
+	_check(BoardCanon.canonical(BoardCanon.transform(trap, 1)) == BoardCanon.canonical(trap), "a rotated turner board has the same canonical layout")
+	_check(BoardCanon.canonical(trap) != BoardCanon.canonical(plain), "turners and plain arrows never share a layout")
+	_check(BoardCanon.transform(trap, 2).is_turner(0), "transforms keep the turner flag")
+	var arrows := LevelGenerator.board_to_arrows(trap)
+	_check(arrows[0].get("turn", false) == true and not arrows[1].has("turn"), "only turners carry 'turn' in level files")
+	var levels := _repo_levels([{"id": 1, "name": "T", "width": 3, "height": 3, "moves_limit": 4, "arrows": arrows}])
+	_check(levels.size() == 1 and levels[0]["board"].is_turner(0) and not levels[0]["board"].is_turner(1), "the repository reads turners")
+	var bad := PuzzleRepository.new()
+	_check(not bad.load_text(JSON.stringify({"version": 2, "levels": [{"id": 1, "width": 3, "height": 3, "moves_limit": 4, "arrows": [{"x": 0, "y": 0, "dir": "up", "turn": "yes"}]}]})) and _has(bad.errors, "'turn'"), "a non-boolean 'turn' is rejected")
+
+
+## World 11 onward: every level has turners and the turner count never
+## drops; levels 1..100 have none. Traps along the winning line never drop in
+## Easy. Difficult boards are bigger and the generator could not always hold
+## that floor, so there each turner world must average more traps than the
+## one before and end higher than it starts.
+func _test_turner_packs() -> void:
+	for dir in ["res://data/packs", "res://data/packs_hard"]:
+		var levels := _pack_levels(dir)
+		var plain_ok := true
+		for i in mini(PLAIN_LEVELS, levels.size()):
+			plain_ok = plain_ok and not levels[i]["board"].has_turners()
+		_check(plain_ok, "%s: levels 1..%d have no turners" % [dir, PLAIN_LEVELS])
+		var all_turners := true
+		var turners_ok := true
+		var traps_ok := true
+		var hint_ok := true
+		var prev_turners := 0
+		var prev_traps := 0
+		var dips: Array[int] = []
+		var world_traps: Array[Array] = []
+		for i in range(PLAIN_LEVELS, levels.size()):
+			var board: BoardState = levels[i]["board"]
+			all_turners = all_turners and board.has_turners()
+			if not board.has_turners():
+				continue
+			var m := LevelMetrics.turner_metrics(board)
+			if (i - PLAIN_LEVELS) % Economy.LEVELS_PER_WORLD == 0:
+				world_traps.append([])
+			world_traps[-1].append(m["traps"])
+			turners_ok = turners_ok and m["turners"] >= prev_turners
+			if m["traps"] < prev_traps:
+				traps_ok = false
+				dips.append(i + 1)
+			prev_turners = m["turners"]
+			prev_traps = m["traps"]
+			hint_ok = hint_ok and PuzzleSolver.solve_search(board, GameController.HINT_SEARCH_BUDGET)["status"] == PuzzleSolver.SOLVED
+		_check(levels.size() > PLAIN_LEVELS and all_turners, "%s: every level after %d has turners" % [dir, PLAIN_LEVELS])
+		_check(turners_ok, "%s: the turner count never drops" % dir)
+		if dir == "res://data/packs":
+			_check(traps_ok, "%s: traps along the winning line never drop (dips at %s)" % [dir, dips])
+		var worlds_ok := true
+		var previous_mean := -1.0
+		for traps_of in world_traps:
+			var mean := float(traps_of.reduce(func(a: int, b: int) -> int: return a + b, 0)) / traps_of.size()
+			worlds_ok = worlds_ok and mean > previous_mean and traps_of[-1] > traps_of[0]
+			previous_mean = mean
+		_check(worlds_ok and world_traps.size() >= 2, "%s: each turner world averages more traps than the last and ends higher than it starts" % dir)
+		_check(prev_traps > 0, "%s: the last level has traps (%d)" % [dir, prev_traps])
+		_check(hint_ok, "%s: the in-game hint search solves every turner level from the start" % dir)
+
+
+func _test_turner_ui() -> void:
+	_check(Tutorial.step_for(101, _trap_board(), 0, false)["text"] == Tutorial.TEXT_TURNER, "level 101 explains turners even with tips off")
+	_check(Tutorial.step_for(Difficulty.make_id(Difficulty.DIFFICULT, 102), _trap_board(), 0, false)["text"] == Tutorial.TEXT_TURNER_TRAP, "Difficult level 102 warns about traps")
+	_check(Tutorial.step_for(101, _trap_board(), Tutorial.TEXT_TIP_TAPS, true).is_empty(), "turner tips go away after a few taps")
+	_check(Tutorial.step_for(104, _trap_board(), 0, true).is_empty(), "no turner tip after level 103")
+	_check(Palette.world_name(10) == "Turning Point" and Palette.world_name(11) == "Spin Cycle", "the turner worlds have names")
+	var save := SaveService.new("user://test_turner_save.json")
+	var progress := Progress.new()
+	var screen := GameScreen.new()
+	root.add_child(screen)
+	var levels: Array[Dictionary] = [{"id": 104, "name": "Trap", "board": _trap_board(), "moves_limit": 5, "variant_of": -1}]
+	screen.setup(levels, 0, progress, save)
+	screen.tap_cell(Vector2i(0, 0))
+	_check(screen.board_view.is_turning(), "a removal starts the turn animation")
+	screen.advance_time(1.0)
+	screen.board_view._process(1.0)
+	_check(not screen.board_view.is_turning(), "the turn animation finishes")
+	var coins := progress.coins
+	screen.use_hint()
+	_check(screen.note_text() == GameScreen.DEAD_END_NOTE and progress.coins == coins, "a dead end says so and the hint costs nothing")
+	screen.use_undo()
+	screen.use_hint()
+	_check(screen.board_view.hint_id() == 0 and progress.coins == coins - Economy.PRICE_UNDO - Economy.PRICE_HINT, "after undo the hint highlights the safe turner")
+	screen.queue_free()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_turner_save.json"))

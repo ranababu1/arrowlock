@@ -1,19 +1,27 @@
 extends SceneTree
-## Generates a draft 100-level pack and validates it.
+## Generates a level pack from its world specs and validates it.
 ## Easy:      godot --headless --path . -s tools/generate_levels.gd
 ##            (tools/world_specs.json -> data/packs)
 ## Difficult: godot --headless --path . -s tools/generate_levels.gd -- --hard
 ##            (tools/world_specs_hard.json -> data/packs_hard)
+## Levels already frozen in data/levels.lock.json are read from their files
+## and kept as they are; only the worlds after them are generated and written.
+## Pass --all to regenerate every world (only before a pack is released).
 ## Output is a DRAFT until the owner has played and reviewed each world.
+
+const LOCK_PATH := "res://data/levels.lock.json"
 
 var SPEC_PATH := "res://tools/world_specs.json"
 var OUT_DIR := "res://data/packs"
+var LOCK_KEY := "packs"
 
 
 func _initialize() -> void:
-	if OS.get_cmdline_user_args().has("--hard"):
+	var args := OS.get_cmdline_user_args()
+	if args.has("--hard"):
 		SPEC_PATH = "res://tools/world_specs_hard.json"
 		OUT_DIR = "res://data/packs_hard"
+		LOCK_KEY = "packs_hard"
 	var spec_file := FileAccess.open(SPEC_PATH, FileAccess.READ)
 	if spec_file == null:
 		printerr("Cannot open %s" % SPEC_PATH)
@@ -24,15 +32,22 @@ func _initialize() -> void:
 		printerr("%s is not a JSON object" % SPEC_PATH)
 		quit(1)
 		return
+	var keep: Array = [] if args.has("--all") else _locked_levels()
+	if keep.size() % LevelGenerator.LEVELS_PER_WORLD != 0:
+		printerr("Locked levels (%d) do not fill whole worlds" % keep.size())
+		quit(1)
+		return
+	config["keep_levels"] = keep
+	var first_new_world := keep.size() / LevelGenerator.LEVELS_PER_WORLD
 	var result := LevelGenerator.generate_pack(config)
 	var failed: bool = not result["failures"].is_empty()
 	for f in result["failures"]:
 		printerr(f)
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT_DIR))
 	var worlds: Array = config["worlds"]
-	for w in worlds.size():
+	for w in range(first_new_world, worlds.size()):
 		var slice: Array = result["levels"].filter(
-			func(l: Dictionary) -> bool: return (l["id"] - 1) / LevelGenerator.LEVELS_PER_WORLD == w)
+			func(l: Dictionary) -> bool: return (int(l["id"]) - 1) / LevelGenerator.LEVELS_PER_WORLD == w)
 		var path := "%s/world_%02d.json" % [OUT_DIR, w + 1]
 		var file := FileAccess.open(path, FileAccess.WRITE)
 		if file == null:
@@ -41,16 +56,35 @@ func _initialize() -> void:
 			continue
 		file.store_string(JSON.stringify({"version": 2, "levels": slice}, "\t"))
 		file.close()
+		for l in slice:
+			print("%d %dx%d arrows %d %s" % [l["id"], l["width"], l["height"], l["arrows"].size(), l["metrics"]])
 	var repo := PuzzleRepository.new()
 	if not repo.load_dir(OUT_DIR):
 		for e in repo.errors:
 			printerr(e)
 		failed = true
 	else:
-		var problems := LevelValidator.validate_pack(repo.levels, {"expected_count": 100})
+		var problems := LevelValidator.validate_pack(repo.levels, {"expected_count": worlds.size() * LevelGenerator.LEVELS_PER_WORLD})
 		for p in problems:
 			printerr(p)
 		failed = failed or not problems.is_empty()
-	print("Generated %d levels (%d variants), failures: %d" % [
-		result["levels"].size(), result["variants"], result["failures"].size()])
+	print("Kept %d locked levels, generated %d (%d variants), failures: %d" % [
+		keep.size(), result["levels"].size() - keep.size(), result["variants"], result["failures"].size()])
 	quit(1 if failed else 0)
+
+
+## The pack's frozen levels, read from the files as JSON, in id order.
+func _locked_levels() -> Array:
+	var lock: Variant = JSON.parse_string(FileAccess.get_file_as_string(LOCK_PATH))
+	if typeof(lock) != TYPE_DICTIONARY or not lock.has(LOCK_KEY):
+		return []
+	var count: int = lock[LOCK_KEY].size()
+	var all: Array = []
+	var names := Array(DirAccess.get_files_at(OUT_DIR)).filter(func(f: String) -> bool: return f.ends_with(".json"))
+	names.sort()
+	for file_name in names:
+		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(OUT_DIR.path_join(file_name)))
+		if typeof(parsed) == TYPE_DICTIONARY:
+			all.append_array(parsed.get("levels", []))
+	all.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return int(a["id"]) < int(b["id"]))
+	return all.slice(0, count)
