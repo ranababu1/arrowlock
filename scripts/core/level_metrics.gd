@@ -23,9 +23,9 @@ static func compute(board: BoardState) -> Dictionary:
 			var distance := (board.arrow_position(ray[0]) - board.arrow_position(id)).abs()
 			if distance.x + distance.y - 1 >= BAIT_MIN_CLEAR_RUN:
 				bait += 1
-		# With turners the starting directions can block each other in a
-		# ring that the turns later break, so the chain depth is undefined.
-		if not board.has_turners():
+		# With turners or flippers the starting directions can block each
+		# other in a ring that later turns or flips break: depth is undefined.
+		if not board.has_turners() and not board.has_flippers():
 			depth = maxi(depth, _depth_of(board, id, depth_memo))
 	var out := {
 		"arrows": board.remaining_count(),
@@ -38,7 +38,24 @@ static func compute(board: BoardState) -> Dictionary:
 	}
 	if board.has_turners():
 		out.merge(turner_metrics(board))
+	if board.has_flippers():
+		out["flippers"] = board.flipper_count()
+		out["timed_flips"] = timed_flips(board)
 	return out
+
+
+## Flippers that can only ever leave one of their two ways (the other is
+## blocked by an arrow that waits for them): those need a well-timed tap.
+static func timed_flips(board: BoardState) -> int:
+	var count := 0
+	for id in board.arrow_ids():
+		if not board.is_flipper(id):
+			continue
+		var a := MoveValidator.first_blocker_toward(board, id, board.arrow_direction(id))
+		var b := MoveValidator.first_blocker_toward(board, id, board.other_direction(id))
+		if (a == -1) != (b == -1) or (a != -1 and b != -1):
+			count += 1
+	return count
 
 
 ## For boards with turners, measured along one winning line (the search's):
@@ -58,7 +75,7 @@ static func turner_metrics(board: BoardState, budget: int = TRAP_SEARCH_BUDGET) 
 	for step in line.size():
 		var here := 0
 		if work.has_turners():
-			for id in MoveValidator.removable_ids(work):
+			for id in MoveValidator.reachable_ids(work):
 				var after := work.duplicate_state()
 				after.remove_arrow(id)
 				after.rotate_turners(1)
@@ -67,7 +84,7 @@ static func turner_metrics(board: BoardState, budget: int = TRAP_SEARCH_BUDGET) 
 				elif step == 0:
 					safe_starts += 1
 		elif step == 0:
-			safe_starts = MoveValidator.removable_ids(work).size()
+			safe_starts = MoveValidator.reachable_ids(work).size()
 		traps += here
 		if here > 0:
 			trap_steps += 1

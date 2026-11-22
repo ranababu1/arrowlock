@@ -13,6 +13,14 @@ extends RefCounted
 ## given the starting direction that turns into its placed direction by then.
 ## Removing IDs in ascending order therefore still clears the board, but other
 ## orders can now fail: those are the traps the spec asks for ("traps").
+##
+## Flip worlds (spec key "flippers") turn some arrows into flippers. Each
+## keeps its placed direction as one of its two, so the player can always
+## wait for it; arrows whose other way is blocked are preferred, because
+## those need a well-timed tap. Colour worlds (spec key "colors": [first,
+## last]) store the size of the colour order on the level; the colours
+## themselves are drawn by the game on every attempt. Specs can combine all
+## three ("mixed" worlds).
 
 const GENERATOR_VERSION := 1
 const LEVELS_PER_WORLD := 10
@@ -130,6 +138,8 @@ static func board_to_arrows(board: BoardState) -> Array[Dictionary]:
 		var entry := {"x": pos.x, "y": pos.y, "dir": board.arrow_direction(id)}
 		if board.is_turner(id):
 			entry["turn"] = true
+		if board.is_flipper(id):
+			entry["flip"] = true
 		out.append(entry)
 	return out
 
@@ -142,6 +152,92 @@ static func board_to_arrows(board: BoardState) -> Array[Dictionary]:
 static func generate_level(spec: Dictionary, world: int, index: int, level_id: int, master_seed: int, candidates: int, used_canon: Dictionary, min_depth: int = 0) -> Dictionary:
 	if spec.has("turners"):
 		return generate_turner_level(spec, index, level_id, master_seed, candidates, used_canon, min_depth)
+	var made := _generate_plain_level(spec, world, index, level_id, master_seed, candidates, used_canon, min_depth)
+	if made.is_empty() or not (spec.has("flippers") or spec.has("colors")):
+		return made
+	var level: Dictionary = made["level"]
+	var board := board_from_level(level)
+	if spec.has("flippers"):
+		var rng := RandomNumberGenerator.new()
+		rng.seed = int(level["seed"]) + 7
+		board = with_flippers(board, flipper_target(spec, index, board.remaining_count()), rng)
+		var canon := BoardCanon.canonical(board)
+		if used_canon.has(canon):
+			return {}
+		made["canon"] = canon
+		var metrics := LevelMetrics.compute(board)
+		# Depth from the plain board: with flippers it depends on timing.
+		metrics["depth"] = level["metrics"]["depth"]
+		level["metrics"] = metrics
+		level["arrows"] = board_to_arrows(board)
+	_add_colors(level, spec, index, board.remaining_count())
+	return made
+
+
+## Size of the colour order for level `index` of a colour world, never more
+## than the arrows on the board.
+static func color_target(spec: Dictionary, index: int, count: int) -> int:
+	var t := float(index) / float(LEVELS_PER_WORLD - 1)
+	var wanted := roundi(lerpf(spec["colors"][0], spec["colors"][1], t))
+	return clampi(mini(wanted, count), PuzzleRepository.MIN_COLORS, PuzzleRepository.MAX_COLORS)
+
+
+static func flipper_target(spec: Dictionary, index: int, count: int) -> int:
+	var t := float(index) / float(LEVELS_PER_WORLD - 1)
+	return clampi(roundi(lerpf(spec["flippers"][0], spec["flippers"][1], t)), 1, count)
+
+
+static func _add_colors(level: Dictionary, spec: Dictionary, index: int, count: int) -> void:
+	if spec.has("colors"):
+		level["colors"] = color_target(spec, index, count)
+		level["metrics"]["colors"] = level["colors"]
+
+
+## Copy of `board` with `k` plain arrows turned into flippers. Arrow IDs are
+## the removal order; an arrow whose other way is blocked by an arrow that
+## leaves after it is preferred, so its exit needs a well-timed tap. Each
+## flipper starts at random on one of its two directions.
+static func with_flippers(board: BoardState, k: int, rng: RandomNumberGenerator) -> BoardState:
+	var timed: Array[int] = []
+	var loose: Array[int] = []
+	for id in board.arrow_ids():
+		if board.is_turner(id) or board.is_flipper(id):
+			continue
+		var back := BoardState.rotated(board.arrow_direction(id), 2)
+		var step: Vector2i = BoardState.DIRECTIONS[back]
+		var cell := board.arrow_position(id) + step
+		var blocked_later := false
+		while board.in_bounds(cell):
+			var other := board.arrow_at(cell)
+			if other > id:
+				blocked_later = true
+				break
+			cell += step
+		(timed if blocked_later else loose).append(id)
+	for pool in [timed, loose]:
+		for i in range(pool.size() - 1, 0, -1):
+			var j := rng.randi_range(0, i)
+			var swap: int = pool[i]
+			pool[i] = pool[j]
+			pool[j] = swap
+	var chosen: Dictionary = {}
+	for id in timed + loose:
+		if chosen.size() >= k:
+			break
+		chosen[id] = true
+	var out := BoardState.new(board.width, board.height)
+	for id in board.arrow_ids():
+		var dir := board.arrow_direction(id)
+		if chosen.has(id):
+			if rng.randf() < 0.5:
+				dir = BoardState.rotated(dir, 2)
+			out.add_arrow(id, board.arrow_position(id), dir, false, true)
+		else:
+			out.add_arrow(id, board.arrow_position(id), dir, board.is_turner(id))
+	return out
+
+
+static func _generate_plain_level(spec: Dictionary, world: int, index: int, level_id: int, master_seed: int, candidates: int, used_canon: Dictionary, min_depth: int = 0) -> Dictionary:
 	var params := slot_params(spec, index)
 	var count: int = params["arrows"]
 	var target_depth := mini(count - 1, maxi(min_depth, target_depth_for(spec, world, index, count)))
@@ -239,6 +335,8 @@ static func generate_turner_level(spec: Dictionary, index: int, level_id: int, m
 		if plain == null:
 			continue
 		var start := with_turners(plain, targets["turners"], rng)
+		if spec.has("flippers"):
+			start = with_flippers(start, flipper_target(spec, index, count), rng)
 		if PuzzleSolver.solve_search(start, GameController.HINT_SEARCH_BUDGET)["status"] != PuzzleSolver.SOLVED:
 			continue
 		var climbed := climb_traps(start, target_traps, steps, rng, used_canon)
@@ -267,6 +365,8 @@ static func generate_turner_level(spec: Dictionary, index: int, level_id: int, m
 			}
 			if cost == 0:
 				break
+	if not best.is_empty():
+		_add_colors(best["level"], spec, index, count)
 	return best
 
 
@@ -309,7 +409,7 @@ static func climb_traps(start: BoardState, target_traps: int, steps: int, rng: R
 static func _mutate_turners(board: BoardState, rng: RandomNumberGenerator) -> BoardState:
 	var ids := board.arrow_ids()
 	var turners: Array[int] = ids.filter(func(i: int) -> bool: return board.is_turner(i))
-	var plain: Array[int] = ids.filter(func(i: int) -> bool: return not board.is_turner(i))
+	var plain: Array[int] = ids.filter(func(i: int) -> bool: return not board.is_turner(i) and not board.is_flipper(i))
 	if turners.is_empty():
 		return null
 	var dirs: Dictionary = {}
@@ -327,8 +427,17 @@ static func _mutate_turners(board: BoardState, rng: RandomNumberGenerator) -> Bo
 		dirs[other] = BoardState.rotated(dirs[other], rng.randi_range(0, 3))
 	var out := BoardState.new(board.width, board.height)
 	for id in ids:
-		out.add_arrow(id, board.arrow_position(id), dirs[id], flags[id])
+		out.add_arrow(id, board.arrow_position(id), dirs[id], flags[id], board.is_flipper(id))
 	return out
+
+
+## Which mechanics a world spec uses, e.g. "plain", "turn", "flip+color".
+static func world_kind(spec: Dictionary) -> String:
+	var parts: Array[String] = []
+	for key in ["turners", "flippers", "colors"]:
+		if spec.has(key):
+			parts.append(key)
+	return "+".join(parts) if not parts.is_empty() else "plain"
 
 
 ## A plain board built from a JSON-style level dictionary (arrow i gets id i).
@@ -336,7 +445,7 @@ static func board_from_level(level: Dictionary) -> BoardState:
 	var board := BoardState.new(int(level["width"]), int(level["height"]))
 	var next_id := 0
 	for a in level["arrows"]:
-		board.add_arrow(next_id, Vector2i(int(a["x"]), int(a["y"])), str(a["dir"]), bool(a.get("turn", false)))
+		board.add_arrow(next_id, Vector2i(int(a["x"]), int(a["y"])), str(a["dir"]), bool(a.get("turn", false)), bool(a.get("flip", false)))
 		next_id += 1
 	return board
 
@@ -399,14 +508,23 @@ static func generate_pack(config: Dictionary) -> Dictionary:
 		levels.append(level)
 		previous_depth = int(level.get("metrics", {}).get("depth", 0))
 	var kept_worlds := kept.size() / LEVELS_PER_WORLD
+	var last_kind := world_kind(worlds[kept_worlds - 1]) if kept_worlds > 0 else "plain"
 	for w in range(kept_worlds, worlds.size()):
 		var spec: Dictionary = worlds[w].duplicate()
 		spec["breathers"] = bool(config.get("breathers", true))
 		var turner_world := spec.has("turners")
+		# A new kind of world starts its own ramp.
+		if world_kind(spec) != last_kind:
+			previous_depth = 0
+			previous_traps = 0
+			last_kind = world_kind(spec)
 		for i in LEVELS_PER_WORLD:
 			var level_id := w * LEVELS_PER_WORLD + i + 1
 			var floor_value := previous_traps if turner_world else previous_depth
+			var started := Time.get_ticks_msec()
 			var made := generate_level(spec, w, i, level_id, master_seed, candidates, used, floor_value if rising else 0)
+			if config.get("verbose", false):
+				print("  level %d: %d ms" % [level_id, Time.get_ticks_msec() - started])
 			if not made.is_empty():
 				used[made["canon"]] = level_id
 				levels.append(made["level"])

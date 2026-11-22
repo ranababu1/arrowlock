@@ -3,8 +3,12 @@ extends SceneTree
 ## Run: godot --headless --path . -s tests/run_tests.gd
 ## Exit code is non-zero when any check fails.
 
-## Levels per pack: 100 frozen plain levels, then the turner worlds.
-const PACK_SIZE := 120
+## Levels per pack: 100 frozen plain levels, then turners (101-120), colour
+## order (121-140), flippers (141-160) and all three mixed (161-200).
+const PACK_SIZE := 200
+const TURNER_END := 120
+const COLOR_END := 140
+const FLIP_END := 160
 ## Levels 1..PLAIN_LEVELS have no turners (released, frozen).
 const PLAIN_LEVELS := 100
 
@@ -74,6 +78,10 @@ func _initialize() -> void:
 	_test_turner_identity_and_data()
 	_test_turner_packs()
 	_test_turner_ui()
+	_test_flipper_rules()
+	_test_color_rules()
+	_test_new_packs()
+	_test_flip_and_color_ui()
 	print("Tests: %d passed, %d failed" % [_passed, _failed])
 	quit(1 if _failed > 0 else 0)
 
@@ -1749,7 +1757,7 @@ func _test_economy_balance() -> void:
 			careless.record_result(id, arrows, limit, limit, limit - arrows)
 			perfect.record_result(id, arrows, limit, arrows, 0)
 		_check(careless_ok, "%s: a one-star player can buy a Hint on every level" % Difficulty.name_of(tier))
-		_check(perfect.coins <= Economy.START_COINS + 100 * 60 * Economy.HARD_REWARD_MULTIPLIER, "%s: a perfect run earns a bounded number of coins (%d)" % [Difficulty.name_of(tier), perfect.coins])
+		_check(perfect.coins <= Economy.START_COINS + levels.size() * 60 * Economy.HARD_REWARD_MULTIPLIER, "%s: a perfect run earns a bounded number of coins (%d)" % [Difficulty.name_of(tier), perfect.coins])
 
 
 func _test_speed_score() -> void:
@@ -2355,7 +2363,7 @@ func _test_turner_solver() -> void:
 	var level := {"id": 1, "name": "Trap", "board": trap, "moves_limit": 3, "variant_of": -1}
 	_check(LevelValidator.validate_level(level).is_empty(), "a solvable turner level passes the validator")
 	var dead_level := {"id": 2, "name": "Stuck", "board": stuck, "moves_limit": 3, "variant_of": -1}
-	_check(_has(LevelValidator.validate_level(dead_level), "turner search"), "an unsolvable turner level is reported")
+	_check(_has(LevelValidator.validate_level(dead_level), "search finds no solution"), "an unsolvable turner level is reported")
 
 
 func _test_turner_identity_and_data() -> void:
@@ -2395,7 +2403,7 @@ func _test_turner_packs() -> void:
 		var prev_traps := 0
 		var dips: Array[int] = []
 		var world_traps: Array[Array] = []
-		for i in range(PLAIN_LEVELS, levels.size()):
+		for i in range(PLAIN_LEVELS, mini(TURNER_END, levels.size())):
 			var board: BoardState = levels[i]["board"]
 			all_turners = all_turners and board.has_turners()
 			if not board.has_turners():
@@ -2411,7 +2419,7 @@ func _test_turner_packs() -> void:
 			prev_turners = m["turners"]
 			prev_traps = m["traps"]
 			hint_ok = hint_ok and PuzzleSolver.solve_search(board, GameController.HINT_SEARCH_BUDGET)["status"] == PuzzleSolver.SOLVED
-		_check(levels.size() > PLAIN_LEVELS and all_turners, "%s: every level after %d has turners" % [dir, PLAIN_LEVELS])
+		_check(levels.size() > PLAIN_LEVELS and all_turners, "%s: every level %d..%d has turners" % [dir, PLAIN_LEVELS + 1, TURNER_END])
 		_check(turners_ok, "%s: the turner count never drops" % dir)
 		if dir == "res://data/packs":
 			_check(traps_ok, "%s: traps along the winning line never drop (dips at %s)" % [dir, dips])
@@ -2451,3 +2459,247 @@ func _test_turner_ui() -> void:
 	_check(screen.board_view.hint_id() == 0 and progress.coins == coins - Economy.PRICE_UNDO - Economy.PRICE_HINT, "after undo the hint highlights the safe turner")
 	screen.queue_free()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_turner_save.json"))
+
+
+## Flipper board: F at (1,1) points left (clear); B at (2,1) points left and
+## waits for F. When F flips to the right it faces B.
+func _flip_board() -> BoardState:
+	var b := BoardState.new(4, 3)
+	b.add_arrow(0, Vector2i(1, 1), "left", false, true)
+	b.add_arrow(1, Vector2i(2, 1), "left")
+	return b
+
+
+func _test_flipper_rules() -> void:
+	_check(Difficulty.flip_period_for(121) == 0.8 and Difficulty.flip_period_for(Difficulty.make_id(Difficulty.DIFFICULT, 141)) == 0.6, "flippers flip every 0.8 s in Easy and 0.6 s in Difficult")
+	var b := _flip_board()
+	_check(b.has_flippers() and b.flipper_count() == 1 and b.is_flipper(0) and not b.is_flipper(1), "flipper flags and count")
+	_check(not BoardState.new(3, 3).add_arrow(0, Vector2i(0, 0), "up", true, true), "an arrow cannot be a turner and a flipper")
+	var copy := b.duplicate_state()
+	copy.flip_flippers()
+	_check(copy.arrow_direction(0) == "right" and copy.arrow_direction(1) == "left" and b.arrow_direction(0) == "left", "flip_flippers swaps only flippers, only on that copy")
+	_check(copy.other_direction(0) == "left" and copy.other_direction(1) == "left", "other_direction is the opposite for flippers only")
+	var info := copy.remove_arrow(0)
+	copy.flip_flippers()
+	copy.restore_arrow(0, info)
+	_check(copy.arrow_direction(0) == "left" and copy.has_flippers(), "a flipper put back after a flip keeps in step")
+	_check(MoveValidator.can_remove_eventually(copy.duplicate_state(), 0), "a flipper is reachable while one way is clear")
+	var flipped := b.duplicate_state()
+	flipped.flip_flippers()
+	_check(not MoveValidator.can_remove(flipped, 0) and MoveValidator.can_remove_eventually(flipped, 0) and str(MoveValidator.reachable_ids(flipped)) == "[0]", "a flipper facing a blocker is reachable after a flip")
+
+	var c := GameController.new()
+	c.start(_flip_board(), 6, 0.0, 0.8)
+	_check(is_equal_approx(c.time_to_flip(), 0.8), "the first flip comes after one period")
+	var flips := [0]
+	c.flipped.connect(func() -> void: flips[0] += 1)
+	c.tick(0.85)
+	_check(flips[0] == 1 and c.board.arrow_direction(0) == "right", "the clock flips the flipper")
+	_check(c.tap(Vector2i(1, 1)), "a tap just after a flip still counts the way it pointed before")
+	c.undo()
+	c.tick(0.2)
+	_check(not c.tap(Vector2i(1, 1)) and c.wasted_taps == 1, "a tap while it faces a blocker is a wasted move")
+	c.tick(0.6)
+	_check(c.board.arrow_direction(0) == "left" and c.tap(Vector2i(1, 1)), "once it flips back it can leave")
+	_check(c.tap(Vector2i(2, 1)) and c.state == GameController.State.WON, "the level is won")
+	var plain := GameController.new()
+	plain.start(_board(3, 3, [[0, 0, "up"]]), 3, 0.0, 0.8)
+	_check(plain.flip_period == 0.0 and plain.time_to_flip() == 0.0, "levels without flippers have no flip clock")
+
+	_check(PuzzleSolver.solve(flipped).size() == 2, "the solver waits for a flip")
+	_check(PuzzleSolver.replay_wins(flipped, [0, 1] as Array[int]), "replay waits for the flip and wins")
+	var level := {"id": 3, "name": "Flip", "board": flipped, "moves_limit": 3, "variant_of": -1}
+	_check(LevelValidator.validate_level(level).is_empty(), "a flipper level passes the validator")
+	var m := LevelMetrics.compute(flipped)
+	_check(m["flippers"] == 1 and m["timed_flips"] == 1 and m["depth"] == 0, "flipper metrics")
+	var gen := RandomNumberGenerator.new()
+	var ok := true
+	for k in 20:
+		gen.seed = 300 + k
+		var made := LevelGenerator.with_flippers(LevelGenerator.generate_board(5, 6, 12, 0.8, gen, 0.4), 4, gen)
+		ok = ok and made.flipper_count() == 4 and PuzzleSolver.replay_wins(made, made.arrow_ids())
+	_check(ok, "with_flippers keeps ascending ids a winning order")
+
+
+func _test_color_rules() -> void:
+	var c := GameController.new()
+	c.rng.seed = 12345
+	var board := _board(5, 5, [[0, 0, "up"], [1, 0, "up"], [2, 0, "up"], [3, 0, "up"], [4, 0, "up"], [0, 4, "down"]])
+	_check(c.start(board, 20, 0.0, 0.0, 5), "a colour level starts")
+	var distinct: Dictionary = {}
+	for i in c.color_sequence:
+		distinct[i] = true
+	_check(c.has_colors() and c.color_sequence.size() == 5 and distinct.size() == 5, "the colour order has 5 different colours")
+	var fair := true
+	var removed := 0
+	var wrong_seen := false
+	var recolors := [0]
+	c.recolored.connect(func() -> void: recolors[0] += 1)
+	var wrong := [0]
+	c.wrong_color.connect(func(_id: int) -> void: wrong[0] += 1)
+	for _round in 40:
+		if c.state != GameController.State.PLAYING:
+			break
+		var needed := c.needed_color()
+		var matching := MoveValidator.reachable_ids(c.board).filter(func(id: int) -> bool: return c.color_of(id) == needed)
+		fair = fair and not matching.is_empty() and c.color_of(c.hint()) == needed
+		var off := MoveValidator.removable_ids(c.board).filter(func(id: int) -> bool: return c.color_of(id) != needed)
+		if not off.is_empty() and not wrong_seen:
+			var before := c.moves_used
+			var snapshot := {}
+			for id in c.board.arrow_ids():
+				snapshot[id] = c.color_of(id)
+			_check(not c.tap(c.board.arrow_position(off[0])) and c.moves_used == before + 1 and c.wasted_taps == 1 and wrong[0] == 1, "a free arrow of the wrong colour costs a move and stays")
+			c.undo()
+			var same := true
+			for id in snapshot:
+				same = same and c.color_of(id) == snapshot[id]
+			_check(same and c.wasted_taps == 0, "undo brings the colours back")
+			wrong_seen = true
+			continue
+		var step := c.color_step()
+		if c.tap(c.board.arrow_position(matching[0])):
+			removed += 1
+			_check(c.color_step() == (step + 1) % 5 or c.board.is_empty(), "each clear moves one place along the order")
+	_check(fair, "after every tap a free arrow has the needed colour and the hint points at one")
+	_check(wrong_seen and removed == 6 and c.state == GameController.State.WON, "the colour level can be won")
+	_check(recolors[0] >= 6, "the arrows are recoloured after every tap")
+	var orders: Dictionary = {}
+	for _i in 6:
+		c.restart()
+		orders[str(c.color_sequence)] = true
+	_check(orders.size() > 1, "every try draws a new colour order")
+	# With turners the needed colour must go to a safe arrow, never the trap.
+	var safe := true
+	for k in 20:
+		var t := GameController.new()
+		t.rng.seed = 700 + k
+		t.start(_trap_board(), 5, 0.0, 0.0, 5)
+		safe = safe and t.color_of(0) == t.needed_color() and t.hint() == 0
+	_check(safe, "with turners the needed colour always goes to a safe arrow")
+	# Data.
+	var arrows := [{"x": 0, "y": 0, "dir": "up"}, {"x": 1, "y": 0, "dir": "up"}, {"x": 2, "y": 0, "dir": "up"}, {"x": 3, "y": 0, "dir": "up"}, {"x": 4, "y": 0, "dir": "up", "flip": true}]
+	var levels := _repo_levels([{"id": 1, "name": "C", "width": 5, "height": 2, "moves_limit": 6, "colors": 5, "arrows": arrows}])
+	_check(levels[0]["colors"] == 5 and levels[0]["board"].is_flipper(4), "the repository reads colours and flippers")
+	_check(_repo_levels([{"id": 1, "name": "P", "width": 5, "height": 2, "moves_limit": 6, "arrows": arrows}])[0]["colors"] == 0, "levels without colours read as 0")
+	for bad_count in [3, 11]:
+		var bad := PuzzleRepository.new()
+		_check(not bad.load_text(JSON.stringify({"version": 2, "levels": [{"id": 1, "width": 5, "height": 2, "moves_limit": 6, "colors": bad_count, "arrows": arrows}]})), "a colour order of %d is rejected" % bad_count)
+	var bad_flip := PuzzleRepository.new()
+	_check(not bad_flip.load_text(JSON.stringify({"version": 2, "levels": [{"id": 1, "width": 3, "height": 3, "moves_limit": 4, "arrows": [{"x": 0, "y": 0, "dir": "up", "flip": 1}]}]})), "a non-boolean 'flip' is rejected")
+	var few := {"id": 4, "name": "Few", "board": _board(3, 3, [[0, 0, "up"]]), "moves_limit": 2, "variant_of": -1, "colors": 5}
+	_check(_has(LevelValidator.validate_level(few), "colours for only"), "more colours than arrows is reported")
+	var with_colors := levels[0].duplicate()
+	var without := levels[0].duplicate()
+	without["colors"] = 0
+	_check(LevelFingerprint.of(with_colors) != LevelFingerprint.of(without), "the colour order size is part of the fingerprint")
+	var flip_arrows := LevelGenerator.board_to_arrows(_flip_board())
+	_check(flip_arrows[0].get("flip", false) == true and not flip_arrows[1].has("flip"), "only flippers carry 'flip' in level files")
+
+
+## 121-140 colour order only, 141-160 flippers only, 161-200 all three.
+func _test_new_packs() -> void:
+	for dir in ["res://data/packs", "res://data/packs_hard"]:
+		var levels := _pack_levels(dir)
+		_check(levels.size() == PACK_SIZE, "%s has %d levels" % [dir, PACK_SIZE])
+		if levels.size() < PACK_SIZE:
+			continue
+		var colors_ok := true
+		var colors_rise := true
+		var prev_colors := 0
+		for i in range(TURNER_END, COLOR_END):
+			var l: Dictionary = levels[i]
+			var b: BoardState = l["board"]
+			colors_ok = colors_ok and l["colors"] >= 5 and l["colors"] <= 10 and not b.has_turners() and not b.has_flippers()
+			colors_rise = colors_rise and l["colors"] >= prev_colors
+			prev_colors = l["colors"]
+		_check(colors_ok, "%s: levels 121-140 have a colour order of 5-10 and nothing else" % dir)
+		_check(colors_rise and prev_colors == 10, "%s: the colour order never shrinks and reaches 10" % dir)
+		var flips_ok := true
+		var flips_rise := true
+		var timed := true
+		var prev_flips := 0
+		for i in range(COLOR_END, FLIP_END):
+			var l: Dictionary = levels[i]
+			var b: BoardState = l["board"]
+			flips_ok = flips_ok and b.has_flippers() and l["colors"] == 0 and not b.has_turners()
+			flips_rise = flips_rise and b.flipper_count() >= prev_flips
+			prev_flips = b.flipper_count()
+			timed = timed and LevelMetrics.timed_flips(b) > 0
+		_check(flips_ok, "%s: levels 141-160 have flippers and nothing else" % dir)
+		_check(flips_rise, "%s: the flipper count never drops" % dir)
+		_check(timed, "%s: every flip level has a flipper that needs a well-timed tap" % dir)
+		var mixed_ok := true
+		var counts_rise := true
+		var prev := [0, 0, 0]
+		var world_traps: Array[float] = []
+		for i in range(FLIP_END, PACK_SIZE):
+			var l: Dictionary = levels[i]
+			var b: BoardState = l["board"]
+			mixed_ok = mixed_ok and b.has_turners() and b.has_flippers() and l["colors"] >= 5
+			var now := [b.turner_count(), b.flipper_count(), int(l["colors"])]
+			counts_rise = counts_rise and now[0] >= prev[0] and now[1] >= prev[1] and now[2] >= prev[2]
+			prev = now
+			if (i - FLIP_END) % Economy.LEVELS_PER_WORLD == 0:
+				world_traps.append(0.0)
+			world_traps[-1] += float(LevelMetrics.turner_metrics(b)["traps"]) / Economy.LEVELS_PER_WORLD
+		_check(mixed_ok, "%s: levels 161-200 mix turners, flippers and colours" % dir)
+		_check(counts_rise, "%s: turners, flippers and colours never drop in 161-200" % dir)
+		# The generator could not hold a rising trap floor on these boards, so
+		# only the first mixed world is a floor for the later ones.
+		var above_first := true
+		for w in range(1, world_traps.size()):
+			above_first = above_first and world_traps[w] > world_traps[0]
+		_check(above_first and world_traps[0] > 0.0, "%s: every later mixed world averages more traps than World 17 (%s)" % [dir, world_traps])
+
+
+func _test_flip_and_color_ui() -> void:
+	_check(Tutorial.step_for(121, _trap_board(), 0, false)["text"] == Tutorial.TEXT_COLOR, "level 121 explains the colour order")
+	_check(Tutorial.step_for(Difficulty.make_id(Difficulty.DIFFICULT, 141), _trap_board(), 0, false)["text"] == Tutorial.TEXT_FLIP, "Difficult level 141 explains flippers")
+	_check(Tutorial.step_for(161, _trap_board(), 0, false)["text"] == Tutorial.TEXT_MIX, "level 161 explains the mix")
+	_check(Palette.PASTELS.size() == GameController.COLOR_CHOICES, "the pastel palette matches the colour choices")
+	_check(Palette.world_name(12) == "Color Code" and Palette.world_name(19) == "Final Lock", "all 20 worlds have names")
+	var save := SaveService.new("user://test_flipcolor_save.json")
+	var progress := Progress.new()
+	var screen := GameScreen.new()
+	root.add_child(screen)
+	var color_board := _board(5, 5, [[0, 0, "up"], [1, 0, "up"], [2, 0, "up"], [3, 0, "up"], [4, 0, "up"], [0, 4, "down"]])
+	var levels: Array[Dictionary] = [
+		{"id": 125, "name": "Colours", "board": color_board, "moves_limit": 12, "variant_of": -1, "colors": 5},
+		{"id": 145, "name": "Flip", "board": _flip_board(), "moves_limit": 4, "variant_of": -1, "colors": 0},
+	]
+	screen.setup(levels, 0, progress, save)
+	var ctl := screen.controller
+	_check(screen.color_strip.visible and screen.color_strip.next_index() == 0, "a colour level shows the order with the first colour next")
+	var needed := ctl.needed_color()
+	var good := -1
+	var bad := -1
+	for id in MoveValidator.removable_ids(ctl.board):
+		if ctl.color_of(id) == needed and good == -1:
+			good = id
+		elif ctl.color_of(id) != needed and bad == -1:
+			bad = id
+	_check(screen.board_view.arrow_color(good) == Palette.PASTELS[needed], "arrows are drawn in their pastel colour")
+	if bad != -1:
+		screen.tap_cell(ctl.board.arrow_position(bad))
+		_check(screen.note_text() == GameScreen.WRONG_COLOR_NOTE, "a wrong colour says so")
+	needed = ctl.needed_color()
+	for id in MoveValidator.removable_ids(ctl.board):
+		if ctl.color_of(id) == needed:
+			screen.tap_cell(ctl.board.arrow_position(id))
+			break
+	_check(screen.color_strip.next_index() == 1, "the strip moves on after a clear")
+	screen.queue_free()
+	var flip_screen := GameScreen.new()
+	root.add_child(flip_screen)
+	flip_screen.setup(levels, 1, progress, save)
+	_check(not flip_screen.color_strip.visible, "levels without colours hide the strip")
+	for _i in 4:
+		flip_screen.advance_time(0.25)
+	_check(flip_screen.controller.board.arrow_direction(0) == "right" and flip_screen.board_view.is_flipping(), "the screen clock flips flippers and animates it")
+	flip_screen.board_view._process(1.0)
+	_check(not flip_screen.board_view.is_flipping(), "the flip animation ends")
+	flip_screen.use_hint()
+	_check(flip_screen.note_text() == GameScreen.FLIP_HINT_NOTE, "a hint on a flipper says to wait for free space")
+	flip_screen.queue_free()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_flipcolor_save.json"))

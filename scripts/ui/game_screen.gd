@@ -15,9 +15,13 @@ const STAR_STEP := 0.3
 const MAX_TICK_SECONDS := 0.25
 const LOW_TIME_RATIO := 0.3
 const DEAD_END_NOTE := "No way out from here. Undo or retry."
+const WRONG_COLOR_NOTE := "Wrong colour. Tap the colour marked NEXT."
+const FLIP_HINT_NOTE := "Tap the highlighted arrow when it points to free space"
 
 var controller := GameController.new()
 var board_view: BoardView
+## The colour order of this attempt (hidden on levels without one).
+var color_strip: ColorSequenceView
 
 var _levels: Array[Dictionary]
 var _index: int
@@ -128,7 +132,7 @@ func use_hint() -> void:
 	controller.refill_clock()
 	board_view.show_hint(id)
 	_sfx("hint")
-	_note.text = "Tap the highlighted arrow"
+	_note.text = FLIP_HINT_NOTE if controller.board.is_flipper(id) else "Tap the highlighted arrow"
 	_save.save_data()
 	_refresh()
 
@@ -184,6 +188,9 @@ func _build() -> void:
 	_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_note.custom_minimum_size = Vector2(0, 20)
 	root.add_child(_note)
+
+	color_strip = ColorSequenceView.new()
+	root.add_child(color_strip)
 
 	_coach = PanelContainer.new()
 	_coach.theme_type_variation = "Card"
@@ -370,10 +377,17 @@ func _load_level() -> void:
 	controller.move_blocked.connect(func(_id: int, _blocker: int) -> void:
 		_sfx("tap_blocked")
 		Haptics.buzz(_progress, Haptics.BLOCKED_MS))
-	if not controller.start(level["board"], level["moves_limit"], Difficulty.countdown_for(level["id"])):
+	controller.rng.randomize()
+	controller.wrong_color.connect(func(_id: int) -> void:
+		_sfx("tap_blocked")
+		_note.text = WRONG_COLOR_NOTE
+		Haptics.buzz(_progress, Haptics.BLOCKED_MS))
+	if not controller.start(level["board"], level["moves_limit"], Difficulty.countdown_for(level["id"]),
+			Difficulty.flip_period_for(level["id"]), int(level.get("colors", 0))):
 		_note.text = "This level is misconfigured."
 		return
 	board_view.bind(controller)
+	color_strip.bind(controller)
 	var world := Progress.world_of(level["id"])
 	_title.text = "%d  %s" % [Difficulty.local_id(level["id"]), level["name"]]
 	var tier_prefix := "DIFFICULT  " if Difficulty.of_level(level["id"]) == Difficulty.DIFFICULT else ""
@@ -403,6 +417,7 @@ func _refresh() -> void:
 	_update_coach()
 	_refresh_time()
 	board_view.queue_redraw()
+	color_strip.queue_redraw()
 
 
 func _refresh_time() -> void:

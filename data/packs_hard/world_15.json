@@ -1,0 +1,1230 @@
+{
+	"levels": [
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 7
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 7
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 7
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 4,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 1
+				}
+			],
+			"generator_version": 1,
+			"height": 8,
+			"id": 141,
+			"metrics": {
+				"arrows": 16,
+				"bait": 1,
+				"blocked_at_start": 12,
+				"depth": 6,
+				"flippers": 4,
+				"free_at_start": 4,
+				"height": 8,
+				"timed_flips": 4,
+				"width": 6
+			},
+			"moves_limit": 18,
+			"name": "Narrow Gate",
+			"seed": 20261166925606,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 7
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 5,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 7
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 1
+				}
+			],
+			"generator_version": 1,
+			"height": 8,
+			"id": 142,
+			"metrics": {
+				"arrows": 17,
+				"bait": 3,
+				"blocked_at_start": 13,
+				"depth": 6,
+				"flippers": 4,
+				"free_at_start": 4,
+				"height": 8,
+				"timed_flips": 4,
+				"width": 6
+			},
+			"moves_limit": 19,
+			"name": "Iron Maze",
+			"seed": 20261166926597,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 7
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 2,
+					"y": 7
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 2,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 1,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 4,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 5,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 7
+				}
+			],
+			"generator_version": 1,
+			"height": 8,
+			"id": 143,
+			"metrics": {
+				"arrows": 17,
+				"bait": 0,
+				"blocked_at_start": 12,
+				"depth": 6,
+				"flippers": 5,
+				"free_at_start": 5,
+				"height": 8,
+				"timed_flips": 5,
+				"width": 6
+			},
+			"moves_limit": 19,
+			"name": "Crimson Path",
+			"seed": 20261166927645,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 5,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 5,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 7
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 7
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 7
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 5
+				}
+			],
+			"generator_version": 1,
+			"height": 8,
+			"id": 144,
+			"metrics": {
+				"arrows": 18,
+				"bait": 4,
+				"blocked_at_start": 14,
+				"depth": 7,
+				"flippers": 5,
+				"free_at_start": 4,
+				"height": 8,
+				"timed_flips": 5,
+				"width": 6
+			},
+			"moves_limit": 20,
+			"name": "Bright Quarry",
+			"seed": 20261166928672,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 5,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 0,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 7
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 7
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 1
+				}
+			],
+			"generator_version": 1,
+			"height": 8,
+			"id": 145,
+			"metrics": {
+				"arrows": 19,
+				"bait": 2,
+				"blocked_at_start": 17,
+				"depth": 7,
+				"flippers": 5,
+				"free_at_start": 2,
+				"height": 8,
+				"timed_flips": 5,
+				"width": 6
+			},
+			"moves_limit": 21,
+			"name": "Winding Signal",
+			"seed": 20261166929667,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 6,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 4,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 6,
+					"y": 6
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 6,
+					"y": 5
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 6,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 6,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 5,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 2
+				}
+			],
+			"generator_version": 1,
+			"height": 9,
+			"id": 146,
+			"metrics": {
+				"arrows": 19,
+				"bait": 2,
+				"blocked_at_start": 16,
+				"depth": 7,
+				"flippers": 6,
+				"free_at_start": 3,
+				"height": 9,
+				"timed_flips": 6,
+				"width": 7
+			},
+			"moves_limit": 21,
+			"name": "Tidy Valley",
+			"seed": 20261166930706,
+			"width": 7
+		},
+		{
+			"arrows": [
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 7
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 7
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 6,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 6,
+					"y": 8
+				},
+				{
+					"dir": "down",
+					"x": 6,
+					"y": 7
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 7
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 7
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 5
+				}
+			],
+			"generator_version": 1,
+			"height": 9,
+			"id": 147,
+			"metrics": {
+				"arrows": 20,
+				"bait": 4,
+				"blocked_at_start": 17,
+				"depth": 7,
+				"flippers": 6,
+				"free_at_start": 3,
+				"height": 9,
+				"timed_flips": 6,
+				"width": 7
+			},
+			"moves_limit": 22,
+			"name": "Pale Anchor",
+			"seed": 20261166931763,
+			"width": 7
+		},
+		{
+			"arrows": [
+				{
+					"dir": "down",
+					"x": 6,
+					"y": 7
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 7
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 0,
+					"y": 8
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 1,
+					"y": 8
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 8
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 5,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 4
+				}
+			],
+			"generator_version": 1,
+			"height": 9,
+			"id": 148,
+			"metrics": {
+				"arrows": 21,
+				"bait": 5,
+				"blocked_at_start": 18,
+				"depth": 8,
+				"flippers": 6,
+				"free_at_start": 3,
+				"height": 9,
+				"timed_flips": 6,
+				"width": 7
+			},
+			"moves_limit": 23,
+			"name": "Misty Canyon",
+			"seed": 20261166932723,
+			"width": 7
+		},
+		{
+			"arrows": [
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 7
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "up",
+					"x": 5,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 5,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 5,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 6,
+					"y": 8
+				},
+				{
+					"dir": "down",
+					"x": 6,
+					"y": 7
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 6,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 6,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 7
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 1,
+					"y": 7
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 3,
+					"y": 7
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 7
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 5
+				}
+			],
+			"generator_version": 1,
+			"height": 9,
+			"id": 149,
+			"metrics": {
+				"arrows": 21,
+				"bait": 8,
+				"blocked_at_start": 18,
+				"depth": 8,
+				"flippers": 7,
+				"free_at_start": 3,
+				"height": 9,
+				"timed_flips": 7,
+				"width": 7
+			},
+			"moves_limit": 23,
+			"name": "Hidden Ember",
+			"seed": 20261166933677,
+			"width": 7
+		},
+		{
+			"arrows": [
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 6
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 7
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 7
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 6,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 8
+				},
+				{
+					"dir": "down",
+					"x": 6,
+					"y": 8
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 5,
+					"y": 8
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 8
+				}
+			],
+			"generator_version": 1,
+			"height": 9,
+			"id": 150,
+			"metrics": {
+				"arrows": 22,
+				"bait": 6,
+				"blocked_at_start": 18,
+				"depth": 8,
+				"flippers": 7,
+				"free_at_start": 4,
+				"height": 9,
+				"timed_flips": 7,
+				"width": 7
+			},
+			"moves_limit": 24,
+			"name": "Quiet Glacier",
+			"seed": 20261166934856,
+			"width": 7
+		}
+	],
+	"version": 2
+}

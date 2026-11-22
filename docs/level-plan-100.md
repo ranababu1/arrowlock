@@ -167,3 +167,18 @@ Owner decisions: make the game harder with a new rule, only in new levels after 
 | 12 Spin Cycle | 111–120 | 10–16 / 3–6 / 3–6 | 18–24 / 6–9 / 4–9 |
 
 - **Next:** the owner plays 101–120 in both modes, then decides whether to freeze them and whether to make more turner worlds or add a second mechanic (sliding arrows or walls, see `level-plan-500.md`).
+
+
+## 13. Levels 121–200: colour order, flipping, mixed (owner request, 2026-11-22)
+
+Owner decisions: 121–140 colour order, 141–160 flipping arrows, 161–200 all three mixed with turners. Flips every 0.8 s in Easy and 0.6 s in Difficult. A wrong colour costs a move. Colours change at random after every tap, but always leave at least one safe arrow in the needed colour. Colour is the only cue (5–10 pastels).
+
+| World | Levels | Rule | Easy arrows | Difficult arrows |
+|---|---|---|---|---|
+| 13 Color Code | 121–130 | colour order 5→7 (Difficult 6→8) | 8–14 | 16–22 |
+| 14 Rainbow Rush | 131–140 | colour order 7→10 (Difficult 8→10) | 14–20 | 22–28 |
+| 15 Flip Side | 141–150 | 2→5 flippers (Difficult 4→7) | 8–14 | 16–22 |
+| 16 Quick Draw | 151–160 | 5→9 flippers (Difficult 7→11) | 14–20 | 22–28 |
+| 17–20 | 161–200 | turners, flippers and colours together, all rising | 10–22 | 12–23 |
+
+- **Next:** the owner plays samples of each section in both modes (especially the flip speed on a real phone and whether the pastels can be told apart), then decides whether to freeze 101–200.

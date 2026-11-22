@@ -30,12 +30,22 @@ const WORLD_COLORS: Array[Color] = [
 	Color("6c5cff"), Color("2dd4ff"), Color("35e0a1"), Color("ff8a5b"), Color("ffc83d"),
 	Color("ff6fb5"), Color("5b8cff"), Color("c084fc"), Color("2fd6c4"), Color("ff5d73"),
 	Color("a3e635"), Color("f59e0b"),
+	Color("f9a8d4"), Color("93c5fd"), Color("fbbf24"), Color("34d399"),
+	Color("a78bfa"), Color("fb7185"), Color("22d3ee"), Color("facc15"),
 ]
 ## Short names shown on each world card.
 const WORLD_NAMES: Array[String] = [
 	"First Steps", "Crossroads", "Long Lines", "Late Blockers", "Tight Squeeze",
 	"Dense Lanes", "Deep Chains", "Pressure", "Expert", "Gridlock",
 	"Turning Point", "Spin Cycle",
+	"Color Code", "Rainbow Rush", "Flip Side", "Quick Draw",
+	"Kaleidoscope", "Chaos Theory", "Grand Mix", "Final Lock",
+]
+## Soft pastel colours for colour-order levels, chosen to be as far apart as
+## pastels allow. A level uses 5 to 10 of them.
+const PASTELS: Array[Color] = [
+	Color("ffadad"), Color("ffd6a5"), Color("fdffb6"), Color("caffbf"), Color("9bf6ff"),
+	Color("a0c4ff"), Color("bdb2ff"), Color("ffc6ff"), Color("d6b9a3"), Color("e8e8e8"),
 ]
 
 

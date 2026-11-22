@@ -33,6 +33,12 @@ const TURN_SECONDS := 0.22
 const TURN_RING_RADIUS := 0.43  ## in cells
 const TURN_RING_WIDTH := 0.045  ## in cells
 const TURN_RING_COLOR := Color(1, 1, 1, 0.6)
+## Flippers: a dot at each end of the axis they flip along, and a quick half
+## turn when they swap.
+const FLIP_SECONDS := 0.1
+const FLIP_DOT_REACH := 0.43  ## in cells, from the centre
+const FLIP_DOT_RADIUS := 0.055  ## in cells
+const FLIP_DOT_COLOR := Color(1, 1, 1, 0.7)
 
 var _controller: GameController
 ## id -> {"info": Dictionary, "t": float}; arrows animating off the board.
@@ -49,6 +55,8 @@ var _clock: float = 0.0
 ## Progress (0..1) of the last quarter turn and its direction (+1 / -1).
 var _turn_t: float = 1.0
 var _turn_steps: int = 0
+## Progress (0..1) of the last flip.
+var _flip_t: float = 1.0
 var _rng := RandomNumberGenerator.new()
 var _tile_style := StyleBoxFlat.new()
 static var _shape_cache := PackedVector2Array()
@@ -68,6 +76,10 @@ func bind(controller: GameController) -> void:
 	controller.move_blocked.connect(func(id: int, _blocker: int) -> void: _flashing[id] = BLOCKED_FLASH_SECONDS)
 	controller.arrow_restored.connect(func(id: int) -> void: _exiting.erase(id))
 	controller.turners_rotated.connect(_on_turners_rotated)
+	controller.flipped.connect(func() -> void:
+		_flip_t = 0.0
+		queue_redraw())
+	controller.recolored.connect(queue_redraw)
 
 
 func clear_animations() -> void:
@@ -79,6 +91,7 @@ func clear_animations() -> void:
 	_coach_blocker = -1
 	_turn_t = 1.0
 	_turn_steps = 0
+	_flip_t = 1.0
 	queue_redraw()
 
 
@@ -121,6 +134,20 @@ func spark_count() -> int:
 	return _sparks.size()
 
 
+## True while flippers are swinging round after a flip.
+func is_flipping() -> bool:
+	return _flip_t < 1.0
+
+
+## Colour an arrow is drawn in: its colour-order pastel on colour levels,
+## otherwise the direction colour.
+func arrow_color(id: int) -> Color:
+	var index := _controller.color_of(id)
+	if index >= 0:
+		return Palette.PASTELS[index]
+	return Palette.direction_color(_controller.board.arrow_direction(id))
+
+
 ## True while turners are swinging to their new direction.
 func is_turning() -> bool:
 	return _turn_t < 1.0
@@ -136,17 +163,18 @@ func _on_arrow_removed(id: int, info: Dictionary) -> void:
 	_exiting[id] = {"info": info, "t": 0.0}
 	var l := _layout()
 	var center: Vector2 = l["origin"] + (Vector2(info["pos"]) + Vector2(0.5, 0.5)) * l["cell"]
-	var color := Palette.direction_color(info["dir"])
+	var color: Color = Palette.PASTELS[info["color"]] if info.has("color") else Palette.direction_color(info["dir"])
 	for i in SPARKS_PER_ARROW:
 		var velocity := Vector2.from_angle(_rng.randf() * TAU) * _rng.randf_range(60.0, 190.0)
 		_sparks.append([center, velocity, 0.0, color])
 
 
 func _process(delta: float) -> void:
-	if _exiting.is_empty() and _flashing.is_empty() and _sparks.is_empty() and _hint_id == -1 and _coach_id == -1 and _turn_t >= 1.0:
+	if _exiting.is_empty() and _flashing.is_empty() and _sparks.is_empty() and _hint_id == -1 and _coach_id == -1 and _turn_t >= 1.0 and _flip_t >= 1.0:
 		return
 	_clock += delta
 	_turn_t = minf(1.0, _turn_t + delta / TURN_SECONDS)
+	_flip_t = minf(1.0, _flip_t + delta / FLIP_SECONDS)
 	for id in _exiting.keys():
 		_exiting[id]["t"] += delta / EXIT_SECONDS
 		if _exiting[id]["t"] >= 1.0:
@@ -207,7 +235,7 @@ func _draw() -> void:
 		for x in b.width:
 			draw_style_box(_tile_style, Rect2(origin + Vector2(x, y) * cell, Vector2(cell, cell)).grow(-3.0))
 	for id in b.arrow_ids():
-		var color := Palette.direction_color(b.arrow_direction(id))
+		var color := arrow_color(id)
 		var offset := Vector2.ZERO
 		if _flashing.has(id):
 			color = BLOCKED_COLOR
@@ -226,11 +254,14 @@ func _draw() -> void:
 			# Swing from the old direction into the new one.
 			var eased := 1.0 - pow(1.0 - _turn_t, 3.0)
 			spin = -float(_turn_steps) * (1.0 - eased) * PI * 0.5
+		elif b.is_flipper(id):
+			_draw_flip_dots(origin, cell, b.arrow_position(id), b.arrow_direction(id), offset)
+			spin = PI * (1.0 - _flip_t)
 		_draw_arrow(origin, cell, b.arrow_position(id), b.arrow_direction(id), color, 1.0, 0.0, offset, 1.0, spin)
 	for id in _exiting.keys():
 		var info: Dictionary = _exiting[id]["info"]
 		var t: float = _exiting[id]["t"]
-		var color := Palette.direction_color(info["dir"])
+		var color: Color = Palette.PASTELS[info["color"]] if info.has("color") else Palette.direction_color(info["dir"])
 		_draw_arrow(origin, cell, info["pos"], info["dir"], color, 1.0 - t, t * EXIT_TRAVEL_CELLS, Vector2.ZERO, 1.0 - 0.3 * t)
 	for spark in _sparks:
 		var life: float = 1.0 - float(spark[2]) / SPARK_SECONDS
@@ -246,6 +277,15 @@ func _draw_frame(origin: Vector2, cell: float, pos: Vector2i, color: Color, puls
 	style.set_border_width_all(3)
 	style.set_corner_radius_all(roundi(cell * 0.2))
 	draw_style_box(style, Rect2(origin + Vector2(pos) * cell, Vector2(cell, cell)).grow(-3.0))
+
+
+## The flipper mark: a dot at each end of the axis it flips along.
+func _draw_flip_dots(origin: Vector2, cell: float, pos: Vector2i, dir: String, offset: Vector2) -> void:
+	var center := origin + (Vector2(pos) + Vector2(0.5, 0.5)) * cell + offset
+	var axis := Vector2(BoardState.DIRECTIONS[dir]) * cell * FLIP_DOT_REACH
+	var radius := maxf(1.5, cell * FLIP_DOT_RADIUS)
+	draw_circle(center + axis, radius, FLIP_DOT_COLOR)
+	draw_circle(center - axis, radius, FLIP_DOT_COLOR)
 
 
 ## The turner mark: a clockwise three-quarter ring with a small arrowhead.

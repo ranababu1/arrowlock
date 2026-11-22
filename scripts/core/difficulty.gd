@@ -30,6 +30,16 @@ static func make_id(difficulty: int, local: int) -> int:
 	return HARD_ID_BASE + local if difficulty == DIFFICULT else local
 
 
+## Seconds a flipping arrow points each way, per tier (owner, 2026-11-22).
+const EASY_FLIP_PERIOD := 0.8
+const HARD_FLIP_PERIOD := 0.6
+
+
+## Seconds between flips of flipping arrows on this level's tier.
+static func flip_period_for(level_id: int) -> float:
+	return HARD_FLIP_PERIOD if of_level(level_id) == DIFFICULT else EASY_FLIP_PERIOD
+
+
 ## Seconds allowed between taps, or 0.0 when the level has no clock.
 static func countdown_for(level_id: int) -> float:
 	return HARD_COUNTDOWN if of_level(level_id) == DIFFICULT else 0.0

@@ -5,7 +5,10 @@ extends RefCounted
 const SUPPORTED_VERSION := 2
 const MAX_BOARD_SIZE := 16
 
-## Parsed levels: {"id": int, "name": String, "board": BoardState, "moves_limit": int, "variant_of": int (-1 if none)}.
+## Parsed levels: {"id": int, "name": String, "board": BoardState, "moves_limit": int, "variant_of": int (-1 if none),
+## "colors": int (size of the colour order, 0 for none)}.
+const MIN_COLORS := 5
+const MAX_COLORS := 10
 var levels: Array[Dictionary] = []
 ## Human-readable validation errors from the last load.
 var errors: Array[String] = []
@@ -96,11 +99,12 @@ func _parse_level(raw: Variant) -> Dictionary:
 	var board := BoardState.new(w, h)
 	var next_id := 0
 	for a in raw_arrows:
-		if typeof(a) == TYPE_DICTIONARY and a.has("turn") and typeof(a["turn"]) != TYPE_BOOL:
-			errors.append("Level %d has an arrow whose 'turn' is not true or false" % id)
-			return {}
+		for key in ["turn", "flip"]:
+			if typeof(a) == TYPE_DICTIONARY and a.has(key) and typeof(a[key]) != TYPE_BOOL:
+				errors.append("Level %d has an arrow whose '%s' is not true or false" % [id, key])
+				return {}
 		if typeof(a) != TYPE_DICTIONARY \
-				or not board.add_arrow(next_id, Vector2i(int(a.get("x", -1)), int(a.get("y", -1))), str(a.get("dir", "")), bool(a.get("turn", false))):
+				or not board.add_arrow(next_id, Vector2i(int(a.get("x", -1)), int(a.get("y", -1))), str(a.get("dir", "")), bool(a.get("turn", false)), bool(a.get("flip", false))):
 			errors.append("Level %d has an invalid, duplicate or out-of-bounds arrow" % id)
 			return {}
 		next_id += 1
@@ -108,5 +112,9 @@ func _parse_level(raw: Variant) -> Dictionary:
 	if moves_limit < board.remaining_count():
 		errors.append("Level %d moves_limit %d is below arrow count %d" % [id, moves_limit, board.remaining_count()])
 		return {}
+	var colors := int(raw.get("colors", 0))
+	if colors != 0 and (colors < MIN_COLORS or colors > MAX_COLORS):
+		errors.append("Level %d colors %d is not between %d and %d" % [id, colors, MIN_COLORS, MAX_COLORS])
+		return {}
 	return {"id": id, "name": str(raw.get("name", "Level %d" % id)), "board": board, "moves_limit": moves_limit,
-		"variant_of": int(raw.get("variant_of", -1))}
+		"variant_of": int(raw.get("variant_of", -1)), "colors": colors}

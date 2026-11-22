@@ -1,0 +1,1505 @@
+{
+	"levels": [
+		{
+			"arrows": [
+				{
+					"dir": "down",
+					"x": 6,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 6,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 8
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 5,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 5,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 6,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 6,
+					"y": 8
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 6,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 5,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 4
+				}
+			],
+			"colors": 8,
+			"generator_version": 1,
+			"height": 9,
+			"id": 191,
+			"metrics": {
+				"arrows": 21,
+				"bait": 5,
+				"blocked_at_start": 19,
+				"colors": 8,
+				"depth": 0,
+				"flippers": 5,
+				"free_at_start": 2,
+				"height": 9,
+				"safe_starts": 2,
+				"timed_flips": 5,
+				"trap_steps": 5,
+				"traps": 7,
+				"turners": 6,
+				"width": 7
+			},
+			"moves_limit": 23,
+			"name": "Zesty Bridge",
+			"seed": 20261166976042,
+			"width": 7
+		},
+		{
+			"arrows": [
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 6,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 4,
+					"y": 5
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 4,
+					"y": 8
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 7
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 6,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 6,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 8
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 1,
+					"y": 8
+				},
+				{
+					"dir": "right",
+					"x": 6,
+					"y": 7
+				}
+			],
+			"colors": 8,
+			"generator_version": 1,
+			"height": 9,
+			"id": 192,
+			"metrics": {
+				"arrows": 21,
+				"bait": 2,
+				"blocked_at_start": 18,
+				"colors": 8,
+				"depth": 0,
+				"flippers": 5,
+				"free_at_start": 3,
+				"height": 9,
+				"safe_starts": 4,
+				"timed_flips": 5,
+				"trap_steps": 3,
+				"traps": 6,
+				"turners": 6,
+				"width": 7
+			},
+			"moves_limit": 23,
+			"name": "Velvet Delta",
+			"seed": 20261166977049,
+			"width": 7
+		},
+		{
+			"arrows": [
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 8
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 0,
+					"y": 8
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 2,
+					"y": 8
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 0,
+					"y": 6
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 5,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 6,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 5,
+					"y": 5
+				},
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 6,
+					"y": 8
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 5,
+					"y": 8
+				},
+				{
+					"dir": "up",
+					"x": 5,
+					"y": 7
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 6,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 4,
+					"y": 2
+				}
+			],
+			"colors": 8,
+			"generator_version": 1,
+			"height": 9,
+			"id": 193,
+			"metrics": {
+				"arrows": 21,
+				"bait": 7,
+				"blocked_at_start": 19,
+				"colors": 8,
+				"depth": 0,
+				"flippers": 5,
+				"free_at_start": 2,
+				"height": 9,
+				"safe_starts": 4,
+				"timed_flips": 5,
+				"trap_steps": 3,
+				"traps": 6,
+				"turners": 6,
+				"width": 7
+			},
+			"moves_limit": 23,
+			"name": "Silver Forest",
+			"seed": 20261166978061,
+			"width": 7
+		},
+		{
+			"arrows": [
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 0,
+					"y": 8
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 8
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 8
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 2,
+					"y": 7
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 6,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 5,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 6,
+					"y": 8
+				},
+				{
+					"dir": "up",
+					"x": 5,
+					"y": 8
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 5,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 8
+				}
+			],
+			"colors": 9,
+			"generator_version": 1,
+			"height": 9,
+			"id": 194,
+			"metrics": {
+				"arrows": 22,
+				"bait": 5,
+				"blocked_at_start": 21,
+				"colors": 9,
+				"depth": 0,
+				"flippers": 5,
+				"free_at_start": 1,
+				"height": 9,
+				"safe_starts": 2,
+				"timed_flips": 5,
+				"trap_steps": 4,
+				"traps": 6,
+				"turners": 6,
+				"width": 7
+			},
+			"moves_limit": 24,
+			"name": "Open Island",
+			"seed": 20261166979068,
+			"width": 7
+		},
+		{
+			"arrows": [
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 6,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 6,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 6,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 6,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 1,
+					"y": 8
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 1,
+					"y": 7
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 8
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 3,
+					"y": 7
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 3,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 8
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 5,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 5
+				}
+			],
+			"colors": 9,
+			"generator_version": 1,
+			"height": 9,
+			"id": 195,
+			"metrics": {
+				"arrows": 22,
+				"bait": 2,
+				"blocked_at_start": 21,
+				"colors": 9,
+				"depth": 0,
+				"flippers": 5,
+				"free_at_start": 1,
+				"height": 9,
+				"safe_starts": 4,
+				"timed_flips": 5,
+				"trap_steps": 2,
+				"traps": 7,
+				"turners": 6,
+				"width": 7
+			},
+			"moves_limit": 24,
+			"name": "Lunar Gate",
+			"seed": 20261166980075,
+			"width": 7
+		},
+		{
+			"arrows": [
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 0,
+					"y": 8
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 3,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 6,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 5,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 5,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 5,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 4,
+					"y": 5
+				},
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 3,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 6,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 6,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 6,
+					"y": 7
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 7
+				},
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 3,
+					"y": 0
+				}
+			],
+			"colors": 9,
+			"generator_version": 1,
+			"height": 9,
+			"id": 196,
+			"metrics": {
+				"arrows": 22,
+				"bait": 3,
+				"blocked_at_start": 21,
+				"colors": 9,
+				"depth": 0,
+				"flippers": 6,
+				"free_at_start": 1,
+				"height": 9,
+				"safe_starts": 3,
+				"timed_flips": 6,
+				"trap_steps": 5,
+				"traps": 7,
+				"turners": 7,
+				"width": 7
+			},
+			"moves_limit": 24,
+			"name": "Gentle Maze",
+			"seed": 20261166981093,
+			"width": 7
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 0,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 1,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 6,
+					"y": 8
+				},
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 6,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 5,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 6
+				},
+				{
+					"dir": "up",
+					"x": 5,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 6,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 8
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 1,
+					"y": 8
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 5,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 8
+				},
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 4,
+					"y": 8
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 3,
+					"y": 8
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 7
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 6,
+					"y": 5
+				}
+			],
+			"colors": 9,
+			"generator_version": 1,
+			"height": 9,
+			"id": 197,
+			"metrics": {
+				"arrows": 22,
+				"bait": 0,
+				"blocked_at_start": 21,
+				"colors": 9,
+				"depth": 0,
+				"flippers": 6,
+				"free_at_start": 1,
+				"height": 9,
+				"safe_starts": 4,
+				"timed_flips": 6,
+				"trap_steps": 3,
+				"traps": 5,
+				"turners": 7,
+				"width": 7
+			},
+			"moves_limit": 24,
+			"name": "Amber Path",
+			"seed": 20261166982102,
+			"width": 7
+		},
+		{
+			"arrows": [
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 1,
+					"y": 7
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 4,
+					"y": 8
+				},
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 0,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 6,
+					"y": 7
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 7
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 7
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 7
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 8
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 1,
+					"y": 8
+				},
+				{
+					"dir": "left",
+					"x": 6,
+					"y": 8
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 6,
+					"y": 6
+				},
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 6,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 6,
+					"y": 3
+				}
+			],
+			"colors": 10,
+			"generator_version": 1,
+			"height": 9,
+			"id": 198,
+			"metrics": {
+				"arrows": 23,
+				"bait": 1,
+				"blocked_at_start": 21,
+				"colors": 10,
+				"depth": 0,
+				"flippers": 6,
+				"free_at_start": 2,
+				"height": 9,
+				"safe_starts": 2,
+				"timed_flips": 6,
+				"trap_steps": 2,
+				"traps": 4,
+				"turners": 7,
+				"width": 7
+			},
+			"moves_limit": 25,
+			"name": "Young Quarry",
+			"seed": 20261166983108,
+			"width": 7
+		},
+		{
+			"arrows": [
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 0,
+					"y": 8
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 0,
+					"y": 7
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 6,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 1,
+					"y": 7
+				},
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 3,
+					"y": 7
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 8
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 3,
+					"y": 8
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 6
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 8
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 5,
+					"y": 7
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 7
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 6,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 5,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 1
+				}
+			],
+			"colors": 10,
+			"generator_version": 1,
+			"height": 9,
+			"id": 199,
+			"metrics": {
+				"arrows": 23,
+				"bait": 8,
+				"blocked_at_start": 23,
+				"colors": 10,
+				"depth": 0,
+				"flippers": 6,
+				"free_at_start": 0,
+				"height": 9,
+				"safe_starts": 3,
+				"timed_flips": 6,
+				"trap_steps": 2,
+				"traps": 4,
+				"turners": 7,
+				"width": 7
+			},
+			"moves_limit": 25,
+			"name": "Upper Signal",
+			"seed": 20261166984118,
+			"width": 7
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 6,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 6,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 5,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 0,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 6,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 5,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 5,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 0,
+					"y": 8
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 7
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 6,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 6,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 2
+				}
+			],
+			"colors": 10,
+			"generator_version": 1,
+			"height": 9,
+			"id": 200,
+			"metrics": {
+				"arrows": 23,
+				"bait": 4,
+				"blocked_at_start": 21,
+				"colors": 10,
+				"depth": 0,
+				"flippers": 6,
+				"free_at_start": 2,
+				"height": 9,
+				"safe_starts": 4,
+				"timed_flips": 6,
+				"trap_steps": 2,
+				"traps": 4,
+				"turners": 7,
+				"width": 7
+			},
+			"moves_limit": 25,
+			"name": "Rapid Valley",
+			"seed": 20261166985123,
+			"width": 7
+		}
+	],
+	"version": 2
+}

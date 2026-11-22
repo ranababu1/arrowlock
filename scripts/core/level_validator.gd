@@ -20,12 +20,15 @@ static func validate_level(level: Dictionary) -> Array[String]:
 	var count := board.remaining_count()
 	if level["moves_limit"] < count:
 		errors.append("Level %d: moves_limit %d is below arrow count %d" % [id, level["moves_limit"], count])
-	if board.has_turners():
+	var colors := int(level.get("colors", 0))
+	if colors > count:
+		errors.append("Level %d: %d colours for only %d arrows" % [id, colors, count])
+	if board.has_turners() or board.has_flippers():
 		var found := PuzzleSolver.solve_search(board)
 		if found["status"] != PuzzleSolver.SOLVED:
-			errors.append("Level %d: turner search finds no solution (status %d)" % [id, found["status"]])
+			errors.append("Level %d: turner/flipper search finds no solution (status %d)" % [id, found["status"]])
 		elif not PuzzleSolver.replay_wins(board, found["order"]):
-			errors.append("Level %d: the turner solution does not win when replayed" % id)
+			errors.append("Level %d: the found solution does not win when replayed" % id)
 		return errors
 	if PuzzleSolver.solve(board).size() != count:
 		errors.append("Level %d: greedy solver cannot clear the board" % id)

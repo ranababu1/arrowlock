@@ -32,7 +32,8 @@ static func solve(board: BoardState) -> Array[int]:
 	var work := board.duplicate_state()
 	var order: Array[int] = []
 	while not work.is_empty():
-		var options := MoveValidator.removable_ids(work)
+		# A flipper counts as free if either way is clear: the player waits.
+		var options := MoveValidator.reachable_ids(work)
 		if options.is_empty():
 			return []
 		work.remove_arrow(options[0])
@@ -104,7 +105,7 @@ static func _search(board: BoardState, dead: Dictionary, left: Array[int], order
 	# Turners first: a clear turner may not stay clear, plain arrows will.
 	var moves: Array[int] = []
 	var plain: Array[int] = []
-	for id in MoveValidator.removable_ids(board):
+	for id in MoveValidator.reachable_ids(board):
 		if board.is_turner(id):
 			moves.append(id)
 		else:
@@ -137,13 +138,19 @@ static func _state_key(board: BoardState) -> Variant:
 
 
 ## Replays `order` on a copy of `board` with the game's own rules
-## (GameController), so a search result can be checked independently.
+## (GameController), so a search result can be checked independently. A
+## flipper that points the wrong way is waited for (one flip of the clock).
 static func replay_wins(board: BoardState, order: Array[int]) -> bool:
 	var c := GameController.new()
-	if not c.start(board, board.remaining_count()):
+	var period := 1.0
+	if not c.start(board, board.remaining_count(), 0.0, period if board.has_flippers() else 0.0):
 		return false
 	for id in order:
-		if not c.board.has_arrow(id) or not c.tap(c.board.arrow_position(id)):
+		if not c.board.has_arrow(id):
+			return false
+		if MoveValidator.first_blocker(c.board, id) != -1 and c.board.is_flipper(id):
+			c.tick(period)
+		if not c.tap(c.board.arrow_position(id)):
 			return false
 	return c.state == GameController.State.WON
 

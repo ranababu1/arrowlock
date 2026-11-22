@@ -44,3 +44,38 @@ static func removable_ids(board: BoardState) -> Array[int]:
 		if can_remove(board, id):
 			result.append(id)
 	return result
+
+
+## Nearest arrow on the ray from `id` towards `dir` (not necessarily the way
+## it points), or -1 when that way is clear.
+static func first_blocker_toward(board: BoardState, id: int, dir: String) -> int:
+	if not board.has_arrow(id):
+		return -1
+	var step: Vector2i = BoardState.DIRECTIONS[dir]
+	var pos: Vector2i = board.arrow_position(id) + step
+	while board.in_bounds(pos):
+		var other: int = board.arrow_at(pos)
+		if other != -1:
+			return other
+		pos += step
+	return -1
+
+
+## True when the arrow can leave now, or (a flipper) once it flips: either of
+## its two directions is clear. Waiting changes nothing else on the board,
+## so this is what the solvers use.
+static func can_remove_eventually(board: BoardState, id: int) -> bool:
+	if not board.has_arrow(id):
+		return false
+	if first_blocker(board, id) == -1:
+		return true
+	return board.is_flipper(id) and first_blocker_toward(board, id, board.other_direction(id)) == -1
+
+
+## Arrows that can leave now or after waiting for a flip, ascending.
+static func reachable_ids(board: BoardState) -> Array[int]:
+	var result: Array[int] = []
+	for id in board.arrow_ids():
+		if can_remove_eventually(board, id):
+			result.append(id)
+	return result

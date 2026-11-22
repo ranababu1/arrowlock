@@ -2,6 +2,44 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-22 — 16 KB page size check for Android releases
+
+Owner asked whether the Android build supports 16 KB memory pages (required by Google Play for apps targeting Android 15+). Godot 4.7.2 should already build its engine that way, but nothing checked it.
+
+### Added
+- `tools/check_16kb.py` (standard library only): for every 64-bit native library in an AAB or APK, checks that each ELF LOAD segment is aligned to at least 16 KB, and in an APK that uncompressed libraries start at a 16 KB offset. Checked against hand-built good and bad bundles; not yet run on a real Arrowlock build.
+- `tools/build_android.sh --release` and `--verify` run it on both artifacts and fail the release if either is not compatible (`docs/release.md` §3, check 7).
+
+### Not changed
+- R8 (code shrinking) stays off. It only shrinks the Java/Kotlin plugin code, not the game, so it would not make the game faster, and it can strip plugin classes that need keep rules.
+
+## 2026-11-22 — Colour order, flipping arrows and mixed worlds: levels 121–200 (branch `feat/turning-arrows`)
+
+Owner request: two more mechanics, 20 levels each, then 40 levels mixing everything. Owner decisions (2026-11-22): layout 121–140 colour, 141–160 flipping, 161–200 all three; flip every 0.8 s (Easy) and 0.6 s (Difficult); a wrong colour costs a move; recolouring is random but always fair; colour is the only cue (5–10 pastels, no symbols; I raised the colour-blind risk and the owner chose this).
+
+### Added
+- **Colour order** (`colors` on a level, 5–10): each attempt draws a new order of that many pastel colours (`Palette.PASTELS`), shown in a strip above the board with NEXT on the colour needed. The order repeats. After every tap (even a wasted one) every arrow gets a random colour from the order, and then one arrow that can leave without making the level unwinnable gets the needed colour. A free arrow of another colour costs a move like a blocked tap (`wrong_color` signal, "Wrong colour. Tap the colour marked NEXT."). Undo puts the colours back. Hint shows that fair arrow.
+- **Flipping arrows** (`flip` on an arrow): swap to the opposite direction every 0.8 s (Easy) / 0.6 s (Difficult) (`Difficulty.flip_period_for`). A tap counts while it points at free space, or less than 0.1 s after it flipped away (`GameController.FLIP_GRACE`). Two dots mark the flip axis, and a 0.1 s half turn shows each flip.
+- Solvers treat a flipper as free when either of its two directions is clear (`MoveValidator.can_remove_eventually`, `reachable_ids`), because the player can wait. `replay_wins` waits for flips.
+- Generator: `with_flippers` (prefers arrows whose other way is blocked, so a well-timed tap is needed), `colors` and `flippers` spec keys, mixed worlds (turners, then flippers, then the trap hill climb, then colours). A new kind of world starts its own difficulty ramp. `tools/generate_levels.gd --keep N` keeps levels 1..N from the files; it now prints each level's build time.
+- Metrics: `flippers`, `timed_flips`, `colors`.
+- Content, both modes: World 13 "Color Code", 14 "Rainbow Rush" (colour), 15 "Flip Side", 16 "Quick Draw" (flipping), 17 "Kaleidoscope", 18 "Chaos Theory", 19 "Grand Mix", 20 "Final Lock" (mixed). Tips on levels 121–123, 141–143 and 161–163.
+- `scripts/ui/color_sequence_view.gd`.
+
+### Changed
+- `GameController.start` takes the flip period and colour count. Fingerprints add `,f` for flippers and `|c<n>` for colour levels, only when present, so all earlier fingerprints are unchanged.
+
+### Fixed during the work
+- The removal info sent to the view carried the exit direction and colour, and undo reused it, so an undone flipper came back pointing the wrong way. Undo now keeps the original info.
+
+### Known limits
+- Traps in the Easy mixed worlds do not rise steadily (averages 1.9, 3.5, 4.1, 3.8 for Worlds 17–20). Difficult rises (2.9, 4.5, 4.8, 5.6) after a longer hill climb. The test only requires each later mixed world to beat World 17. Turner, flipper and colour counts never drop.
+- Some pastels (tan and peach) look alike on screen; colour is the only cue, by owner decision.
+- Levels 101–200 are not frozen and have not been played by anyone or run on a device. Building time: Easy 121–200 about 40 min; Difficult 121–160 about 15 min and 161–200 about 60 min.
+
+### Tests (macOS, Godot 4.7.2)
+- `godot --headless --path . -s tests/run_tests.gd` → 745 passed, 0 failed (was 669). The game starts headless with no new errors.
+
 ## 2026-11-22 — Turning arrows: a new rule for levels 101–120 (not committed)
 
 Owner request: the game is too easy. Cause: removing an arrow can only unblock others, so any free arrow is always a safe move. There are no wrong moves, only wrong taps. Owner decisions: add a new rule rather than retune, use it only in new levels after 100, leave levels 1–100 frozen and unchanged.

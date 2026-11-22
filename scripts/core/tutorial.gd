@@ -6,11 +6,6 @@ extends RefCounted
 ## on in Settings.
 
 const LAST_TIP_LEVEL := 3
-## Turners arrive in World 11. Their tips show on these levels (local
-## numbers, both modes) even after the first-run tips have switched off,
-## because they explain a new rule.
-const TURNER_TIP_FIRST := 101
-const TURNER_TIP_LAST := 103
 ## Taps after which the plain-text tips on levels 2 and 3 disappear.
 const TEXT_TIP_TAPS := 3
 
@@ -22,6 +17,23 @@ const TEXT_HINT := "Stuck? Hint shows an arrow that is free to go. It costs a fe
 const TEXT_TURNER := "Arrows with a ring turn a quarter clockwise every time another arrow leaves. Plan the order!"
 const TEXT_TURNER_TRAP := "A free arrow can be a trap: after it leaves, a ringed arrow may turn into a wall."
 const TEXT_TURNER_HINT := "Hint knows which free arrows are safe. If it says there is no way out, undo or retry."
+const TEXT_COLOR := "Clear arrows in the colour order shown above the board. Tap a free arrow in the colour marked NEXT."
+const TEXT_COLOR_CHANGE := "Colours change after every tap, so look again each time. A wrong colour costs a move."
+const TEXT_COLOR_ORDER := "Every try brings a new colour order. Learn it fast!"
+const TEXT_FLIP := "Arrows with two dots flip back and forth. Tap one while it points to free space."
+const TEXT_FLIP_TIMING := "Watch the rhythm: a flipping arrow pointing at a wall wastes a move."
+const TEXT_FLIP_FAST := "Some flippers can only leave one way. Be quick!"
+const TEXT_MIX := "Everything at once: rings turn, dots flip, and colours set the order."
+const TEXT_MIX_PLAN := "Plan the turns, time the flips, and follow the colours."
+const TEXT_MIX_HINT := "Hint picks a safe arrow in the right colour. Use it when stuck."
+## First levels of each new rule (local numbers, both modes) -> tip text.
+## These show even after the first-run tips have switched off.
+const RULE_TIPS := {
+	101: TEXT_TURNER, 102: TEXT_TURNER_TRAP, 103: TEXT_TURNER_HINT,
+	121: TEXT_COLOR, 122: TEXT_COLOR_CHANGE, 123: TEXT_COLOR_ORDER,
+	141: TEXT_FLIP, 142: TEXT_FLIP_TIMING, 143: TEXT_FLIP_FAST,
+	161: TEXT_MIX, 162: TEXT_MIX_PLAN, 163: TEXT_MIX_HINT,
+}
 
 ## What a pointer means: "clear" = tap this one, "blocked" = this one is stuck.
 const KIND_CLEAR := "clear"
@@ -33,9 +45,8 @@ const KIND_BLOCKED := "blocked"
 ## (-1 otherwise). Returns {} when there is nothing to say.
 static func step_for(level_id: int, board: BoardState, moves_used: int, tips_enabled: bool) -> Dictionary:
 	var local := Difficulty.local_id(level_id)
-	if local >= TURNER_TIP_FIRST and local <= TURNER_TIP_LAST and not board.is_empty():
-		var texts := [TEXT_TURNER, TEXT_TURNER_TRAP, TEXT_TURNER_HINT]
-		return _text_only(texts[local - TURNER_TIP_FIRST], moves_used)
+	if RULE_TIPS.has(local) and not board.is_empty():
+		return _text_only(RULE_TIPS[local], moves_used)
 	if not tips_enabled or level_id < 1 or level_id > LAST_TIP_LEVEL or board.is_empty():
 		return {}
 	match level_id:

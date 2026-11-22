@@ -14,7 +14,7 @@ static func transform(board: BoardState, t: int) -> BoardState:
 	var h := board.height
 	var entries: Array[Array] = []
 	for id in board.arrow_ids():
-		entries.append([id, board.arrow_position(id), board.arrow_direction(id), board.is_turner(id)])
+		entries.append([id, board.arrow_position(id), board.arrow_direction(id), board.is_turner(id), board.is_flipper(id)])
 	if t >= 4:
 		for e in entries:
 			var pos: Vector2i = e[1]
@@ -30,7 +30,7 @@ static func transform(board: BoardState, t: int) -> BoardState:
 		h = swap
 	var out := BoardState.new(w, h)
 	for e in entries:
-		out.add_arrow(e[0], e[1], e[2], e[3])
+		out.add_arrow(e[0], e[1], e[2], e[3], e[4])
 	return out
 
 
@@ -39,7 +39,8 @@ static func layout_key(board: BoardState) -> String:
 	var parts: Array[String] = []
 	for id in board.arrow_ids():
 		var pos := board.arrow_position(id)
-		parts.append("%d,%d,%s%s" % [pos.x, pos.y, board.arrow_direction(id), ",t" if board.is_turner(id) else ""])
+		var kind := ",t" if board.is_turner(id) else (",f" if board.is_flipper(id) else "")
+		parts.append("%d,%d,%s%s" % [pos.x, pos.y, board.arrow_direction(id), kind])
 	parts.sort()
 	return "%dx%d|%s" % [board.width, board.height, ";".join(parts)]
 

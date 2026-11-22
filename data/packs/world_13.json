@@ -1,0 +1,775 @@
+{
+	"levels": [
+		{
+			"arrows": [
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 4
+				}
+			],
+			"colors": 5,
+			"generator_version": 1,
+			"height": 6,
+			"id": 121,
+			"metrics": {
+				"arrows": 8,
+				"bait": 1,
+				"blocked_at_start": 4,
+				"colors": 5,
+				"depth": 3,
+				"free_at_start": 4,
+				"height": 6,
+				"width": 5
+			},
+			"moves_limit": 13,
+			"name": "Narrow Orbit",
+			"seed": 20261165905405,
+			"width": 5
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 5
+				}
+			],
+			"colors": 5,
+			"generator_version": 1,
+			"height": 6,
+			"id": 122,
+			"metrics": {
+				"arrows": 9,
+				"bait": 0,
+				"blocked_at_start": 4,
+				"colors": 5,
+				"depth": 3,
+				"free_at_start": 5,
+				"height": 6,
+				"width": 5
+			},
+			"moves_limit": 15,
+			"name": "Iron Quarry",
+			"seed": 20261165906414,
+			"width": 5
+		},
+		{
+			"arrows": [
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 0
+				}
+			],
+			"colors": 5,
+			"generator_version": 1,
+			"height": 6,
+			"id": 123,
+			"metrics": {
+				"arrows": 9,
+				"bait": 0,
+				"blocked_at_start": 3,
+				"colors": 5,
+				"depth": 3,
+				"free_at_start": 6,
+				"height": 6,
+				"width": 5
+			},
+			"moves_limit": 15,
+			"name": "Crimson Signal",
+			"seed": 20261165907422,
+			"width": 5
+		},
+		{
+			"arrows": [
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 5
+				}
+			],
+			"colors": 6,
+			"generator_version": 1,
+			"height": 6,
+			"id": 124,
+			"metrics": {
+				"arrows": 10,
+				"bait": 0,
+				"blocked_at_start": 6,
+				"colors": 6,
+				"depth": 4,
+				"free_at_start": 4,
+				"height": 6,
+				"width": 5
+			},
+			"moves_limit": 16,
+			"name": "Bright Tower",
+			"seed": 20261165908438,
+			"width": 5
+		},
+		{
+			"arrows": [
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 1
+				}
+			],
+			"colors": 6,
+			"generator_version": 1,
+			"height": 6,
+			"id": 125,
+			"metrics": {
+				"arrows": 11,
+				"bait": 1,
+				"blocked_at_start": 5,
+				"colors": 6,
+				"depth": 4,
+				"free_at_start": 6,
+				"height": 6,
+				"width": 5
+			},
+			"moves_limit": 18,
+			"name": "Winding Window",
+			"seed": 20261165909447,
+			"width": 5
+		},
+		{
+			"arrows": [
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 6
+				}
+			],
+			"colors": 6,
+			"generator_version": 1,
+			"height": 7,
+			"id": 126,
+			"metrics": {
+				"arrows": 11,
+				"bait": 0,
+				"blocked_at_start": 5,
+				"colors": 6,
+				"depth": 4,
+				"free_at_start": 6,
+				"height": 7,
+				"width": 6
+			},
+			"moves_limit": 18,
+			"name": "Tidy Bridge",
+			"seed": 20261165910450,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 4
+				}
+			],
+			"colors": 6,
+			"generator_version": 1,
+			"height": 7,
+			"id": 127,
+			"metrics": {
+				"arrows": 12,
+				"bait": 1,
+				"blocked_at_start": 7,
+				"colors": 6,
+				"depth": 4,
+				"free_at_start": 5,
+				"height": 7,
+				"width": 6
+			},
+			"moves_limit": 20,
+			"name": "Pale Delta",
+			"seed": 20261165911469,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 6
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 6
+				}
+			],
+			"colors": 7,
+			"generator_version": 1,
+			"height": 7,
+			"id": 128,
+			"metrics": {
+				"arrows": 13,
+				"bait": 1,
+				"blocked_at_start": 9,
+				"colors": 7,
+				"depth": 5,
+				"free_at_start": 4,
+				"height": 7,
+				"width": 6
+			},
+			"moves_limit": 21,
+			"name": "Misty Forest",
+			"seed": 20261165912469,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 2
+				}
+			],
+			"colors": 7,
+			"generator_version": 1,
+			"height": 7,
+			"id": 129,
+			"metrics": {
+				"arrows": 13,
+				"bait": 2,
+				"blocked_at_start": 6,
+				"colors": 7,
+				"depth": 5,
+				"free_at_start": 7,
+				"height": 7,
+				"width": 6
+			},
+			"moves_limit": 21,
+			"name": "Hidden Island",
+			"seed": 20261165913484,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 4
+				}
+			],
+			"colors": 7,
+			"generator_version": 1,
+			"height": 7,
+			"id": 130,
+			"metrics": {
+				"arrows": 14,
+				"bait": 2,
+				"blocked_at_start": 10,
+				"colors": 7,
+				"depth": 5,
+				"free_at_start": 4,
+				"height": 7,
+				"width": 6
+			},
+			"moves_limit": 23,
+			"name": "Quiet Gate",
+			"seed": 20261165914494,
+			"width": 6
+		}
+	],
+	"version": 2
+}

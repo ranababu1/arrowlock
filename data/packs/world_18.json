@@ -1,0 +1,1130 @@
+{
+	"levels": [
+		{
+			"arrows": [
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 6
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 5,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"x": 3,
+					"y": 2
+				}
+			],
+			"colors": 6,
+			"generator_version": 1,
+			"height": 7,
+			"id": 171,
+			"metrics": {
+				"arrows": 14,
+				"bait": 3,
+				"blocked_at_start": 11,
+				"colors": 6,
+				"depth": 0,
+				"flippers": 3,
+				"free_at_start": 3,
+				"height": 7,
+				"safe_starts": 4,
+				"timed_flips": 3,
+				"trap_steps": 3,
+				"traps": 3,
+				"turners": 3,
+				"width": 6
+			},
+			"moves_limit": 21,
+			"name": "Zesty Ember",
+			"seed": 20261165955860,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 4,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 5,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 5,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 5
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 5,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 1
+				}
+			],
+			"colors": 6,
+			"generator_version": 1,
+			"height": 7,
+			"id": 172,
+			"metrics": {
+				"arrows": 14,
+				"bait": 3,
+				"blocked_at_start": 12,
+				"colors": 6,
+				"depth": 0,
+				"flippers": 3,
+				"free_at_start": 2,
+				"height": 7,
+				"safe_starts": 4,
+				"timed_flips": 3,
+				"trap_steps": 2,
+				"traps": 3,
+				"turners": 3,
+				"width": 6
+			},
+			"moves_limit": 21,
+			"name": "Velvet Glacier",
+			"seed": 20261165956866,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 5,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 5,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 5,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 5,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 4
+				}
+			],
+			"colors": 6,
+			"generator_version": 1,
+			"height": 7,
+			"id": 173,
+			"metrics": {
+				"arrows": 15,
+				"bait": 4,
+				"blocked_at_start": 14,
+				"colors": 6,
+				"depth": 0,
+				"flippers": 3,
+				"free_at_start": 1,
+				"height": 7,
+				"safe_starts": 2,
+				"timed_flips": 3,
+				"trap_steps": 2,
+				"traps": 3,
+				"turners": 3,
+				"width": 6
+			},
+			"moves_limit": 23,
+			"name": "Silver Drift",
+			"seed": 20261165957874,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 5,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 4,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 1
+				}
+			],
+			"colors": 6,
+			"generator_version": 1,
+			"height": 7,
+			"id": 174,
+			"metrics": {
+				"arrows": 15,
+				"bait": 2,
+				"blocked_at_start": 12,
+				"colors": 6,
+				"depth": 0,
+				"flippers": 3,
+				"free_at_start": 3,
+				"height": 7,
+				"safe_starts": 4,
+				"timed_flips": 3,
+				"trap_steps": 1,
+				"traps": 3,
+				"turners": 3,
+				"width": 6
+			},
+			"moves_limit": 23,
+			"name": "Open Harbor",
+			"seed": 20261165958888,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 1,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 5,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 5,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"x": 5,
+					"y": 3
+				}
+			],
+			"colors": 6,
+			"generator_version": 1,
+			"height": 7,
+			"id": 175,
+			"metrics": {
+				"arrows": 15,
+				"bait": 2,
+				"blocked_at_start": 13,
+				"colors": 6,
+				"depth": 0,
+				"flippers": 3,
+				"free_at_start": 2,
+				"height": 7,
+				"safe_starts": 3,
+				"timed_flips": 3,
+				"trap_steps": 2,
+				"traps": 3,
+				"turners": 3,
+				"width": 6
+			},
+			"moves_limit": 23,
+			"name": "Lunar Orbit",
+			"seed": 20261165959898,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 2,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 5
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 5,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 5,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 5,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 6
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 2,
+					"y": 6
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 2,
+					"y": 3
+				}
+			],
+			"colors": 7,
+			"generator_version": 1,
+			"height": 7,
+			"id": 176,
+			"metrics": {
+				"arrows": 16,
+				"bait": 3,
+				"blocked_at_start": 13,
+				"colors": 7,
+				"depth": 0,
+				"flippers": 4,
+				"free_at_start": 3,
+				"height": 7,
+				"safe_starts": 4,
+				"timed_flips": 4,
+				"trap_steps": 2,
+				"traps": 4,
+				"turners": 4,
+				"width": 6
+			},
+			"moves_limit": 24,
+			"name": "Gentle Quarry",
+			"seed": 20261165960899,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 6
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 5,
+					"y": 5
+				},
+				{
+					"dir": "up",
+					"x": 4,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 4,
+					"y": 5
+				},
+				{
+					"dir": "up",
+					"x": 5,
+					"y": 3
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 1
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 6
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 6
+				}
+			],
+			"colors": 7,
+			"generator_version": 1,
+			"height": 7,
+			"id": 177,
+			"metrics": {
+				"arrows": 16,
+				"bait": 4,
+				"blocked_at_start": 15,
+				"colors": 7,
+				"depth": 0,
+				"flippers": 4,
+				"free_at_start": 1,
+				"height": 7,
+				"safe_starts": 2,
+				"timed_flips": 4,
+				"trap_steps": 2,
+				"traps": 4,
+				"turners": 4,
+				"width": 6
+			},
+			"moves_limit": 24,
+			"name": "Amber Signal",
+			"seed": 20261165961908,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 1,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 0,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 1,
+					"y": 6
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 6
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 3
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 0,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 1,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 0,
+					"y": 2
+				},
+				{
+					"dir": "left",
+					"x": 2,
+					"y": 2
+				}
+			],
+			"colors": 7,
+			"generator_version": 1,
+			"height": 7,
+			"id": 178,
+			"metrics": {
+				"arrows": 16,
+				"bait": 4,
+				"blocked_at_start": 14,
+				"colors": 7,
+				"depth": 0,
+				"flippers": 4,
+				"free_at_start": 2,
+				"height": 7,
+				"safe_starts": 3,
+				"timed_flips": 4,
+				"trap_steps": 2,
+				"traps": 4,
+				"turners": 4,
+				"width": 6
+			},
+			"moves_limit": 24,
+			"name": "Young Tower",
+			"seed": 20261165962923,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 5,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 5,
+					"y": 6
+				},
+				{
+					"dir": "right",
+					"x": 3,
+					"y": 6
+				},
+				{
+					"dir": "up",
+					"x": 3,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"flip": true,
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "down",
+					"x": 4,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 0,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"x": 3,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"turn": true,
+					"x": 3,
+					"y": 3
+				},
+				{
+					"dir": "left",
+					"flip": true,
+					"x": 5,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"x": 5,
+					"y": 2
+				},
+				{
+					"dir": "right",
+					"x": 1,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 1,
+					"y": 5
+				}
+			],
+			"colors": 7,
+			"generator_version": 1,
+			"height": 7,
+			"id": 179,
+			"metrics": {
+				"arrows": 17,
+				"bait": 0,
+				"blocked_at_start": 14,
+				"colors": 7,
+				"depth": 0,
+				"flippers": 4,
+				"free_at_start": 3,
+				"height": 7,
+				"safe_starts": 5,
+				"timed_flips": 4,
+				"trap_steps": 2,
+				"traps": 4,
+				"turners": 4,
+				"width": 6
+			},
+			"moves_limit": 26,
+			"name": "Upper Window",
+			"seed": 20261165963929,
+			"width": 6
+		},
+		{
+			"arrows": [
+				{
+					"dir": "left",
+					"x": 0,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 0
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 2,
+					"y": 0
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 4,
+					"y": 4
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"flip": true,
+					"x": 2,
+					"y": 3
+				},
+				{
+					"dir": "up",
+					"x": 2,
+					"y": 4
+				},
+				{
+					"dir": "left",
+					"x": 5,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"flip": true,
+					"x": 3,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 0,
+					"y": 4
+				},
+				{
+					"dir": "right",
+					"turn": true,
+					"x": 0,
+					"y": 1
+				},
+				{
+					"dir": "up",
+					"x": 0,
+					"y": 5
+				},
+				{
+					"dir": "left",
+					"x": 1,
+					"y": 5
+				},
+				{
+					"dir": "down",
+					"turn": true,
+					"x": 5,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"x": 4,
+					"y": 0
+				},
+				{
+					"dir": "left",
+					"turn": true,
+					"x": 1,
+					"y": 6
+				},
+				{
+					"dir": "down",
+					"x": 1,
+					"y": 2
+				}
+			],
+			"colors": 7,
+			"generator_version": 1,
+			"height": 7,
+			"id": 180,
+			"metrics": {
+				"arrows": 17,
+				"bait": 3,
+				"blocked_at_start": 16,
+				"colors": 7,
+				"depth": 0,
+				"flippers": 4,
+				"free_at_start": 1,
+				"height": 7,
+				"safe_starts": 2,
+				"timed_flips": 4,
+				"trap_steps": 2,
+				"traps": 4,
+				"turners": 4,
+				"width": 6
+			},
+			"moves_limit": 26,
+			"name": "Rapid Bridge",
+			"seed": 20261165964941,
+			"width": 6
+		}
+	],
+	"version": 2
+}

@@ -6,7 +6,9 @@ extends SceneTree
 ##            (tools/world_specs_hard.json -> data/packs_hard)
 ## Levels already frozen in data/levels.lock.json are read from their files
 ## and kept as they are; only the worlds after them are generated and written.
-## Pass --all to regenerate every world (only before a pack is released).
+## Pass --all to regenerate every world (only before a pack is released), or
+## --keep N to also keep levels 1..N from the files (whole worlds) even if
+## they are not frozen yet, so only the worlds after them are generated.
 ## Output is a DRAFT until the owner has played and reviewed each world.
 
 const LOCK_PATH := "res://data/levels.lock.json"
@@ -32,12 +34,17 @@ func _initialize() -> void:
 		printerr("%s is not a JSON object" % SPEC_PATH)
 		quit(1)
 		return
-	var keep: Array = [] if args.has("--all") else _locked_levels()
+	var keep_count := -1
+	var at := args.find("--keep")
+	if at != -1 and at + 1 < args.size():
+		keep_count = int(args[at + 1])
+	var keep: Array = [] if args.has("--all") else _locked_levels(keep_count)
 	if keep.size() % LevelGenerator.LEVELS_PER_WORLD != 0:
 		printerr("Locked levels (%d) do not fill whole worlds" % keep.size())
 		quit(1)
 		return
 	config["keep_levels"] = keep
+	config["verbose"] = true
 	var first_new_world := keep.size() / LevelGenerator.LEVELS_PER_WORLD
 	var result := LevelGenerator.generate_pack(config)
 	var failed: bool = not result["failures"].is_empty()
@@ -73,12 +80,16 @@ func _initialize() -> void:
 	quit(1 if failed else 0)
 
 
-## The pack's frozen levels, read from the files as JSON, in id order.
-func _locked_levels() -> Array:
+## The pack's frozen levels (or the first `keep_count`, when given), read
+## from the files as JSON, in id order.
+func _locked_levels(keep_count: int = -1) -> Array:
 	var lock: Variant = JSON.parse_string(FileAccess.get_file_as_string(LOCK_PATH))
-	if typeof(lock) != TYPE_DICTIONARY or not lock.has(LOCK_KEY):
+	var count := 0
+	if typeof(lock) == TYPE_DICTIONARY and lock.has(LOCK_KEY):
+		count = lock[LOCK_KEY].size()
+	count = maxi(count, keep_count)
+	if count == 0:
 		return []
-	var count: int = lock[LOCK_KEY].size()
 	var all: Array = []
 	var names := Array(DirAccess.get_files_at(OUT_DIR)).filter(func(f: String) -> bool: return f.ends_with(".json"))
 	names.sort()
