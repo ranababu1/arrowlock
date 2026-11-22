@@ -64,6 +64,11 @@ func _ready() -> void:
 func _apply_safe_area() -> void:
 	var screen := Vector2(DisplayServer.screen_get_size())
 	var safe := DisplayServer.get_display_safe_area()
+	# Notches and system bars exist only on phones and tablets. On a desktop with
+	# several monitors the safe area can sit on another monitor, which would push
+	# the content off the window.
+	if not OS.has_feature("mobile") or safe.size.x <= 0 or safe.size.y <= 0:
+		safe = Rect2i(Vector2i.ZERO, Vector2i(screen))
 	var view := get_viewport_rect().size
 	var ratio := Vector2(view.x / maxf(screen.x, 1.0), view.y / maxf(screen.y, 1.0))
 	var left := maxf(MIN_MARGIN, safe.position.x * ratio.x)

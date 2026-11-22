@@ -176,7 +176,8 @@ install_on_device() {
 	xcrun devicectl device install app --device "$udid" "$app" > build/logs/device-install.log 2>&1 \
 		|| { tail -5 build/logs/device-install.log >&2; fail "install failed (log: build/logs/device-install.log)"; }
 	xcrun devicectl device process launch --device "$udid" "$BUNDLE_ID" > build/logs/device-launch.log 2>&1 \
-		|| { tail -5 build/logs/device-launch.log >&2; fail "installed, but it did not open: on the device, trust the developer in Settings > General > VPN & Device Management, then open Arrowlock"; }
+		|| { grep -q "Locked" build/logs/device-launch.log && fail "installed, but the device is locked: unlock it and open Arrowlock"
+			tail -5 build/logs/device-launch.log >&2; fail "installed, but it did not open: on the device, trust the developer in Settings > General > VPN & Device Management, then open Arrowlock"; }
 	echo "Installed and opened on device $udid."
 }
 

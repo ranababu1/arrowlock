@@ -9,7 +9,7 @@ Status (2026-11-13): the code, the export and the build script are in place. No 
 - **No online leaderboard and no sign-in.** Play Games is Android-only. On iOS the Profile screen shows the local name and avatar, stats and badges; the leaderboard card and every mention of Google are hidden (the App Store rejects references to other platforms). Scores are still kept on the phone. A Game Center leaderboard would be a new feature and needs your approval.
 - **Ads are a separate AdMob app.** iOS has its own AdMob app id and ad unit id (§6). Until they are set, the iOS build shows no ads and `--release` refuses to build.
 - **No tracking prompt.** App Tracking Transparency is off, so ads are served without the advertising identifier (lower revenue, no permission dialog). Turning it on is a decision for you (§6).
-- **iPhone only.** The preset targets iPhone; iPads run it in iPhone compatibility mode, and no iPad screenshots are needed.
+- **iPhone and iPad.** The preset targets both (since 2026-11-23), so the game fills the iPad screen, portrait only. App Store Connect therefore asks for iPad screenshots (13-inch) as well as iPhone ones.
 - **Vibration.** iPhones ignore the requested length, so the blocked-tap, win and loss buzzes feel the same.
 - **Version name `0.3.0`** comes from `project.godot`, shared with Android. The iOS build number is separate and starts at 1.
 
@@ -51,7 +51,7 @@ application/bundle_identifier="dev.imrn.arrowlock"
 application/short_version=""
 application/version="1"
 application/min_ios_version="15.0"
-application/targeted_device_family=0
+application/targeted_device_family=2
 application/export_method_release=0
 application/additional_plist_content="<key>ITSAppUsesNonExemptEncryption</key>
 <false/>"
@@ -69,7 +69,7 @@ plugins/AdmobPlugin=true
 | `exclude_filter="build/*"`, `include_filter="*.json"` | Keeps build output out of the game; keeps levels and config in. |
 | `ITSAppUsesNonExemptEncryption` false | The game has no encryption of its own, so App Store Connect does not ask on every upload. |
 | `icons/icon_1024x1024` | The App Store icon (no transparency). Regenerate with `python -I tools/make_icon.py`. |
-| `application/targeted_device_family=0` | iPhone only. |
+| `application/targeted_device_family=2` | iPhone and iPad (0 would be iPhone only: iPads then show a phone-sized window in the middle). |
 
 ## 3. Build and check
 
@@ -84,7 +84,7 @@ Both workflows are in `tools/build_ios.sh`:
 
 **Your own iPhone:** run the first command, open `build/ios/Arrowlock.xcodeproj` in Xcode, choose your iPhone at the top and press Run. The first time, the phone asks you to trust the developer (Settings → General → VPN & Device Management). These builds are stamped to use Google's test ad unit, whatever `data/ads.json` says.
 
-**Testing without the App Store, free Apple ID (done on this Mac 2026-11-23, iPad 9th gen):** a paid membership is not needed to test on your own devices. Xcode → Settings → Accounts → your Apple ID → Personal Team → Manage Certificates → + Apple Development. Put the team ID (the `OU` of that certificate: `security find-certificate -c "Apple Development" -p | openssl x509 -noout -subject`) in the preset, turn on Developer Mode on the device, plug it in and run `tools/build_ios.sh --device`. Free installs stop opening after 7 days; run the command again to renew. If macOS reports "0 valid identities" for the certificate, the keychain lacks Apple's intermediate certificate: install `AppleWWDRCAG3.cer` from apple.com/certificateauthority. The preset targets iPhone, so an iPad shows the game in iPhone mode. Xcode 27 builds only for iOS 15.0 and later, so `application/min_ios_version` is `15.0` (was 14.3).
+**Testing without the App Store, free Apple ID (done on this Mac 2026-11-23, iPad 9th gen):** a paid membership is not needed to test on your own devices. Xcode → Settings → Accounts → your Apple ID → Personal Team → Manage Certificates → + Apple Development. Put the team ID (the `OU` of that certificate: `security find-certificate -c "Apple Development" -p | openssl x509 -noout -subject`) in the preset, turn on Developer Mode on the device, plug it in and run `tools/build_ios.sh --device`. Free installs stop opening after 7 days; run the command again to renew. If macOS reports "0 valid identities" for the certificate, the keychain lacks Apple's intermediate certificate: install `AppleWWDRCAG3.cer` from apple.com/certificateauthority. The game fills the iPad screen. Xcode 27 builds only for iOS 15.0 and later, so `application/min_ios_version` is `15.0` (was 14.3).
 
 **Signing:** Xcode's automatic signing for the Team ID in the preset. Xcode creates the certificate and profile itself (`-allowProvisioningUpdates`). The script reads no certificate, profile or password.
 
