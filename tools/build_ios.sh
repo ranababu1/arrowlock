@@ -6,6 +6,11 @@
 #   tools/build_ios.sh [--bump]
 #   -> build/ios/Arrowlock.xcodeproj
 #
+# Same, then also build, install and open it on a device connected by cable
+# (works with a free Apple ID; such installs stop opening after 7 days, so
+# rerun this to renew):
+#   tools/build_ios.sh --device [--bump]
+#
 # App Store release (REAL ads): archives, signs and exports an .ipa, then
 # verifies it. Nothing is uploaded:
 #   tools/build_ios.sh --release [--bump] [--overwrite]
@@ -42,12 +47,14 @@ release=0
 bump=0
 overwrite=0
 verify=0
+device=0
 while [ $# -gt 0 ]; do
 	case "$1" in
 		--bump) bump=1 ;;
 		--overwrite) overwrite=1 ;;
 		--verify) verify=1 ;;
 		--release) release=1 ;;
+		--device) device=1 ;;
 		*) echo "Unknown option: $1" >&2; exit 2 ;;
 	esac
 	shift
@@ -149,7 +156,32 @@ export_project() {
 	grep -q "GoogleMobileAds" "$PROJECT/project.pbxproj" || fail "Google's ads SDK was not added to the Xcode project (log: build/logs/export-ios.log)"
 }
 
+# Builds the exported project for the first connected iPhone or iPad, installs
+# it and opens it. Signing: Xcode's automatic signing for the preset's Team ID.
+install_on_device() {
+	local team udid app
+	team=$(preset "application/app_store_team_id")
+	[[ "$team" =~ ^[A-Z0-9]{10}$ ]] || fail "application/app_store_team_id is not your Apple Team ID (docs/release-ios.md §3)"
+	check_xcode_version
+	udid=$(xcrun devicectl list devices 2>/dev/null | awk '/ connected / && / physical/ { for (i = 1; i <= NF; i++) if ($i ~ /^[0-9A-F]{8}-[0-9A-F]{16}$/) { print $i; exit } }')
+	[ -n "$udid" ] || fail "no iPhone or iPad connected (plug it in, unlock it, turn on Developer Mode)"
+	echo "Building for device $udid (a few minutes the first time) ..."
+	xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Debug \
+		-destination "id=$udid" -derivedDataPath "$PROJECT_DIR/DerivedData" \
+		-allowProvisioningUpdates -allowProvisioningDeviceRegistration \
+		DEVELOPMENT_TEAM="$team" CODE_SIGN_STYLE=Automatic build > build/logs/xcodebuild-device.log 2>&1 \
+		|| { grep -E "error:" build/logs/xcodebuild-device.log | sort -u | head -20 >&2; fail "device build failed (log: build/logs/xcodebuild-device.log)"; }
+	app="$PROJECT_DIR/DerivedData/Build/Products/Debug-iphoneos/$SCHEME.app"
+	[ -d "$app" ] || fail "no app at $app"
+	xcrun devicectl device install app --device "$udid" "$app" > build/logs/device-install.log 2>&1 \
+		|| { tail -5 build/logs/device-install.log >&2; fail "install failed (log: build/logs/device-install.log)"; }
+	xcrun devicectl device process launch --device "$udid" "$BUNDLE_ID" > build/logs/device-launch.log 2>&1 \
+		|| { tail -5 build/logs/device-launch.log >&2; fail "installed, but it did not open: on the device, trust the developer in Settings > General > VPN & Device Management, then open Arrowlock"; }
+	echo "Installed and opened on device $udid."
+}
+
 if [ $verify -eq 0 ]; then
+	[ $device -eq 0 ] || [ $release -eq 0 ] || fail "--device and --release cannot be combined"
 	check_tools
 	check_common
 	echo "Testing..."
@@ -163,7 +195,11 @@ if [ $release -eq 0 ] && [ $verify -eq 0 ]; then
 	echo "Exporting $PROJECT (test ads) ..."
 	export_project
 	echo "Exported $PROJECT (version $version, build $build, commit $commit, test ads)"
-	echo "Next: open it in Xcode, pick your iPhone and press Run (docs/release-ios.md §3)."
+	if [ $device -eq 0 ]; then
+		echo "Next: open it in Xcode, pick your iPhone and press Run (docs/release-ios.md §3)."
+		exit 0
+	fi
+	install_on_device
 	exit 0
 fi
 

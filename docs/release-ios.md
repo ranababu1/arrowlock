@@ -50,7 +50,7 @@ application/export_project_only=true
 application/bundle_identifier="dev.imrn.arrowlock"
 application/short_version=""
 application/version="1"
-application/min_ios_version="14.3"
+application/min_ios_version="15.0"
 application/targeted_device_family=0
 application/export_method_release=0
 application/additional_plist_content="<key>ITSAppUsesNonExemptEncryption</key>
@@ -78,10 +78,13 @@ Both workflows are in `tools/build_ios.sh`:
 | Command | Output | Ads |
 |---|---|---|
 | `tools/build_ios.sh [--bump]` | `build/ios/Arrowlock.xcodeproj` | Google **test** ads |
+| `tools/build_ios.sh --device [--bump]` | the same, then built, installed and opened on the iPhone or iPad connected by cable | Google **test** ads |
 | `tools/build_ios.sh --release [--bump] [--overwrite]` | `build/arrowlock-<v>-b<n>.xcarchive` and `build/arrowlock-<v>-b<n>.ipa` | **Real** ads |
 | `tools/build_ios.sh --verify` | re-checks an existing archive and .ipa | |
 
 **Your own iPhone:** run the first command, open `build/ios/Arrowlock.xcodeproj` in Xcode, choose your iPhone at the top and press Run. The first time, the phone asks you to trust the developer (Settings → General → VPN & Device Management). These builds are stamped to use Google's test ad unit, whatever `data/ads.json` says.
+
+**Testing without the App Store, free Apple ID (done on this Mac 2026-11-23, iPad 9th gen):** a paid membership is not needed to test on your own devices. Xcode → Settings → Accounts → your Apple ID → Personal Team → Manage Certificates → + Apple Development. Put the team ID (the `OU` of that certificate: `security find-certificate -c "Apple Development" -p | openssl x509 -noout -subject`) in the preset, turn on Developer Mode on the device, plug it in and run `tools/build_ios.sh --device`. Free installs stop opening after 7 days; run the command again to renew. If macOS reports "0 valid identities" for the certificate, the keychain lacks Apple's intermediate certificate: install `AppleWWDRCAG3.cer` from apple.com/certificateauthority. The preset targets iPhone, so an iPad shows the game in iPhone mode. Xcode 27 builds only for iOS 15.0 and later, so `application/min_ios_version` is `15.0` (was 14.3).
 
 **Signing:** Xcode's automatic signing for the Team ID in the preset. Xcode creates the certificate and profile itself (`-allowProvisioningUpdates`). The script reads no certificate, profile or password.
 
