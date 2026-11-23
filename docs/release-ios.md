@@ -8,10 +8,10 @@ Status (2026-11-13): the code, the export and the build script are in place. No 
 
 - **Game Center instead of Play Games** (since 2026-11-23, owner request). The same Easy and Difficult score leaderboards, but on Apple's Game Center; the scores are separate from the Google Play ones. At launch Apple shows its sign-in sheet or a "Welcome back" banner. The Profile screen shows the Game Center name (Game Center gives no picture to the plugin, so the local avatar stays) and never mentions Google. Setup in §8. A build without Game Center (`entitlements/game_center` off) hides the leaderboard card as before.
 - **Ads are a separate AdMob app.** iOS has its own AdMob app id and ad unit id (§6), set on 2026-11-23 (`ca-app-pub-1106747567696734~5954632193`, unit `…/7100192908`).
-- **No tracking prompt.** App Tracking Transparency is off, so ads are served without the advertising identifier (lower revenue, no permission dialog). Turning it on is a decision for you (§6).
+- **Tracking prompt (ATT) on** (2026-11-23, owner request). After the consent step, iOS asks "Allow Arrowlock to track your activity…" with the text "This lets us show you more relevant ads. You can still play if you say no." The ads SDK starts only after the answer; a no still gets ads, just not personalised.
 - **iPhone and iPad.** The preset targets both (since 2026-11-23), so the game fills the iPad screen, portrait only. App Store Connect therefore asks for iPad screenshots (13-inch) as well as iPhone ones.
 - **Vibration.** iPhones ignore the requested length, so the blocked-tap, win and loss buzzes feel the same.
-- **Version name `0.3.0`** comes from `project.godot`, shared with Android. The iOS build number is separate and starts at 1.
+- **Version name `1.0.0`** (since 2026-11-23, for the first App Store release) comes from `project.godot`, shared with Android, so the next Android build is 1.0.0 too. The iOS build number is separate and starts at 1.
 
 ## 1. One-time setup (Owner)
 
@@ -132,7 +132,7 @@ Write the result of each line in the changelog.
    - `data/ads.json`: `"ios_interstitial_unit_id": "<iOS unit id>"`.
 5. The ad rules are the same as on Android (`release.md` §6a).
 
-**Tracking prompt (optional).** With ATT off the game never asks "Allow Arrowlock to track your activity?" and ads are not personalised by device. To turn it on: `ios_export.cfg` `[ATT] att_enabled=true` with an `att_text`, a call to `request_tracking_authorization()` in `scripts/services/ads.gd` before the SDK starts, and "Used to track you" answers in the App Privacy form. Do not create an "IDFA explainer" message in AdMob while ATT is off: it would try to show the system prompt without the text Apple requires.
+**Tracking prompt (on since 2026-11-23).** `ios_export.cfg` `[ATT] att_enabled=true` with the usage text, and `"ios_ask_tracking": true` in `data/ads.json` (a test checks they match). `scripts/services/ads.gd` calls `request_tracking_authorization()` after consent and initialises the SDK only when the answer arrives. In AdMob → Privacy & messaging you may add an "IDFA explainer" message; it is optional. The App Privacy form must say the advertising data is used for tracking (§7).
 
 The plugin adds `NSAllowsArbitraryLoads` to Info.plist, as Google's setup guide asks. If App Review questions it, the answer is "required by the Google Mobile Ads SDK".
 
@@ -141,7 +141,7 @@ The plugin adds `NSAllowsArbitraryLoads` to Info.plist, as Google's setup guide 
 - [ ] Name, subtitle, description, keywords, support URL, category Games → Puzzle.
 - [ ] Screenshots: iPhone 6.9" (1320 x 2868 or 1290 x 2796), at least one. No Android status bars or Google Play wording in them.
 - [ ] **Privacy policy URL** (required). The Android text needs an iOS paragraph: ads by Google AdMob; optional Game Center sign-in for the leaderboard (Apple shares the player's Game Center name and score).
-- [ ] **App Privacy** form: Game Center scores are Apple's own service and need no entry. For AdMob without ATT: Identifiers → Device ID; Usage Data → Advertising data and Product interaction; Location → Coarse location; Diagnostics → Crash and Performance data. Purpose: Third-party advertising (and Analytics where Google's guide says so). Linked to the user: no. Used for tracking: no. Check Google's current "Apple privacy details" page for AdMob, since its list changes.
+- [ ] **App Privacy** form: Game Center scores are Apple's own service and need no entry. For AdMob with ATT on: Identifiers → Device ID; Usage Data → Advertising data and Product interaction; Location → Coarse location; Diagnostics → Crash and Performance data. Purpose: Third-party advertising (and Analytics where Google's guide says so). Linked to the user: no. **Used for tracking: yes** for Device ID and Advertising data (the app asks for ATT). Check Google's current "Apple privacy details" page for AdMob, since its list changes.
 - [ ] Age rating questionnaire: no violence, no user content, no purchases; **contains ads**. Expected 4+.
 - [ ] Pricing: Free. Availability: your choice of countries.
 - [ ] App Review notes: no account is needed; ads appear from level 11.

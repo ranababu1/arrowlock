@@ -4,6 +4,7 @@
 	"use_real_ads": true,
 	"interstitial_unit_id": "ca-app-pub-1106747567696734/1268428091",
 	"ios_interstitial_unit_id": "ca-app-pub-1106747567696734/7100192908",
+	"ios_ask_tracking": true,
 	"first_level": 11,
 	"min_seconds_between": 180,
 	"min_rounds_between": 3

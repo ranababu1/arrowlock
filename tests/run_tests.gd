@@ -73,6 +73,7 @@ func _initialize() -> void:
 	_test_speed_score()
 	_test_ad_policy()
 	_test_ads_service()
+	_test_ads_tracking()
 	_test_ads_after_game()
 	_test_turner_rules()
 	_test_turner_solver()
@@ -2074,6 +2075,7 @@ func _test_ad_policy() -> void:
 		_check(ios_app != str(export_cfg.get_value("Release", "app_id", "")) and ios_unit != Ads.unit_id_for(shipped, false), "the iOS app id and unit id are not copies of Android's")
 		if bool(ios_cfg.get_value("ATT", "att_enabled", false)):
 			_check(str(ios_cfg.get_value("ATT", "att_text", "")).strip_edges() != "", "ATT needs a usage text")
+	_check(bool(ios_cfg.get_value("ATT", "att_enabled", false)) == bool(shipped.get(Ads.IOS_TRACKING_KEY, false)), "the game asks for tracking exactly when the build carries the ATT text")
 	_check(FileAccess.file_exists("res://ios/plugins/AdmobPlugin.gdip"), "the AdMob iOS plugin descriptor is in the project")
 	# The App Store rejects icons that are not 1024x1024 or that have transparency.
 	var ios_icon := Image.load_from_file(ProjectSettings.globalize_path("res://assets/icon/ios_1024.png"))
@@ -2114,6 +2116,8 @@ class FakeAdmob:
 	signal interstitial_ad_failed_to_load(ad: Variant, error: Variant)
 	signal interstitial_ad_dismissed_full_screen_content(ad: Variant)
 	signal interstitial_ad_failed_to_show_full_screen_content(ad: Variant, error: Variant)
+	signal tracking_authorization_granted
+	signal tracking_authorization_denied
 	var calls: Array[String] = []
 	var consent := "NOT_REQUIRED"
 	var form_available := true
@@ -2134,6 +2138,9 @@ class FakeAdmob:
 	func show_consent_form() -> void:
 		calls.append("show_consent_form")
 
+	func request_tracking_authorization() -> void:
+		calls.append("ask_tracking")
+
 	func initialize() -> void:
 		calls.append("initialize")
 
@@ -2146,6 +2153,41 @@ class FakeAdmob:
 	func show_interstitial_ad() -> void:
 		calls.append("show")
 		ad_loaded = false
+
+
+## iOS: tracking permission is asked after consent and before the SDK starts;
+## either answer starts the SDK. Android never asks.
+func _test_ads_tracking() -> void:
+	for answer in ["granted", "denied"]:
+		var fake := FakeAdmob.new()
+		var path := "user://test_ads_att.json"
+		_write_text(path, JSON.stringify({"ios_ask_tracking": true}))
+		var ads := Ads.new()
+		ads.is_ios = true
+		root.add_child(ads)
+		ads.add_child(fake)
+		ads.start(fake, path, "user://no_build_info.json", "user://test_ad_policy_att.json")
+		fake.consent_info_updated.emit()
+		_check(fake.calls.has("ask_tracking") and not fake.calls.has("initialize"), "iOS asks for tracking before the ads SDK starts (%s)" % answer)
+		if answer == "granted":
+			fake.tracking_authorization_granted.emit()
+		else:
+			fake.tracking_authorization_denied.emit()
+		_check(fake.calls.count("initialize") == 1, "the SDK starts after tracking is %s" % answer)
+		fake.tracking_authorization_granted.emit()
+		_check(fake.calls.count("initialize") == 1, "a second answer does not start the SDK twice")
+		ads.queue_free()
+	var android := FakeAdmob.new()
+	var android_ads := Ads.new()
+	android_ads.is_ios = false
+	root.add_child(android_ads)
+	android_ads.add_child(android)
+	android_ads.start(android, "user://test_ads_att.json", "user://no_build_info.json", "user://test_ad_policy_att.json")
+	android.consent_info_updated.emit()
+	_check(not android.calls.has("ask_tracking") and android.calls.has("initialize"), "Android never asks for tracking")
+	android_ads.queue_free()
+	for f in ["user://test_ads_att.json", "user://test_ad_policy_att.json"]:
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(f))
 
 
 func _ads_with(fake: FakeAdmob, config: Dictionary) -> Ads:

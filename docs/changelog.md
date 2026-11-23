@@ -2,6 +2,23 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-23 — iOS release prep: tracking prompt, ad networks, version 1.0.0
+
+Owner's iOS release brief: real AdMob ids (already in), ATT, Google's current SKAdNetwork list, Game Center on, A12 minimum kept, encryption flag, version 1.0.0 build 1, upload to App Store Connect without submitting.
+
+### Added
+- **ATT:** `NSUserTrackingUsageDescription` = "This lets us show you more relevant ads. You can still play if you say no." (`ios_export.cfg` `[ATT]`). `Ads` asks for tracking after the consent step and starts the SDK only after the answer (`"ios_ask_tracking": true` in `data/ads.json`); either answer starts ads, a no without the advertising identifier. Android never asks.
+- 5 tests: the ask comes before the SDK starts, both answers start it once, Android never asks, `ios_ask_tracking` matches the ATT text in the build.
+
+### Changed
+- `addons/AdmobPlugin/model/MediationNetwork.gd` (third-party, local patch): Google's SKAdNetwork list brought to the current 50 ids (developers.google.com/admob/ios/3p-skadnetworks, updated 2026-01-30); `wg4vff78zm` was missing.
+- Version name 0.3.0 → **1.0.0** (`project.godot`, shared with Android). iOS build number 1.
+- `tools/build_ios.sh --device` also finds a device that is paired but shown as "available" (over the network).
+- Unchanged by request: Android AdMob ids, the A12 minimum (`iphone-ipad-minimum-performance-a12`), bundle id `dev.imrn.arrowlock`, `ITSAppUsesNonExemptEncryption` false, Game Center entitlement on.
+
+### Checked
+- 780 tests pass. The exported Info.plist has the tracking text, the real iOS AdMob app id, 50 SKAdNetwork ids, the encryption flag and the A12 requirement. Installed on the owner's iPad (test ads).
+
 ## 2026-11-23 — Levels unlock one at a time
 
 Owner request: players unlock levels by clearing the one before, apart from the first few.

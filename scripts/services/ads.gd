@@ -12,8 +12,12 @@ extends Node
 ## "interstitial_unit_id" is Android's, "ios_interstitial_unit_id" is iOS's.
 ##
 ## Start-up order follows Google's UMP guidance: ask for consent info first,
-## show the consent form when it is required (EEA/UK), and only then initialise
-## the SDK and preload one interstitial. A new one is preloaded after each show.
+## show the consent form when it is required (EEA/UK), then on iOS ask for App
+## Tracking Transparency ("ios_ask_tracking"), and only after the answer
+## initialise the SDK and preload one interstitial, so no ad is requested before
+## the player has answered. A "no" still gets ads, just not personalised by the
+## advertising identifier (the SDK handles that). A new interstitial is
+## preloaded after each show.
 ##
 ## Which games earn an ad is AdPolicy; settings live in data/ads.json.
 
@@ -21,6 +25,9 @@ const SINGLETON := "AdmobPlugin"
 const CONFIG_PATH := "res://data/ads.json"
 const ANDROID_UNIT_KEY := "interstitial_unit_id"
 const IOS_UNIT_KEY := "ios_interstitial_unit_id"
+## Must match [ATT] att_enabled in addons/AdmobPlugin/ios_export.cfg, which puts
+## the prompt text (NSUserTrackingUsageDescription) in Info.plist.
+const IOS_TRACKING_KEY := "ios_ask_tracking"
 ## Wait before retrying a failed load; doubles after each failure up to the max.
 const RETRY_FIRST_SECONDS := 30.0
 const RETRY_MAX_SECONDS := 300.0
@@ -29,6 +36,8 @@ var policy := AdPolicy.new()
 var use_real_ads := false
 ## The real ad unit of the platform this build runs on ("" = none set).
 var interstitial_unit_id := ""
+## True when this build asks for tracking permission before the first ad (iOS).
+var ask_tracking := false
 ## Which unit id is used. Tests replace it.
 var is_ios := OS.has_feature("ios")
 ## Wall-clock Unix time in seconds. Tests replace it.
@@ -37,6 +46,7 @@ var clock: Callable = func() -> float: return Time.get_unix_time_from_system()
 ## The Admob node, or a stand-in with the same signals and methods in tests.
 var _backend: Node
 var _sdk_started := false
+var _waiting_for_tracking := false
 var _sdk_ready := false
 var _loading := false
 var _retry_seconds := RETRY_FIRST_SECONDS
@@ -55,6 +65,7 @@ func start(backend: Node = null, config_path: String = CONFIG_PATH, build_info_p
 	policy.load_state(clock.call())
 	use_real_ads = bool(config.get("use_real_ads", false)) and not BuildInfo.forces_test_ads(build_info_path)
 	interstitial_unit_id = unit_id_for(config, is_ios)
+	ask_tracking = is_ios and bool(config.get(IOS_TRACKING_KEY, false))
 	if not policy.enabled:
 		return
 	if backend == null:
@@ -72,6 +83,9 @@ func start(backend: Node = null, config_path: String = CONFIG_PATH, build_info_p
 	_backend.interstitial_ad_failed_to_load.connect(_on_load_failed)
 	_backend.interstitial_ad_dismissed_full_screen_content.connect(_on_closed)
 	_backend.interstitial_ad_failed_to_show_full_screen_content.connect(_on_closed)
+	if ask_tracking:
+		_backend.tracking_authorization_granted.connect(_on_tracking_answered)
+		_backend.tracking_authorization_denied.connect(_on_tracking_answered)
 	_backend.update_consent_info()
 
 
@@ -168,6 +182,19 @@ func _start_sdk() -> void:
 	if _sdk_started:
 		return
 	_sdk_started = true
+	if ask_tracking:
+		# iOS answers at once when the player was asked before.
+		_waiting_for_tracking = true
+		_backend.request_tracking_authorization()
+	else:
+		_backend.initialize()
+
+
+## Allowed or not, ads go on; without permission they are not personalised.
+func _on_tracking_answered() -> void:
+	if not _waiting_for_tracking:
+		return
+	_waiting_for_tracking = false
 	_backend.initialize()
 
 

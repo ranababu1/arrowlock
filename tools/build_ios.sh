@@ -215,7 +215,7 @@ install_on_device() {
 	team=$(preset "application/app_store_team_id")
 	[[ "$team" =~ ^[A-Z0-9]{10}$ ]] || fail "application/app_store_team_id is not your Apple Team ID (docs/release-ios.md §3)"
 	check_xcode_version
-	udid=$(xcrun devicectl list devices 2>/dev/null | awk '/ connected / && / physical/ { for (i = 1; i <= NF; i++) if ($i ~ /^[0-9A-F]{8}-[0-9A-F]{16}$/) { print $i; exit } }')
+	udid=$(xcrun devicectl list devices 2>/dev/null | awk '(/ connected / || / available /) && / physical/ { for (i = 1; i <= NF; i++) if ($i ~ /^[0-9A-F]{8}-[0-9A-F]{16}$/) { print $i; exit } }')
 	[ -n "$udid" ] || fail "no iPhone or iPad connected (plug it in, unlock it, turn on Developer Mode)"
 	echo "Building for device $udid (a few minutes the first time) ..."
 	xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Debug \
