@@ -2,6 +2,19 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-23 — Levels unlock one at a time
+
+Owner request: players unlock levels by clearing the one before, apart from the first few.
+
+### Changed
+- `Progress.is_level_unlocked`: levels 1–3 of each mode are open (`Economy.OPEN_LEVELS`); every other level opens when the level before it is cleared. A world opens with its first level. Replaces the old rule (a whole world opened after 8 of its previous world's 10 levels were cleared; `Economy.WORLD_UNLOCK_CLEARS` removed).
+- Level select: each tile is locked or open on its own; a locked world says "Clear level N to unlock". Next on the win panel now always goes on to the following level (it used to return to the menu at a locked world), except after the last level of the pack.
+- Existing saves: a cleared level stays open, and so does the level after any cleared level, so players who skipped levels under the old rule keep what they reached; the skipped levels are open to clear.
+- Trade-off: one hard level now blocks progress (the old rule allowed skipping two per world). Hint and +3 moves are the way past.
+
+### Checked
+- 771 tests pass (unlock rule for both modes and old saves, tile states, Next behaviour). Menu screenshot: levels 1–3 open, the rest locked.
+
 ## 2026-11-23 — Real AdMob ads on iOS
 
 Owner created the iOS app and interstitial unit in AdMob (frequency cap one ad per user every 3 minutes, as on Android).

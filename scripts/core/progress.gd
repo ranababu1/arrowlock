@@ -122,12 +122,19 @@ func _world_perfect_count(world: int, tier: int) -> int:
 	return count
 
 
+## A world is open once its first level is.
 func is_world_unlocked(world: int, tier: int = Difficulty.EASY) -> bool:
-	return world <= 0 or world_clears(world - 1, tier) >= Economy.WORLD_UNLOCK_CLEARS
+	return world <= 0 or is_level_unlocked(Difficulty.make_id(tier, world * Economy.LEVELS_PER_WORLD + 1))
 
 
+## The first Economy.OPEN_LEVELS levels of each mode are open; any other level
+## opens when the level before it is cleared. A cleared level stays open (saves
+## from the old 8-of-10 world rule may have clears past the first gap).
 func is_level_unlocked(level_id: int) -> bool:
-	return Difficulty.local_id(level_id) >= 1 and is_world_unlocked(world_of(level_id), Difficulty.of_level(level_id))
+	var local := Difficulty.local_id(level_id)
+	if local < 1:
+		return false
+	return local <= Economy.OPEN_LEVELS or is_cleared(level_id) or is_cleared(level_id - 1)
 
 
 func can_afford(price: int) -> bool:

@@ -296,14 +296,23 @@ func _test_rewards() -> void:
 
 func _test_world_unlock_and_bonus() -> void:
 	var p := Progress.new()
-	_check(p.is_level_unlocked(1) and p.is_level_unlocked(10) and not p.is_level_unlocked(11), "only world 1 unlocked at start")
-	for id in range(1, 8):
+	_check(Economy.OPEN_LEVELS == 3, "three levels are open from the start")
+	_check(p.is_level_unlocked(1) and p.is_level_unlocked(3) and not p.is_level_unlocked(4) and not p.is_level_unlocked(0), "only levels 1-3 are open at start")
+	_check(not p.is_world_unlocked(1) and p.is_world_unlocked(0), "only world 1 is open at start")
+	p.record_result(3, 3, 6, 3, 0)
+	_check(p.is_level_unlocked(4) and not p.is_level_unlocked(5), "clearing a level opens the next one only")
+	for id in range(4, 10):
 		p.record_result(id, 3, 6, 3, 0)
-	_check(not p.is_world_unlocked(1), "7 clears do not unlock the next world")
-	p.record_result(8, 3, 6, 3, 0)
-	_check(p.is_world_unlocked(1) and p.is_level_unlocked(11) and not p.is_world_unlocked(2), "8 of 10 clears unlock the next world")
-	p.record_result(9, 3, 6, 3, 0)
+	_check(not p.is_world_unlocked(1) and not p.is_level_unlocked(11), "the next world stays locked until the level before it is cleared")
+	_check(p.is_level_unlocked(10), "level 10 opens after level 9")
+	p.record_result(1, 3, 6, 3, 0)
+	p.record_result(2, 3, 6, 3, 0)
 	var last := p.record_result(10, 3, 6, 3, 0)
+	_check(p.is_world_unlocked(1) and p.is_level_unlocked(11) and not p.is_level_unlocked(12), "clearing level 10 opens world 2 at level 11")
+	var old_save := Progress.new()
+	for id in [1, 2, 3, 4, 5, 6, 7, 8, 11]:
+		old_save.record_result(id, 3, 6, 3, 0)
+	_check(old_save.is_level_unlocked(9) and not old_save.is_level_unlocked(10) and old_save.is_level_unlocked(11) and old_save.is_level_unlocked(12), "saves from the old world rule keep their cleared levels and the ones after them open")
 	_check(last["world_bonus"] == Economy.WORLD_COMPLETE_BONUS, "completing a world pays the bonus")
 	_check(last["new_badges"].has("clears_10") and last["new_badges"].has("world_perfect"), "10 clears and a perfect world earn badges")
 	var replay := p.record_result(10, 3, 6, 3, 0)
@@ -624,13 +633,13 @@ func _test_level_select_ui() -> void:
 	root.add_child(select)
 	select.setup(repo, progress)
 	_check(select.level_button_count() == PACK_SIZE, "level select lists all %d levels" % PACK_SIZE)
-	_check(select.enabled_level_count() == 10, "only world 1 is playable at the start")
+	_check(select.enabled_level_count() == Economy.OPEN_LEVELS, "only levels 1-3 are playable at the start")
 	var chosen := [-1]
 	select.level_chosen.connect(func(i: int) -> void: chosen[0] = i)
+	select.press_level(2)
+	_check(chosen[0] == 2, "pressing an unlocked level selects it")
 	select.press_level(3)
-	_check(chosen[0] == 3, "pressing an unlocked level selects it")
-	select.press_level(15)
-	_check(chosen[0] == 3, "pressing a locked level does nothing")
+	_check(chosen[0] == 2, "pressing a locked level does nothing")
 
 	# Dragging scrolls the list and swallows the tap at the end of the drag.
 	await process_frame
@@ -682,7 +691,7 @@ func _test_level_select_ui() -> void:
 	var later := LevelSelect.new()
 	root.add_child(later)
 	later.setup(repo, progress)
-	_check(later.enabled_level_count() == 20, "clearing 8 levels opens world 2")
+	_check(later.enabled_level_count() == 9, "clearing levels 1-8 opens level 9 and nothing after it")
 	later.queue_free()
 
 
@@ -787,12 +796,17 @@ func _test_game_screen_ui() -> void:
 	_check(poor.coins == 5 and screen2.board_view.hint_id() == -1, "hint without enough coins does nothing")
 	screen2.queue_free()
 
-	# Next at the edge of a locked world or the end of the pack returns to the menu.
-	for index in [9, 99]:
+	# Clearing a level opens the next one, so Next moves on, even into the next
+	# world; only the end of the pack returns to the menu.
+	for case in [[9, false], [99, false], [9, true]]:
+		var index: int = case[0]
+		var at_end: bool = case[1]
+		# The end of a pack, with a 10-level list ending at level 10.
+		var levels: Array = repo.levels.slice(0, 10) if at_end else repo.levels
 		var fresh := Progress.new()
 		var edge := GameScreen.new()
 		root.add_child(edge)
-		edge.setup(repo.levels, index, fresh, save)
+		edge.setup(levels, index, fresh, save)
 		var menu_calls := [0]
 		var next_calls := [0]
 		edge.menu_requested.connect(func() -> void: menu_calls[0] += 1)
@@ -801,7 +815,10 @@ func _test_game_screen_ui() -> void:
 		for id in PuzzleSolver.solve(edge_board):
 			edge.tap_cell(edge_board.arrow_position(id))
 		edge.press_next()
-		_check(edge.overlay_kind() == "won" and menu_calls[0] == 1 and next_calls[0] == 0, "Next returns to the menu when nothing is unlocked after level %d" % repo.levels[index]["id"])
+		if at_end:
+			_check(edge.overlay_kind() == "won" and menu_calls[0] == 1 and next_calls[0] == 0, "Next returns to the menu after the last level of the pack")
+		else:
+			_check(edge.overlay_kind() == "won" and menu_calls[0] == 0 and next_calls[0] == 1, "Next goes on to level %d after clearing level %d" % [repo.levels[index]["id"] + 1, repo.levels[index]["id"]])
 		edge.queue_free()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_ui_save.json"))
 
@@ -937,14 +954,19 @@ func _test_level_select_design() -> void:
 		tiles.append(select._level_buttons[i])
 	_check(tiles[0].tile_state == LevelTile.State.CLEARED and tiles[1].tile_state == LevelTile.State.CLEARED, "cleared levels are marked cleared")
 	_check(tiles[2].tile_state == LevelTile.State.CURRENT, "the next level is marked current")
-	_check(tiles[3].tile_state == LevelTile.State.OPEN and tiles[10].tile_state == LevelTile.State.LOCKED, "open and locked levels are marked")
-	_check(tiles[10].disabled and not tiles[3].disabled, "locked tiles cannot be pressed")
+	_check(tiles[3].tile_state == LevelTile.State.LOCKED and tiles[10].tile_state == LevelTile.State.LOCKED, "levels after the next one are locked")
+	_check(tiles[3].disabled and not tiles[2].disabled, "locked tiles cannot be pressed")
 	var opened := [-1]
 	select.level_chosen.connect(func(i: int) -> void: opened[0] = i)
 	select.settings_requested.connect(func() -> void: opened[0] = -99)
-	tiles[3].pressed.emit()
-	_check(opened[0] == 3, "pressing a tile opens that level")
+	tiles[2].pressed.emit()
+	_check(opened[0] == 2, "pressing a tile opens that level")
 	select.queue_free()
+	var fresh := LevelSelect.new()
+	root.add_child(fresh)
+	fresh.setup(repo, Progress.new(), 0)
+	_check(fresh._level_buttons[0].tile_state == LevelTile.State.CURRENT and fresh._level_buttons[1].tile_state == LevelTile.State.OPEN and fresh._level_buttons[3].tile_state == LevelTile.State.LOCKED, "open and locked levels are marked")
+	fresh.queue_free()
 
 
 func _test_arrow_shape() -> void:
@@ -1283,11 +1305,11 @@ func _test_difficulty_progress() -> void:
 	_check(p.cleared_count(Difficulty.EASY) == 1 and p.cleared_count(Difficulty.DIFFICULT) == 1, "cleared_count can filter by tier")
 	_check(p.total_stars(Difficulty.DIFFICULT) == 3 and p.total_stars() == 6, "stars can be totalled by tier")
 	_check(p.badges.has("hard_clear"), "the first Difficult clear awards its badge")
-	_check(p.is_level_unlocked(1001) and not p.is_level_unlocked(1011), "Difficult world 2 starts locked")
+	_check(p.is_level_unlocked(1001) and p.is_level_unlocked(1003) and not p.is_level_unlocked(1004) and not p.is_level_unlocked(1011), "Difficult opens levels 1-3 only")
 	for n in range(2, 9):
 		p.record_result(Difficulty.make_id(Difficulty.DIFFICULT, n), 3, 4, 4, 1)
 	_check(p.world_clears(0, Difficulty.DIFFICULT) == 8 and p.world_clears(0, Difficulty.EASY) == 1, "world clears are counted per tier")
-	_check(p.is_level_unlocked(1011) and not p.is_level_unlocked(11), "clearing Difficult world 1 does not unlock Easy world 2")
+	_check(not p.is_level_unlocked(1011) and p.is_level_unlocked(1009), "Difficult also opens one level at a time")
 	for n in range(9, 11):
 		p.record_result(Difficulty.make_id(Difficulty.DIFFICULT, n), 3, 4, 3, 0)
 	var last := p.record_result(1010, 3, 4, 3, 0)
@@ -1316,11 +1338,11 @@ func _test_difficulty_ui() -> void:
 	select.setup(hard, progress, 0)
 	await process_frame
 	_check(select.mode_label.text == "Difficult mode", "the menu names the mode being played")
-	_check(select.level_button_count() == PACK_SIZE and select.enabled_level_count() == 10, "Difficult starts with its first world open")
+	_check(select.level_button_count() == PACK_SIZE and select.enabled_level_count() == Economy.OPEN_LEVELS, "Difficult starts with levels 1-3 open")
 	var picked: Array = []
 	select.level_chosen.connect(func(index: int) -> void: picked.append(index))
-	select.press_level(3)
-	_check(picked == [3], "Difficult levels can be opened")
+	select.press_level(2)
+	_check(picked == [2], "Difficult levels can be opened")
 	select.queue_free()
 
 	var easy_select := LevelSelect.new()

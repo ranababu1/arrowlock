@@ -22,7 +22,9 @@ const PRICE_EXTRA_MOVES := 50
 const EXTRA_MOVES := 3
 
 const LEVELS_PER_WORLD := 10
-const WORLD_UNLOCK_CLEARS := 8
+## Levels open from the start in each mode; every later level opens when the
+## one before it is cleared (owner decision 2026-11-23).
+const OPEN_LEVELS := 3
 
 const MAX_STARS := 3
 

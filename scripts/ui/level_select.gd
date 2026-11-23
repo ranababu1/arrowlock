@@ -238,7 +238,7 @@ func _world_card(world: int, focus_index: int) -> Control:
 	if unlocked:
 		caption.text = "%d / %d cleared   %d / %d stars" % [cleared, last - first, stars, (last - first) * Economy.MAX_STARS]
 	else:
-		caption.text = "Clear %d of %d in World %d to unlock" % [Economy.WORLD_UNLOCK_CLEARS, Economy.LEVELS_PER_WORLD, world]
+		caption.text = "Clear level %d to unlock" % (first)
 	text.add_child(caption)
 	if not unlocked:
 		head.add_child(GlyphView.new("lock", Color(1, 1, 1, 0.45), 28))
@@ -256,7 +256,7 @@ func _world_card(world: int, focus_index: int) -> Control:
 	for index in range(first, last):
 		var level_id: int = _repo.levels[index]["id"]
 		var state := LevelTile.State.LOCKED
-		if unlocked:
+		if _progress.is_level_unlocked(level_id):
 			state = LevelTile.State.OPEN
 			if _progress.is_cleared(level_id):
 				state = LevelTile.State.CLEARED

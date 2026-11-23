@@ -77,7 +77,7 @@ Release 1 has no ads, no purchases and no accounts (`plan.md` section 4), so eve
 | Helper: Undo | 20 coins | Restore the last removed arrow and refund that move |
 | Helper: Hint | 30 coins | Highlight one currently clear arrow |
 | Helper: Extra moves | 50 coins | After game over, continue the same board with +3 moves (once per attempt) |
-| World unlock | Clear 8 of 10 levels in the previous world | Prevents one hard level from blocking the game |
+| Level unlock | Levels 1–3 of each mode are open; every other level opens when the one before it is cleared (owner decision 2026-11-23; was: a world opened after 8 of 10 clears in the previous one) | Players cannot skip ahead; one hard level now blocks progress, so Hint and +3 moves matter more |
 | Milestone badges | First clear, 10/50/100 levels, first world at 3 stars, a level cleared with zero wasted taps | Local badges now; map to Play Games achievements later |
 
 Balance goal to verify in playtesting: a player who clears levels normally can afford about one helper per world without grinding. Prices and payouts are tuning constants kept in one config file, not scattered in code. Coin and star totals are validated on load so a corrupt save cannot produce negative balances.
