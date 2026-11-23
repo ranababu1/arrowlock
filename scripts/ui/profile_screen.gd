@@ -1,13 +1,15 @@
 class_name ProfileScreen
 extends Control
-## The player's profile: who they are (Play Games name and picture when signed
-## in, otherwise a local nickname and a built-in avatar), stats for the mode
-## being played, the online leaderboard and every badge (earned or how to earn
-## it). Presentation only.
+## The player's profile: who they are (the online service's name and picture
+## when signed in, otherwise a local nickname and a built-in avatar), stats for
+## the mode being played, the online leaderboard and every badge (earned or how
+## to earn it). Presentation only.
 ##
-## Play Games exists only in the Android build. Where it is not set up (iOS,
-## desktop) the screen never mentions it: no sign-in button, no leaderboard
-## card. The App Store rejects apps that refer to other platforms.
+## The online service is Google Play Games on Android and Game Center on iOS;
+## the screen names only the one of this build (`PlayGames.service_name`). Where
+## none is set up (desktop, iOS without Game Center) the screen never mentions
+## one: no sign-in button, no leaderboard card. The App Store rejects apps that
+## refer to other platforms.
 
 signal back_requested
 
@@ -143,7 +145,7 @@ func _profile_card() -> Control:
 
 	edit_button = _button("Edit name and avatar", false, _open_editor)
 	box.add_child(edit_button)
-	sign_in_button = _button("Sign in with Play Games", true, func() -> void:
+	sign_in_button = _button("Sign in with %s" % _service_name(), true, func() -> void:
 		if _play_games != null:
 			_play_games.sign_in())
 	box.add_child(sign_in_button)
@@ -192,7 +194,7 @@ func _editor() -> Control:
 	editor_note = Label.new()
 	editor_note.text = "Saved on this phone only."
 	if _has_play_games():
-		editor_note.text += " Sign in with Play Games to use your Play Games name and picture on the leaderboard."
+		editor_note.text += " Sign in with %s to use your %s name on the leaderboard." % [_service_name(), _service_name()]
 	editor_note.theme_type_variation = "Caption"
 	editor_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	editor.add_child(editor_note)
@@ -233,7 +235,7 @@ func _refresh_profile() -> void:
 		name_label.text = gamer if gamer != "" else "Signed in"
 		avatar.picture = _play_games.player_picture
 		avatar.choice = _progress.profile_avatar
-		source_label.text = "Google Play Games profile. Change your name and picture in the Play Games app."
+		source_label.text = _play_games.profile_note
 		edit_button.visible = false
 		sign_in_button.visible = false
 		editor.visible = false
@@ -326,8 +328,8 @@ func _refresh_leaderboard() -> void:
 		leaderboard_button.text = "Leaderboard unavailable"
 		leaderboard_button.disabled = true
 	elif not _play_games.signed_in:
-		leaderboard_caption.text = "Optional. Sign in with Google Play Games to post your score. The game works the same without it."
-		leaderboard_button.text = "Sign in with Play Games"
+		leaderboard_caption.text = "Optional. Sign in with %s to post your score. The game works the same without it.%s" % [_play_games.service_full_name, _play_games.sign_in_hint]
+		leaderboard_button.text = "Sign in with %s" % _service_name()
 		leaderboard_button.disabled = false
 	else:
 		var shown_as := " You appear as %s." % _play_games.player_name if _play_games.player_name != "" else ""
@@ -339,6 +341,10 @@ func _refresh_leaderboard() -> void:
 ## True when this build has Play Games set up, so it may be offered and named.
 func _has_play_games() -> bool:
 	return _play_games != null and _play_games.is_configured()
+
+
+func _service_name() -> String:
+	return _play_games.service_name if _play_games != null else ""
 
 
 func _on_auth_changed(_signed_in: bool) -> void:

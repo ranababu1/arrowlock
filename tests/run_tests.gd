@@ -67,6 +67,7 @@ func _initialize() -> void:
 	_test_leaderboard_sync()
 	_test_play_games_service()
 	_test_profile_screen()
+	await _test_game_center()
 	_test_version_text()
 	_test_economy_balance()
 	_test_speed_score()
@@ -1637,6 +1638,81 @@ func _test_play_games_service() -> void:
 	pg.queue_free()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_pg_save.json"))
 	DirAccess.remove_absolute(ProjectSettings.globalize_path("user://test_play_games.json"))
+
+
+class FakeGameCenterKit:
+	extends RefCounted
+	signal authenticated(ok: bool, error: String)
+	signal score_submitted(ok: bool, leaderboard_id: String, error: String)
+	signal panel_closed(panel: String)
+	signal panel_failed(panel: String, error: String)
+	var calls: Array[String] = []
+	var signed_in := false
+	var display_name := ""
+
+	func authenticate() -> void:
+		calls.append("authenticate")
+
+	func is_authenticated() -> bool:
+		return signed_in
+
+	func player_display_name() -> String:
+		return display_name
+
+	func submit_score(id: String, score: int) -> void:
+		calls.append("submit:%s:%d" % [id, score])
+
+	func show_leaderboard(id: String) -> void:
+		calls.append("show:" + id)
+
+
+## Game Center (iOS) goes through the same service and Profile screen as Play
+## Games, with Apple's names and no Google wording.
+func _test_game_center() -> void:
+	_check(GameCenterBridge.find_kit() == null, "Game Center is never used off iOS")
+	var gc_config: Variant = JSON.parse_string(FileAccess.get_file_as_string(GameCenterBridge.CONFIG_PATH))
+	_check(typeof(gc_config) == TYPE_DICTIONARY and str(gc_config["leaderboards"]["score_easy"]) != "" and str(gc_config["leaderboards"]["score_difficult"]) != "" and str(gc_config["leaderboards"]["score_easy"]) != str(gc_config["leaderboards"]["score_difficult"]), "the shipped Game Center config has two different leaderboard ids")
+	var save := SaveService.new("user://test_gc_save.json")
+	save.progress.record_result(1, 3, 6, 3, 0)
+	var kit := FakeGameCenterKit.new()
+	var gc := _play_games_with(GameCenterBridge.new(kit), save, ["gc.easy", "gc.hard"])
+	_check(gc.service_name == "Game Center" and gc.is_configured(), "with the bridge the service is Game Center")
+	_check(kit.calls == ["authenticate"], "start asks Game Center to sign the player in")
+	var screen := ProfileScreen.new()
+	root.add_child(screen)
+	screen.setup(save.progress, gc, 100, save)
+	_check(screen.leaderboard_card.visible and screen.sign_in_button.text == "Sign in with Game Center" and screen.leaderboard_caption.text.contains("Settings > Game Center"), "signed out: Game Center sign-in is offered, with where to sign in if nothing opens")
+	_check(_reachable_texts(screen, []).all(func(t: String) -> bool: return not _names_google(t)), "with Game Center no text the player can reach names Google, Play or Android")
+	kit.authenticated.emit(false, "cancelled")
+	_check(not gc.signed_in and not kit.calls.any(func(c: String) -> bool: return c.begins_with("submit")), "a cancelled sign-in sends nothing")
+	screen.sign_in_button.pressed.emit()
+	_check(kit.calls.count("authenticate") == 2, "the sign-in button asks Game Center again")
+	kit.signed_in = true
+	kit.display_name = "AppleAce"
+	kit.authenticated.emit(true, "")
+	_check(gc.signed_in and kit.calls.has("submit:gc.easy:300"), "signing in sends the score")
+	await process_frame
+	await process_frame
+	_check(gc.player_name == "AppleAce" and screen.name_label.text == "AppleAce" and gc.player_picture == null, "the Game Center name is shown, with the local avatar")
+	_check(screen.source_label.text.contains("Settings > Game Center") and not screen.edit_button.visible, "the profile says where to change the Game Center name")
+	kit.score_submitted.emit(false, "gc.easy", "network")
+	_check(save.progress.leaderboard_sent.get(Difficulty.EASY, 0) == 0 and gc.sync(Difficulty.EASY), "a failed submit is retried")
+	kit.score_submitted.emit(true, "gc.easy", "")
+	_check(save.progress.leaderboard_sent.get(Difficulty.EASY, 0) == 300, "an accepted submit is recorded")
+	screen.leaderboard_button.pressed.emit()
+	_check(kit.calls.has("show:gc.easy"), "the leaderboard button opens the Game Center leaderboard")
+	kit.panel_failed.emit("leaderboard", "missing metadata")
+	_check(gc.signed_in, "a leaderboard that cannot open changes nothing else")
+	screen.queue_free()
+	gc.queue_free()
+	var returning := FakeGameCenterKit.new()
+	returning.signed_in = true
+	var again := _play_games_with(GameCenterBridge.new(returning), save, ["gc.easy", "gc.hard"])
+	await process_frame
+	_check(again.signed_in and not returning.calls.has("authenticate"), "a player already signed in on the device is not asked again")
+	again.queue_free()
+	for f in ["user://test_gc_save.json", "user://test_play_games.json"]:
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(f))
 
 
 func _test_version_text() -> void:

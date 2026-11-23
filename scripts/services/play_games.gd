@@ -1,15 +1,18 @@
 class_name PlayGames
 extends Node
-## Google Play Games sign-in, the player's Play Games profile (gamer name and
+## Online gaming service: sign-in, the player's profile (gamer name and
 ## picture, for the Profile screen) and the online score leaderboards.
 ##
-## Talks to the Android singleton of the GodotPlayGameServices plugin
-## (addons/GodotPlayGameServices, MIT, v3.4.0). On desktop, in tests, or when a
+## Android: Google Play Games, through the Android singleton of the
+## GodotPlayGameServices plugin (addons/GodotPlayGameServices, MIT, v3.4.0).
+## iOS: Apple Game Center, through `GameCenterBridge`, which gives the
+## GameCenterKit plugin the same calls and signals. On desktop, in tests, or when a
 ## leaderboard id is missing, everything here quietly does nothing, so the game
 ## stays fully playable offline and signed out. Sign-in is optional.
 ##
 ## Leaderboard ids are set in data/play_games.json once the Play Console game
-## services project exists (see docs/release.md).
+## services project exists (see docs/release.md), and for Game Center in
+## data/game_center.json (docs/release-ios.md §8).
 
 signal auth_changed(signed_in: bool)
 ## The signed-in player's name or picture arrived (or changed).
@@ -26,8 +29,17 @@ var leaderboard_ids: Array[String] = ["", ""]
 ## Play Games gamer name of the signed-in player ("" until loaded). This is the
 ## name other players see on the leaderboard.
 var player_name := ""
-## Play Games profile picture, or null until it has been downloaded.
+## Play Games profile picture, or null until it has been downloaded (always
+## null on Game Center).
 var player_picture: Texture2D
+## Names used on screen for the service of this build.
+var service_name := "Play Games"
+var service_full_name := "Google Play Games"
+## Where the player changes the name and picture the service shows.
+var profile_note := "Google Play Games profile. Change your name and picture in the Play Games app."
+## Added after the sign-in offer. Game Center shows its sheet only once per
+## launch, so a second tap may do nothing.
+var sign_in_hint := ""
 
 var _plugin: Object
 var _progress: Progress
@@ -42,6 +54,16 @@ var _picture_path := ""
 func start(progress: Progress, save: SaveService, plugin: Object = null, config_path: String = CONFIG_PATH) -> void:
 	_progress = progress
 	_save = save
+	if plugin == null:
+		var kit := GameCenterBridge.find_kit()
+		if kit != null:
+			plugin = GameCenterBridge.new(kit)
+			config_path = GameCenterBridge.CONFIG_PATH
+	if plugin is GameCenterBridge:
+		service_name = "Game Center"
+		service_full_name = "Game Center"
+		profile_note = "Game Center profile. Change your name in Settings > Game Center."
+		sign_in_hint = " If nothing opens, sign in under Settings > Game Center."
 	_load_config(config_path)
 	if plugin == null and Engine.has_singleton(SINGLETON):
 		plugin = Engine.get_singleton(SINGLETON)
@@ -54,6 +76,7 @@ func start(progress: Progress, save: SaveService, plugin: Object = null, config_
 	_plugin.currentPlayerLoaded.connect(_on_current_player_loaded)
 	_plugin.imageStored.connect(_on_image_stored)
 	# Play Games v2 signs returning players in silently; this asks for the result.
+	# Game Center shows Apple's sign-in sheet or a "Welcome back" banner.
 	_plugin.isAuthenticated()
 
 

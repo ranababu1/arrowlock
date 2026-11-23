@@ -2,6 +2,24 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-23 — iPad testing, iPad screen, Game Center leaderboard on iOS
+
+Owner asked to test on their iPad without the App Store, then for the game to fill the iPad screen, then for a Game Center leaderboard on iOS (Play Games is Android-only).
+
+### Added
+- `tools/build_ios.sh --device`: exports, builds, installs and opens the game on the iPhone or iPad connected by cable. Signs with the owner's paid team `CW68Z23WQ4` (development profile valid 365 days; a free Apple ID would give 7). Installed and run on the owner's iPad (9th gen), Xcode 27.2.
+- iPad: the iOS preset targets iPhone and iPad (`targeted_device_family=2`), so the game fills the screen (portrait). The layout already adapts (checked in screenshots at 3:4). App Store Connect will ask for iPad screenshots.
+- **Game Center** (iOS): `scripts/services/game_center_bridge.gd` gives the GameCenterKit plugin (v1.0.1, MIT, github.com/keremvatandas/godot-ios-gamecenter) the calls and signals of the Play Games plugin, so `PlayGames` and the Profile screen serve both. At launch Apple's sign-in sheet or "Welcome back" banner appears; the score is sent as on Android; the Profile shows the Game Center name (no picture: the plugin has none, the local avatar stays) and wording names only Game Center. Leaderboard ids `arrowlock.score.easy` / `arrowlock.score.difficult` in `data/game_center.json`.
+- The plugin's 124 MB of iOS libraries are not in Git: `tools/build_ios.sh` downloads the release zip and checks its SHA-256 (`addons/gamecenter/` is gitignored). The preset's `entitlements/game_center` switches it on or off (off: the folder gets a `.gdignore`); `--release` requires it on. The script adds `GameKit.framework` to the exported Xcode project and checks the plugin, the framework and the entitlement. `tools/build_android.sh` hides the folder too (no Android library).
+- 16 tests: the bridge with a fake GameCenterKit (sign-in at start, returning player not asked again, cancelled sign-in sends nothing, score sent and retried, name shown, leaderboard opens, failed panel harmless), the shipped config, Game Center never used off iOS, no Google wording with Game Center.
+
+### Changed
+- Minimum iOS 14.3 → 15.0 (the lowest Xcode 27 builds for).
+- Safe-area margins apply only on phones and tablets (a desktop with two monitors pushed the whole UI off the window).
+
+### Checked
+- Game Center build: exports, links and signs with the owner's paid team (the signed app and its profile carry `com.apple.developer.game-center`). Not run on a device with Game Center yet (the iPad was disconnected), and sign-in cannot work until the app and leaderboards exist in App Store Connect (paid membership; steps in `release-ios.md` §8).
+
 ## 2026-11-22 — 16 KB page size check for Android releases
 
 Owner asked whether the Android build supports 16 KB memory pages (required by Google Play for apps targeting Android 15+). Godot 4.7.2 should already build its engine that way, but nothing checked it.

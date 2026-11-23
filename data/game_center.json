@@ -1,0 +1,7 @@
+{
+	"_comment": "Game Center leaderboard ids. Create them with exactly these ids in App Store Connect > Arrowlock > Services > Game Center > Leaderboards (classic, high score, integer). Empty = online leaderboard switched off on iOS. Not secret.",
+	"leaderboards": {
+		"score_easy": "arrowlock.score.easy",
+		"score_difficult": "arrowlock.score.difficult"
+	}
+}

@@ -114,6 +114,12 @@ stamp() { printf '{"build": %s, "commit": "%s", "test_ads": %s}\n' "$code" "$(gi
 original_format=$(preset "gradle_build\/export_format")
 set_format() { sed -i "s/^gradle_build\/export_format=.*/gradle_build\/export_format=$1/" "$PRESETS"; }
 trap 'set_format "$original_format"' EXIT
+# The Game Center plugin (iOS only, fetched by tools/build_ios.sh) has no
+# Android library; hide it from Godot so it is not exported.
+if [ -d addons/gamecenter ] && [ ! -f addons/gamecenter/.gdignore ]; then
+	touch addons/gamecenter/.gdignore
+	godot --headless --path . --import > /dev/null 2>&1 || true
+fi
 export_as() {
 	local format=$1 out=$2 log=$3
 	set_format "$format"

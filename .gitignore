@@ -31,3 +31,6 @@ Thumbs.db
 
 # Stamped by tools/build_android.sh and tools/build_ios.sh
 data/build_info.json
+
+# Game Center plugin (124 MB of iOS libraries): fetched and checked by tools/build_ios.sh
+addons/gamecenter/

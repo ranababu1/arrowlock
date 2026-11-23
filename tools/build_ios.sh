@@ -7,8 +7,8 @@
 #   -> build/ios/Arrowlock.xcodeproj
 #
 # Same, then also build, install and open it on a device connected by cable
-# (works with a free Apple ID; such installs stop opening after 7 days, so
-# rerun this to renew):
+# (installs from the paid team last a year; with a free Apple ID they stop
+# opening after 7 days, so rerun this to renew):
 #   tools/build_ios.sh --device [--bump]
 #
 # App Store release (REAL ads): archives, signs and exports an .ipa, then
@@ -42,6 +42,11 @@ IOS_CFG=addons/AdmobPlugin/ios_export.cfg
 # Godot 4.7 iOS templates use iOS 26 SDK symbols, and the App Store accepts only
 # builds made with Xcode 26 or later.
 MIN_XCODE_MAJOR=26
+# Game Center plugin (GameCenterKit, MIT). Its iOS libraries are 124 MB, so it
+# is not in Git: this exact release is downloaded and checked on first use.
+GC_DIR=addons/gamecenter
+GC_URL="https://github.com/keremvatandas/godot-ios-gamecenter/releases/download/v1.0.1/gamecenter-addon.zip"
+GC_SHA256="b27db4e3192d6fa07ec33b6af8d109d6ee4dab5a0b4b0895d23dd5f26e50b92f"
 
 release=0
 bump=0
@@ -109,6 +114,7 @@ check_common() {
 	[ -f ios/plugins/AdmobPlugin.gdip ] || fail "ios/plugins/AdmobPlugin.gdip is missing"
 }
 check_release_config() {
+	[ "$(preset "entitlements/game_center")" = "true" ] || fail "entitlements/game_center is not true: the App Store build would have no leaderboard (docs/release-ios.md §8)"
 	team=$(preset "application/app_store_team_id")
 	[[ "$team" =~ ^[A-Z0-9]{10}$ && "$team" != "0000000000" ]] || fail "application/app_store_team_id is not your Apple Team ID (10 letters and digits)"
 	grep -q "ITSAppUsesNonExemptEncryption" "$PRESETS" || fail "application/additional_plist_content lacks ITSAppUsesNonExemptEncryption"
@@ -141,9 +147,45 @@ stamp() { printf '{"build": %s, "commit": "%s", "test_ads": %s}\n' "$build" "$(g
 
 # Exports the Xcode project. Godot scans everything under res://, so build/ is
 # marked as not part of the game, otherwise old build output ends up in the app.
+# Game Center is in the app only when the preset's entitlements/game_center is
+# true. Otherwise the plugin folder is hidden from Godot (.gdignore), so it is
+# not exported either.
+game_center_on() { [ "$(preset "entitlements/game_center")" = "true" ]; }
+prepare_game_center() {
+	if ! game_center_on; then
+		[ ! -d "$GC_DIR" ] || touch "$GC_DIR/.gdignore"
+		return
+	fi
+	if [ ! -f "$GC_DIR/gamecenter.gdextension" ] || [ ! -d "$GC_DIR/bin/libgamecenter.ios.xcframework" ]; then
+		echo "Downloading the Game Center plugin ..."
+		mkdir -p build
+		curl -sSfL -o build/gamecenter-addon.zip "$GC_URL" || fail "could not download $GC_URL"
+		[ "$(shasum -a 256 build/gamecenter-addon.zip | cut -d' ' -f1)" = "$GC_SHA256" ] || fail "the Game Center plugin download does not match its SHA-256"
+		unzip -o -q build/gamecenter-addon.zip -d . || fail "could not unpack the Game Center plugin"
+	fi
+	rm -f "$GC_DIR/.gdignore"
+	# Let Godot register (or forget) the extension before exporting.
+	godot --headless --path . --import > build/logs/import.log 2>&1 || true
+}
+# The plugin's GameKit calls need Apple's GameKit framework. Its own editor
+# plugin would add it, but that plugin cannot be switched on in project.godot
+# (the folder does not exist on machines that only build for Android).
+link_game_kit() {
+	ruby - "$PROJECT" <<'RUBY' || fail "could not add GameKit.framework to the Xcode project"
+require "xcodeproj"
+project = Xcodeproj::Project.open(ARGV[0])
+target = project.targets.find { |t| t.name == "Arrowlock" } or abort "no Arrowlock target"
+unless target.frameworks_build_phase.files_references.any? { |r| r && r.path.to_s.end_with?("GameKit.framework") }
+  target.add_system_framework("GameKit")
+  project.save
+end
+RUBY
+}
+
 export_project() {
 	mkdir -p build/logs
 	touch build/.gdignore
+	prepare_game_center
 	rm -rf "$PROJECT_DIR"
 	mkdir -p "$PROJECT_DIR"
 	godot --headless --path . --export-release iOS "$PROJECT" > build/logs/export-ios.log 2>&1 || true
@@ -154,6 +196,16 @@ export_project() {
 	[ -d "$PROJECT" ] || fail "the export produced no Xcode project (log: build/logs/export-ios.log)"
 	grep -q "AdmobPlugin.xcframework" "$PROJECT/project.pbxproj" || fail "the ads plugin is not in the Xcode project"
 	grep -q "GoogleMobileAds" "$PROJECT/project.pbxproj" || fail "Google's ads SDK was not added to the Xcode project (log: build/logs/export-ios.log)"
+	if game_center_on; then
+		grep -q "libgamecenter.ios.xcframework" "$PROJECT/project.pbxproj" || fail "the Game Center plugin is not in the Xcode project"
+		link_game_kit
+		grep -q "GameKit.framework" "$PROJECT/project.pbxproj" || fail "GameKit.framework is not linked"
+		grep -q "com.apple.developer.game-center" "$PROJECT_DIR/$SCHEME/$SCHEME.entitlements" || fail "the Game Center entitlement is missing"
+		echo "Game Center: on"
+	else
+		! grep -q "libgamecenter" "$PROJECT/project.pbxproj" || fail "Game Center is off, but its plugin was exported"
+		echo "Game Center: off (entitlements/game_center in $PRESETS)"
+	fi
 }
 
 # Builds the exported project for the first connected iPhone or iPad, installs
@@ -221,8 +273,13 @@ else
 
 	echo "Archiving (this takes a few minutes) ..."
 	rm -rf "$archive"
+	# Godot's Release configuration asks for "Apple Distribution" together with
+	# automatic signing, which Xcode 27 refuses ("conflicting provisioning
+	# settings"). Archive with the development identity; the .ipa export below
+	# re-signs it with an Apple Distribution certificate for App Store Connect.
 	xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Release \
 		-destination "generic/platform=iOS" -archivePath "$archive" \
+		CODE_SIGN_IDENTITY="Apple Development" \
 		-allowProvisioningUpdates archive > build/logs/xcodebuild-archive.log 2>&1 \
 		|| { grep -E "error:" build/logs/xcodebuild-archive.log | sort -u | head -20 >&2; fail "archive failed (log: build/logs/xcodebuild-archive.log)"; }
 
