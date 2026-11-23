@@ -348,7 +348,9 @@ unpacked=$(mktemp -d)
 trap 'rm -rf "$unpacked"' EXIT
 unzip -q "$ipa" -d "$unpacked"
 verify_app "$unpacked/Payload/$SCHEME.app" ".ipa"
-codesign -dv --verbose=2 "$unpacked/Payload/$SCHEME.app" 2>&1 | grep -q "^Authority=Apple Distribution" \
+# Captured first: with pipefail, grep -q closing the pipe early fails the pipeline.
+ipa_signing=$(codesign -dv --verbose=2 "$unpacked/Payload/$SCHEME.app" 2>&1)
+grep -q "^Authority=Apple Distribution" <<< "$ipa_signing" \
 	|| fail ".ipa is not signed with an Apple Distribution certificate"
 
 if [ $verify -eq 1 ]; then commit="not rebuilt"; fi

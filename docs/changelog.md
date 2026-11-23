@@ -19,6 +19,12 @@ Owner's iOS release brief: real AdMob ids (already in), ATT, Google's current SK
 ### Checked
 - 780 tests pass. The exported Info.plist has the tracking text, the real iOS AdMob app id, 50 SKAdNetwork ids, the encryption flag and the A12 requirement. Installed on the owner's iPad (test ads).
 
+### Release build and upload (2026-11-23)
+- `tools/build_ios.sh --release`: tests pass; archive `build/arrowlock-1.0.0-b1.xcarchive` (Apple Development); `build/arrowlock-1.0.0-b1.ipa`, 36,628,207 bytes, SHA-256 `063e22bcd04fe848d77450a93995bb03764760d333f1810e589ab1921d0dd82c`, signed by the Apple Distribution certificate Xcode created for team CW68Z23WQ4; real ads; commit 2108c53.
+- Fixed in the script: the distribution-certificate check piped `codesign` into `grep -q`, which fails under `pipefail` even when the certificate is right.
+- Uploaded with `xcodebuild -exportArchive` (destination upload, version and build number not changed by Xcode): **1.0.0 (1) uploaded to App Store Connect**, "Upload succeeded", package processing. Not submitted for review. Warnings only: no dSYMs for GoogleMobileAds and UserMessagingPlatform (Google ships those frameworks without symbols; crash reports inside them are not symbolicated). Processing status could not be read from here (no App Store Connect API key).
+- Note: App Store Connect's version record is "1.0" while the build says 1.0.0; if App Store Connect does not offer the build for version 1.0, rename the version record to 1.0.0.
+
 ## 2026-11-23 — Levels unlock one at a time
 
 Owner request: players unlock levels by clearing the one before, apart from the first few.
