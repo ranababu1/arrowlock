@@ -2,6 +2,18 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-23 — Real AdMob ads on iOS
+
+Owner created the iOS app and interstitial unit in AdMob (frequency cap one ad per user every 3 minutes, as on Android).
+
+### Changed
+- `addons/AdmobPlugin/ios_export.cfg`: `is_real=true`, `[Release] app_id="ca-app-pub-1106747567696734~5954632193"`.
+- `data/ads.json`: `ios_interstitial_unit_id` = `ca-app-pub-1106747567696734/7100192908`. Ids are public by design.
+- The game's own ad rules are unchanged and the same on both platforms: no ads before level 11, only when leaving a result panel, at most every 3 rounds and 180 s. The AdMob cap is a second limit on Google's side.
+
+### Checked
+- 764 tests pass (the real-id checks for iOS now run). An iOS export carries the real app id as `GADApplicationIdentifier` and Google's SKAdNetwork list (49 entries); no tracking text (ATT off). Device builds from `tools/build_ios.sh --device` still use Google's test unit; only `--release` uses the real one.
+
 ## 2026-11-23 — iPad testing, iPad screen, Game Center leaderboard on iOS
 
 Owner asked to test on their iPad without the App Store, then for the game to fill the iPad screen, then for a Game Center leaderboard on iOS (Play Games is Android-only).

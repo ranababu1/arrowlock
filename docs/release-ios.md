@@ -7,7 +7,7 @@ Status (2026-11-13): the code, the export and the build script are in place. No 
 ## What is different from Android
 
 - **Game Center instead of Play Games** (since 2026-11-23, owner request). The same Easy and Difficult score leaderboards, but on Apple's Game Center; the scores are separate from the Google Play ones. At launch Apple shows its sign-in sheet or a "Welcome back" banner. The Profile screen shows the Game Center name (Game Center gives no picture to the plugin, so the local avatar stays) and never mentions Google. Setup in §8. A build without Game Center (`entitlements/game_center` off) hides the leaderboard card as before.
-- **Ads are a separate AdMob app.** iOS has its own AdMob app id and ad unit id (§6). Until they are set, the iOS build shows no ads and `--release` refuses to build.
+- **Ads are a separate AdMob app.** iOS has its own AdMob app id and ad unit id (§6), set on 2026-11-23 (`ca-app-pub-1106747567696734~5954632193`, unit `…/7100192908`).
 - **No tracking prompt.** App Tracking Transparency is off, so ads are served without the advertising identifier (lower revenue, no permission dialog). Turning it on is a decision for you (§6).
 - **iPhone and iPad.** The preset targets both (since 2026-11-23), so the game fills the iPad screen, portrait only. App Store Connect therefore asks for iPad screenshots (13-inch) as well as iPhone ones.
 - **Vibration.** iPhones ignore the requested length, so the blocked-tap, win and loss buzzes feel the same.
