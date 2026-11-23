@@ -9,8 +9,8 @@
 | Godot project scaffold | Implemented; loads and starts headless |
 | Rules engine, solvers, move limits | Implemented; tests pass. Undo takes back exactly one tap (wasted or not) and refunds it; empty-cell taps are free; a level is lost only at 0 moves (owner decision, even if already unwinnable) |
 | Level select, game screen, win/game-over panels, hint/undo/extra moves | Implemented; verified on the emulator on 2026-11-01 (before today's changes) |
-| Turning arrows (levels 101–120) | Implemented and tested 2026-11-22: rule, search solver, safe hint with "No way out" note, generator with trap targets, ring and turn animation, tips on 101–103. 20 new levels per pack, **not frozen**, not played by anyone, not run on a device |
-| Colour order, flipping arrows, mixed (levels 121–200) | Implemented and tested 2026-11-22: fair random recolouring after every tap, colour strip, wrong colour costs a move; flips every 0.8 s / 0.6 s with a 0.1 s grace; generator and tips. 80 new levels per pack, **not frozen**, not played, not run on a device. Seen once in a desktop screenshot |
+| Turning arrows (levels 101–120) | Implemented and tested 2026-11-22: rule, search solver, safe hint with "No way out" note, generator with trap targets, ring and turn animation, tips on 101–103. 20 new levels per pack, frozen 2026-11-23, not played by anyone, not run on a device |
+| Colour order, flipping arrows, mixed (levels 121–200) | Implemented and tested 2026-11-22: fair random recolouring after every tap, colour strip, wrong colour costs a move; flips every 0.8 s / 0.6 s with a 0.1 s grace; generator and tips. 80 new levels per pack, frozen 2026-11-23, not played, not run on a device. Seen once in a desktop screenshot |
 | Content | Easy and Difficult packs, 100 levels each, regenerated 2026-11-05 to get harder level by level (no breathers, no reused layouts) and **frozen** in `data/levels.lock.json`. Not reviewed by the owner (owner chose not to review now) |
 | Level tooling | Generator with depth ranges per world, rising-depth floor and a switch to forbid reuse; validator; `tools/generate_levels.gd`, `tools/freeze_levels.gd` |
 | Save v2 + rewards | Implemented and tested: stars, coins, level-by-level unlock (levels 1–3 open, each later level after the one before; since 2026-11-23), badges, v1 migration, vibration setting, leaderboard state. Older 0.1.0 saves load unchanged (defaults fill the new fields) |
@@ -63,7 +63,7 @@ Verified 2026-11-05 in a Linux container with the official Godot 4.7.2 build:
 - A level is lost only at 0 moves even if already unwinnable (by design).
 - Emulator `adb` is flaky; `DirAccess.rename_absolute` overwrite on Windows and save atomicity are unverified.
 - Levels are frozen: changing a released level breaks the tests on purpose. Add new levels only after level 100.
-- Levels 101–120 are not frozen yet; regenerating Difficult takes about 30 minutes. In Difficult, traps dip inside World 12 (for example, level 118 has 4 after 7).
+- Levels 1–200 are frozen; regenerating Difficult takes about 30 minutes. In Difficult, traps dip inside World 12 (for example, level 118 has 4 after 7).
 
 ## Next steps
 iOS (owner, `docs/release-ios.md`): Apple Developer Program and Team ID; Xcode 26; Team ID in the export preset; run on an iPhone; `tools/build_ios.sh --release`; TestFlight; listing, privacy policy and App Privacy form.

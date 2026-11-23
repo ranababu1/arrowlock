@@ -1499,7 +1499,7 @@ func _test_levels_frozen() -> void:
 		for i in frozen.size():
 			if i >= levels.size() or LevelFingerprint.of(levels[i]) != frozen[i]:
 				changed.append(i + 1)
-		_check(frozen.size() == 100 and changed.is_empty(), "%s: all %d locked levels are unchanged (changed: %s)" % [key, frozen.size(), changed])
+		_check(frozen.size() == 200 and changed.is_empty(), "%s: all %d locked levels are unchanged (changed: %s)" % [key, frozen.size(), changed])
 	var level: Dictionary = _pack_levels("res://data/packs")[0]
 	var moved := level.duplicate()
 	moved["moves_limit"] = int(level["moves_limit"]) + 1

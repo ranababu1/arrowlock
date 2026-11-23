@@ -2,6 +2,17 @@
 
 Reverse chronological. See `instructions.md` §8 for entry requirements.
 
+## 2026-11-23 — Levels 101–200 frozen; Android update prepared
+
+Owner: the Play Store version has 100 levels per mode; the 200-level version was deployed first on Apple and now goes to Play as an update.
+
+### Changed
+- `data/levels.lock.json`: all 200 levels per pack frozen (first 100 fingerprints identical to before). The levels are the ones in the uploaded iOS build (commit `2108c53`). The freeze test now expects 200.
+
+### Checked (Windows, Godot 4.7.2)
+- 780 tests pass. `tools/build_android.sh` built `arrowlock-1.0.0-b38-arm64-v8a.apk` (internal key, test ads); it passes the 16 KB page check.
+- **Not done:** signed release AAB, any run on an Android device, upload to Play.
+
 ## 2026-11-23 — iOS release prep: tracking prompt, ad networks, version 1.0.0
 
 Owner's iOS release brief: real AdMob ids (already in), ATT, Google's current SKAdNetwork list, Game Center on, A12 minimum kept, encryption flag, version 1.0.0 build 1, upload to App Store Connect without submitting.
